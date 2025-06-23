@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>In đơn thuốc</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2, h4 {
+            margin: 4px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+        }
+        @media print {
+            @page {
+                margin: 2cm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h2 id="prescription-id"></h2>
+<h4 id="prescription-date"></h4>
+<h4 id="patient-name"></h4>
+<h4 id="doctor-name"></h4>
+
+<table>
+    <thead>
+    <tr>
+        <th>STT</th>
+        <th>Tên</th>
+        <th>Thể loại</th>
+        <th>Giá</th>
+        <th>Số lượng</th>
+    </tr>
+    </thead>
+    <tbody id="medicine-table">
+    </tbody>
+</table>
+
+<script>
+    const data = JSON.parse(localStorage.getItem("printPrescription"));
+    if (!data) {
+        document.body.innerHTML = "<p style='color:red;'>Không có dữ liệu để in!</p>";
+    } else {
+        document.getElementById("prescription-id").textContent = `Đơn thuốc #${data.data.id}`;
+        document.getElementById("prescription-date").textContent = `Ngày kê: ${data.data.prescriptionDate}`;
+        document.getElementById("patient-name").textContent = `Bệnh nhân: ${data.data.medicineRecord.patient.fullName}`;
+        document.getElementById("doctor-name").textContent = `Bác sĩ: ${data.data.doctor.fullName}`;
+
+        const tbody = document.getElementById("medicine-table");
+        data.items.forEach((item, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${item.name}</td>
+          <td>${item.category.name}</td>
+          <td>${parseInt(item.price).toLocaleString()}₫</td>
+          <td>${item.quantity}</td>
+        `;
+            tbody.appendChild(row);
+        });
+
+        setTimeout(() => {
+            window.print();
+        }, 300);
+    }
+</script>
+
+</body>
+</html>

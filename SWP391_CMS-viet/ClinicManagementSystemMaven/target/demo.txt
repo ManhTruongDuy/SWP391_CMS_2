@@ -1,0 +1,7 @@
+Customer paying for service:
+- Customer pressed the "Pay now" button at the payment page.
+- System redirects customer to "Invoice page", shows detailed invoice and different payment methods.
+- Customer choose to pay via QR code.
+- System shows user a QR code to scan.
+- Customer scans QR code and finish paying on their banking app.
+- System sends the corressponding confirmation message on the web app and email.
