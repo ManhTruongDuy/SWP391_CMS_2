@@ -256,18 +256,29 @@
                     alert('Chưa có thuốc nào được chọn!');
                     return;
                 }
-
+                if (!prescriptionOrderDetail) {
+                    alert('Không có thông tin đơn thuốc!');
+                    return;
+                }
                 const urlParams = new URLSearchParams(window.location.search);
                 const prescriptionId = urlParams.get('id');
-
+                if (!prescriptionId) {
+                    alert('Không tìm thấy mã đơn thuốc!');
+                    return;
+                }
                 const orderData = {
                     prescriptionId: prescriptionId,
                     items: prescriptionOrder
                 };
                 const exportData = {
-                    data :prescriptionOrderDetail,
-                    items :prescriptionOrder
-                }
+                    data: prescriptionOrderDetail,
+                    items: prescriptionOrder
+                };
+                // Tính tổng tiền
+                let totalAmount = 0;
+                prescriptionOrder.forEach(item => {
+                    totalAmount += item.price * item.quantity;
+                });
                 fetch(`${baseUrl}/api/medicineCounter`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -280,17 +291,16 @@
                     .then(data => {
                         alert('Đã lưu đơn thuốc thành công!');
                         localStorage.setItem('printPrescription', JSON.stringify(exportData));
-                        window.open('print-prescription.html', '_blank');
-                        prescriptionOrder.length = 0;
-                        renderPrescriptionOrder();
+                        console.log('Chuyển sang trang payment.html');
+                        window.location.href = `payment.html?amount=${encodeURIComponent(totalAmount)}&id=${encodeURIComponent(prescriptionId)}`;
+                        // prescriptionOrder.length = 0;
+                        // renderPrescriptionOrder();
                     })
                     .catch(err => {
                         console.error(err);
-                        alert('Gửi đơn thuốc thất bại');
+                        alert('Gửi đơn thuốc thất bại: ' + err.message);
                     });
             });
-
-
         }
     }
 
