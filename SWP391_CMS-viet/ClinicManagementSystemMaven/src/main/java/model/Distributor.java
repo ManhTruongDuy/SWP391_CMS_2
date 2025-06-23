@@ -1,51 +1,61 @@
 package model;
 
 public class Distributor {
-    private int idDistributor;
-    private String distributorName;
-    private String address;
-    private String phone;
+    private int DistributorID;
+    private String DistributorName;
+    private String Address;
+    private String DistributorEmail;
+    private String DistributorPhone;
 
     public Distributor() {
     }
 
-    public Distributor(int idDistributor, String distributorName, String address, String phone) {
-        this.idDistributor = idDistributor;
-        this.distributorName = distributorName;
-        this.address = address;
-        this.phone = phone;
+    public Distributor(int distributorID, String distributorName, String address, String distributorEmail, String distributorPhone) {
+        DistributorID = distributorID;
+        DistributorName = distributorName;
+        Address = address;
+        DistributorEmail = distributorEmail;
+        DistributorPhone = distributorPhone;
     }
 
-    public int getIdDistributor() {
-        return idDistributor;
+    public int getDistributorID() {
+        return DistributorID;
     }
 
-    public void setIdDistributor(int idDistributor) {
-        this.idDistributor = idDistributor;
+    public void setDistributorID(int distributorID) {
+        DistributorID = distributorID;
     }
 
     public String getDistributorName() {
-        return distributorName;
+        return DistributorName;
     }
 
     public void setDistributorName(String distributorName) {
-        this.distributorName = distributorName;
+        DistributorName = distributorName;
     }
 
     public String getAddress() {
-        return address;
+        return Address;
     }
 
     public void setAddress(String address) {
-        this.address = address;
+        Address = address;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getDistributorEmail() {
+        return DistributorEmail;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setDistributorEmail(String distributorEmail) {
+        DistributorEmail = distributorEmail;
+    }
+
+    public String getDistributorPhone() {
+        return DistributorPhone;
+    }
+
+    public void setDistributorPhone(String distributorPhone) {
+        DistributorPhone = distributorPhone;
     }
 }
 

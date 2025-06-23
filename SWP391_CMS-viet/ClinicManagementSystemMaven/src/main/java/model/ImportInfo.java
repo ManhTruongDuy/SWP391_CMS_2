@@ -3,71 +3,60 @@ package model;
 import java.time.LocalDate;
 
 public class ImportInfo {
-    private int idImportInfo;
-    private int medicineId;
-    private LocalDate importDate;
-    private float quantity;
-    private float importPrice;
-    private int distributorId;
+    private int ImportID;
+    private int DistributorID;
+    private int medicine_id;
+    private LocalDate ImportDate;
+    private float ImportAmount;
 
     public ImportInfo() {
     }
 
-    public ImportInfo(int idImportInfo, int medicineId, LocalDate importDate, float quantity, float importPrice, int distributorId) {
-        this.idImportInfo = idImportInfo;
-        this.medicineId = medicineId;
-        this.importDate = importDate;
-        this.quantity = quantity;
-        this.importPrice = importPrice;
-        this.distributorId = distributorId;
+    public ImportInfo(int importID, int distributorID, int medicine_id, LocalDate importDate, float importAmount) {
+        ImportID = importID;
+        DistributorID = distributorID;
+        this.medicine_id = medicine_id;
+        ImportDate = importDate;
+        ImportAmount = importAmount;
     }
 
-    public int getIdImportInfo() {
-        return idImportInfo;
+    public int getImportID() {
+        return ImportID;
     }
 
-    public void setIdImportInfo(int idImportInfo) {
-        this.idImportInfo = idImportInfo;
+    public void setImportID(int importID) {
+        ImportID = importID;
     }
 
-    public int getMedicineId() {
-        return medicineId;
+    public int getDistributorID() {
+        return DistributorID;
     }
 
-    public void setMedicineId(int medicineId) {
-        this.medicineId = medicineId;
+    public void setDistributorID(int distributorID) {
+        DistributorID = distributorID;
+    }
+
+    public int getMedicine_id() {
+        return medicine_id;
+    }
+
+    public void setMedicine_id(int medicine_id) {
+        this.medicine_id = medicine_id;
     }
 
     public LocalDate getImportDate() {
-        return importDate;
+        return ImportDate;
     }
 
     public void setImportDate(LocalDate importDate) {
-        this.importDate = importDate;
+        ImportDate = importDate;
     }
 
-    public float getQuantity() {
-        return quantity;
+    public float getImportAmount() {
+        return ImportAmount;
     }
 
-    public void setQuantity(float quantity) {
-        this.quantity = quantity;
-    }
-
-    public float getImportPrice() {
-        return importPrice;
-    }
-
-    public void setImportPrice(float importPrice) {
-        this.importPrice = importPrice;
-    }
-
-    public int getDistributorId() {
-        return distributorId;
-    }
-
-    public void setDistributorId(int distributorId) {
-        this.distributorId = distributorId;
+    public void setImportAmount(float importAmount) {
+        ImportAmount = importAmount;
     }
 }
-
