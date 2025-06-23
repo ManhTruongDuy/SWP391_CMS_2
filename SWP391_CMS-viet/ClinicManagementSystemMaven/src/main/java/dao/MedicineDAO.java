@@ -227,4 +227,49 @@ public class MedicineDAO {
         }
         return list;
     }
+    public List<Medicine> getExpiredMedicines() {
+        List<Medicine> list = new ArrayList<>();
+        String sql = "SELECT * FROM medicines WHERE expDate < CURDATE()";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Medicine medicine = extractMedicineFromResultSet(rs);
+                list.add(medicine);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    private Medicine extractMedicineFromResultSet(ResultSet rs) throws SQLException {
+        Medicine medicine = new Medicine();
+        medicine.setMedicine_id(rs.getInt("medicine_id"));
+        medicine.setName(rs.getString("name"));
+        medicine.setUnit_id(rs.getInt("unit_id"));
+        medicine.setCategory_id(rs.getInt("category_id"));
+        medicine.setIngredient(rs.getString("ingredient"));
+        medicine.setUsage(rs.getString("usage"));
+        medicine.setPreservation(rs.getString("preservation"));
+        medicine.setManuDate(rs.getDate("manuDate").toLocalDate());
+        medicine.setExpDate(rs.getDate("expDate").toLocalDate());
+        medicine.setQuantity(rs.getInt("quantity"));
+        medicine.setPrice(rs.getFloat("price"));
+        medicine.setWarehouse_id(rs.getInt("warehouse_id"));
+        return medicine;
+    }
+
+    private void setMedicineParameters(PreparedStatement ps, Medicine medicine) throws SQLException {
+        ps.setString(1, medicine.getName());
+        ps.setInt(2, medicine.getUnit_id());
+        ps.setInt(3, medicine.getCategory_id());
+        ps.setString(4, medicine.getIngredient());
+        ps.setString(5, medicine.getUsage());
+        ps.setString(6, medicine.getPreservation());
+        ps.setDate(7, Date.valueOf(medicine.getManuDate()));
+        ps.setDate(8, Date.valueOf(medicine.getExpDate()));
+        ps.setInt(9, medicine.getQuantity());
+        ps.setFloat(10, medicine.getPrice());
+        ps.setInt(11, medicine.getWarehouse_id());
+    }
 }
