@@ -44,6 +44,10 @@
   <label>Quantity: <input id="add-quantity" type="number"></label>
   <label>Unit ID: <input id="add-unit_id" type="number"></label>
   <label>Warehouse ID: <input id="add-warehouse_id" type="number"></label>
+  <div id="add-warehouse-info" style="margin-top: 5px;">
+    <span id="add-warehouse-name"></span><br>
+    <span id="add-warehouse-location"></span>
+  </div>
   <button onclick="addMedicine()">Add</button>
 </div>
 
@@ -77,6 +81,10 @@
   <label>Quantity: <input id="update-quantity" type="number"></label>
   <label>Unit ID: <input id="update-unit_id" type="number"></label>
   <label>Warehouse ID: <input id="update-warehouse_id" type="number"></label>
+  <div id="update-warehouse-info" style="margin-top: 5px;">
+    <span id="update-warehouse-name"></span><br>
+    <span id="update-warehouse-location"></span>
+  </div>
   <button onclick="updateMedicine()">Update</button>
 </div>
 
@@ -89,6 +97,7 @@
 
 <script>
   const BASE_URL = "http://localhost:8080/ClinicManagementSystem_war_exploded/api/medicines";
+  const WAREHOUSE_API = "http://localhost:8080/ClinicManagementSystem_war_exploded/api/warehouse";
 
   function fetchMedicines() {
     const keyword = document.getElementById("search-keyword").value;
@@ -142,7 +151,7 @@
   }
 
   function updateLimit() {
-    document.getElementById("search-offset").value = "0"; // Reset offset khi thay đổi limit
+    document.getElementById("search-offset").value = "0";
     fetchMedicines();
   }
 
@@ -189,6 +198,7 @@
     document.getElementById("update-quantity").value = quantity;
     document.getElementById("update-unit_id").value = unit_id;
     document.getElementById("update-warehouse_id").value = warehouse_id;
+    if (warehouse_id) fetchWarehouseInfo(warehouse_id, 'update');
   }
 
   function updateMedicine() {
@@ -234,6 +244,41 @@
             })
             .catch(e => alert("API error: " + e));
   }
+
+  function fetchWarehouseInfo(id, type = 'add') {
+    fetch(`${WAREHOUSE_API}/${id}`)
+            .then(response => response.json())
+            .then(data => {
+              document.getElementById(`${type}-warehouse-name`).textContent = `Name: ${data.name}`;
+              document.getElementById(`${type}-warehouse-location`).textContent = `Location: ${data.location}`;
+            })
+            .catch(error => {
+              console.error('Error fetching warehouse info:', error);
+              document.getElementById(`${type}-warehouse-name`).textContent = 'Error fetching warehouse info';
+              document.getElementById(`${type}-warehouse-location`).textContent = '';
+            });
+  }
+
+  document.getElementById('add-warehouse_id').addEventListener('change', function() {
+    const id = this.value;
+    if (id) {
+      fetchWarehouseInfo(id, 'add');
+    } else {
+      document.getElementById('add-warehouse-name').textContent = '';
+      document.getElementById('add-warehouse-location').textContent = '';
+    }
+  });
+
+  document.getElementById('update-warehouse_id').addEventListener('change', function() {
+    const id = this.value;
+    if (id) {
+      fetchWarehouseInfo(id, 'update');
+    } else {
+      document.getElementById('update-warehouse-name').textContent = '';
+      document.getElementById('update-warehouse-location').textContent = '';
+    }
+  });
+
   fetchMedicines();
 </script>
 </body>
