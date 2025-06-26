@@ -4,6 +4,7 @@ import model.PrescriptionDetailView;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.MedicineStatistic;
 
 public class PrescriptionDetailViewDAO {
     private final Connection conn;
@@ -61,6 +62,50 @@ public class PrescriptionDetailViewDAO {
                     d.setDosage(rs.getString("dosage"));
                     d.setTotalPrice(rs.getDouble("total_price"));
                     list.add(d);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<MedicineStatistic> getMedicineStatistics(java.sql.Date date, boolean byMonth) {
+        List<MedicineStatistic> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT med.name AS medicine_name, " +
+            "SUM(ms.quantity) AS total_quantity, " +
+            "COUNT(DISTINCT p.prescription_id) AS total_prescriptions " +
+            "FROM Prescription p " +
+            "INNER JOIN PrescriptionInvoice pi ON p.prescription_id = pi.prescription_id " +
+            "INNER JOIN Medicines ms ON pi.prescription_invoice_id = ms.prescription_invoice_id " +
+            "INNER JOIN Medicine med ON ms.medicine_id = med.medicine_id " +
+            "WHERE 1=1 "
+        );
+        if (date != null) {
+            if (byMonth) {
+                sql.append(" AND MONTH(p.prescription_date) = MONTH(?) AND YEAR(p.prescription_date) = YEAR(?) ");
+            } else {
+                sql.append(" AND p.prescription_date = ? ");
+            }
+        }
+        sql.append(" GROUP BY med.name ORDER BY med.name");
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            if (date != null) {
+                if (byMonth) {
+                    ps.setDate(1, date);
+                    ps.setDate(2, date);
+                } else {
+                    ps.setDate(1, date);
+                }
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    MedicineStatistic stat = new MedicineStatistic();
+                    stat.setMedicineName(rs.getString("medicine_name"));
+                    stat.setTotalQuantity(rs.getInt("total_quantity"));
+                    stat.setTotalPrescriptions(rs.getInt("total_prescriptions"));
+                    list.add(stat);
                 }
             }
         } catch (Exception e) {

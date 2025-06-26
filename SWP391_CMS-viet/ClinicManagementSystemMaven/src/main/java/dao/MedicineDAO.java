@@ -227,4 +227,64 @@ public class MedicineDAO {
         }
         return list;
     }
+
+    public List<Medicine> findMedicinesByIngredient(String ingredient) {
+        List<Medicine> list = new ArrayList<>();
+        String sql = "SELECT medicine_id, name, unit_id, category_id, ingredient, usage, preservation, manuDate, expDate, quantity, price, warehouse_id FROM Medicine WHERE ingredient = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, ingredient);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Medicine m = new Medicine(
+                            rs.getInt("medicine_id"),
+                            rs.getString("name"),
+                            rs.getInt("unit_id"),
+                            rs.getInt("category_id"),
+                            rs.getString("ingredient"),
+                            rs.getString("usage"),
+                            rs.getString("preservation"),
+                            rs.getDate("manuDate") != null ? rs.getDate("manuDate").toLocalDate() : null,
+                            rs.getDate("expDate") != null ? rs.getDate("expDate").toLocalDate() : null,
+                            rs.getInt("quantity"),
+                            rs.getFloat("price"),
+                            rs.getInt("warehouse_id")
+                    );
+                    list.add(m);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Medicine> findMedicinesByName(String name) {
+        List<Medicine> list = new ArrayList<>();
+        String sql = "SELECT medicine_id, name, unit_id, category_id, ingredient, usage, preservation, manuDate, expDate, quantity, price, warehouse_id FROM Medicine WHERE name LIKE ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + name + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Medicine m = new Medicine(
+                            rs.getInt("medicine_id"),
+                            rs.getString("name"),
+                            rs.getInt("unit_id"),
+                            rs.getInt("category_id"),
+                            rs.getString("ingredient"),
+                            rs.getString("usage"),
+                            rs.getString("preservation"),
+                            rs.getDate("manuDate") != null ? rs.getDate("manuDate").toLocalDate() : null,
+                            rs.getDate("expDate") != null ? rs.getDate("expDate").toLocalDate() : null,
+                            rs.getInt("quantity"),
+                            rs.getFloat("price"),
+                            rs.getInt("warehouse_id")
+                    );
+                    list.add(m);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
