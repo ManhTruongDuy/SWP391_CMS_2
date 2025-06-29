@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống kê phát thuốc - Hệ thống quản lý bệnh viện</title>
+    <link href="/view/assets/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="/view/assets/css/custom.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c5aa0;
+            --secondary-color: #17a2b8;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #6f42c1;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+            --border-radius: 15px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            margin: 2rem auto;
+            overflow: hidden;
+            max-width: 1400px;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--success-color) 0%, var(--primary-color) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stats" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.1"/><rect x="5" y="15" width="2" height="3" fill="white" opacity="0.1"/><rect x="8" y="12" width="2" height="6" fill="white" opacity="0.1"/><rect x="11" y="14" width="2" height="4" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23stats)"/></svg>');
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .filter-section {
+            padding: 1.5rem 2rem;
+            background: var(--light-bg);
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .filter-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--success-color), var(--primary-color), var(--info-color));
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--success-color);
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .btn-stats {
+            background: linear-gradient(135deg, var(--success-color) 0%, var(--primary-color) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .btn-stats:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(40, 167, 69, 0.3);
+            color: white;
+        }
+
+        .stats-overview {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, #e8f5e8 0%, #e3f2fd 100%);
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card.primary::before { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); }
+        .stat-card.success::before { background: linear-gradient(90deg, var(--success-color), #20c997); }
+        .stat-card.warning::before { background: linear-gradient(90deg, var(--warning-color), #fd7e14); }
+        .stat-card.info::before { background: linear-gradient(90deg, var(--info-color), var(--primary-color)); }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-change.positive { color: var(--success-color); }
+        .stat-change.negative { color: var(--danger-color); }
+
+        .icon-primary { color: var(--primary-color); }
+        .icon-success { color: var(--success-color); }
+        .icon-warning { color: var(--warning-color); }
+        .icon-info { color: var(--info-color); }
+
+        .charts-section {
+            padding: 1.5rem 2rem;
+            background: var(--white);
+        }
+
+        .chart-container {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            border: 1px solid #e9ecef;
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 200px; /* Reduced height */
+        }
+
+        .mini-chart-wrapper {
+            position: relative;
+            height: 150px; /* Even smaller for pie chart */
+        }
+
+        .table-section {
+            padding: 1.5rem 2rem;
+            background: var(--light-bg);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, var(--info-color) 0%, var(--primary-color) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1.25rem;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(111, 66, 193, 0.3);
+            color: white;
+        }
+
+        .table-container {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid #e9ecef;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+            color: white;
+            border: none;
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.8rem;
+            position: relative;
+        }
+
+        .table thead th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--success-color), var(--primary-color));
+        }
+
+        .table tbody td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.05) 0%, rgba(44, 90, 160, 0.05) 100%);
+            transform: scale(1.01);
+        }
+
+        .medicine-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .prescription-count {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .pills-count {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #fd7e14 100%);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .row-number {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 auto;
+            font-size: 0.9rem;
+        }
+
+        .footer-section {
+            padding: 1.5rem 2rem;
+            background: var(--light-bg);
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-back:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.4rem;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+        }
+
+        .trend-up {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                border-radius: 15px;
+            }
+
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .table-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .chart-wrapper {
+                height: 180px;
+            }
+
+            .mini-chart-wrapper {
+                height: 130px;
+            }
+
+            .chart-container {
+                padding: 1rem;
+            }
+
+            .charts-section .row .col-lg-8,
+            .charts-section .row .col-lg-4 {
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="main-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="header-content">
+                <h1 class="page-title">
+                    <i class="fas fa-chart-bar me-3"></i>
+                    Thống kê phát thuốc
+                </h1>
+                <p class="page-subtitle">Phân tích và theo dõi hoạt động cấp phát thuốc</p>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-card">
+                <form class="row g-3 align-items-end" id="statsForm">
+                    <div class="col-md-3">
+                        <label for="startDate" class="form-label fw-bold">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Từ ngày
+                        </label>
+                        <input type="date" class="form-control" id="startDate" name="startDate">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="endDate" class="form-label fw-bold">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Đến ngày
+                        </label>
+                        <input type="date" class="form-control" id="endDate" name="endDate">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="period" class="form-label fw-bold">
+                            <i class="fas fa-clock me-2"></i>
+                            Khoảng thời gian
+                        </label>
+                        <select class="form-control" id="period" name="period">
+                            <option value="today">Hôm nay</option>
+                            <option value="week">Tuần này</option>
+                            <option value="month" selected>Tháng này</option>
+                            <option value="quarter">Quý này</option>
+                            <option value="year">Năm này</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-stats w-100">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Xem thống kê
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Statistics Overview -->
+        <div class="stats-overview">
+            <div class="stats-cards">
+                <div class="stat-card primary">
+                    <div class="stat-icon icon-primary">
+                        <i class="fas fa-file-prescription"></i>
+                    </div>
+                    <div class="stat-number">25</div>
+                    <div class="stat-label">Tổng đơn thuốc</div>
+                    <div class="trend-indicator trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        +12%
+                    </div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-icon icon-success">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <div class="stat-number">250</div>
+                    <div class="stat-label">Tổng viên thuốc</div>
+                    <div class="trend-indicator trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        +8%
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon icon-warning">
+                        <i class="fas fa-capsules"></i>
+                    </div>
+                    <div class="stat-number">15</div>
+                    <div class="stat-label">Loại thuốc</div>
+                    <div class="trend-indicator trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        +3
+                    </div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-icon icon-info">
+                        <i class="fas fa-user-injured"></i>
+                    </div>
+                    <div class="stat-number">18</div>
+                    <div class="stat-label">Bệnh nhân</div>
+                    <div class="trend-indicator trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        +5
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="chart-container">
+                        <h4 class="chart-title">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Xu hướng phát thuốc theo thời gian
+                        </h4>
+                        <div class="chart-wrapper">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="chart-container">
+                        <h4 class="chart-title">
+                            <i class="fas fa-chart-pie me-2"></i>
+                            Phân bố theo loại thuốc
+                        </h4>
+                        <div class="mini-chart-wrapper">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner-border text-success" style="width: 2.5rem; height: 2.5rem;" role="status">
+                <span class="visually-hidden">Đang tải thống kê...</span>
+            </div>
+            <h5 class="mt-3 text-success">Đang tạo báo cáo thống kê...</h5>
+            <p class="text-muted">Vui lòng chờ trong giây lát</p>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-section" id="tableSection">
+            <div class="table-header">
+                <h3 class="table-title">
+                    <i class="fas fa-table me-2"></i>
+                    Chi tiết thống kê
+                </h3>
+                <button class="export-btn" onclick="exportData()">
+                    <i class="fas fa-download me-2"></i>
+                    Xuất Excel
+                </button>
+            </div>
+
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table" id="statsTable">
+                        <thead>
+                        <tr>
+                            <th width="8%">
+                                <i class="fas fa-hashtag me-2"></i>STT
+                            </th>
+                            <th width="40%">
+                                <i class="fas fa-pills me-2"></i>Tên thuốc
+                            </th>
+                            <th width="26%">
+                                <i class="fas fa-file-prescription me-2"></i>Số đơn đã phát
+                            </th>
+                            <th width="26%">
+                                <i class="fas fa-sort-numeric-up me-2"></i>Số viên đã cấp
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <div class="row-number">1</div>
+                            </td>
+                            <td>
+                                <div class="medicine-name">
+                                    <i class="fas fa-capsules me-2 text-primary"></i>
+                                    Paracetamol 500mg
+                                </div>
+                            </td>
+                            <td>
+                                        <span class="prescription-count">
+                                            <i class="fas fa-file-prescription me-1"></i>
+                                            12 đơn
+                                        </span>
+                            </td>
+                            <td>
+                                        <span class="pills-count">
+                                            <i class="fas fa-pills me-1"></i>
+                                            120 viên
+                                        </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row-number">2</div>
+                            </td>
+                            <td>
+                                <div class="medicine-name">
+                                    <i class="fas fa-tablets me-2 text-primary"></i>
+                                    Amoxicillin 500mg
+                                </div>
+                            </td>
+                            <td>
+                                        <span class="prescription-count">
+                                            <i class="fas fa-file-prescription me-1"></i>
+                                            8 đơn
+                                        </span>
+                            </td>
+                            <td>
+                                        <span class="pills-count">
+                                            <i class="fas fa-pills me-1"></i>
+                                            80 viên
+                                        </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row-number">3</div>
+                            </td>
+                            <td>
+                                <div class="medicine-name">
+                                    <i class="fas fa-pills me-2 text-primary"></i>
+                                    Vitamin C 100mg
+                                </div>
+                            </td>
+                            <td>
+                                        <span class="prescription-count">
+                                            <i class="fas fa-file-prescription me-1"></i>
+                                            5 đơn
+                                        </span>
+                            </td>
+                            <td>
+                                        <span class="pills-count">
+                                            <i class="fas fa-pills me-1"></i>
+                                            50 viên
+                                        </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer-section">
+            <a href="dashboard-pharmacist.html" class="btn-back">
+                <i class="fas fa-arrow-left me-2"></i>
+                Quay lại Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="/view/assets/js/core/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialize charts
+    let trendChart, pieChart;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+        setupEventListeners();
+        setDefaultDates();
+    });
+
+    function initializeCharts() {
+        // Trend Chart - Smaller and more compact
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        trendChart = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                datasets: [{
+                    label: 'Số đơn thuốc',
+                    data: [12, 19, 15, 25, 22, 18, 20],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                }, {
+                    label: 'Số viên thuốc',
+                    data: [120, 190, 150, 250, 220, 180, 200],
+                    borderColor: '#2c5aa0',
+                    backgroundColor: 'rgba(44, 90, 160, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Pie Chart - Smaller and more compact
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        pieChart = new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Paracetamol', 'Amoxicillin', 'Vitamin C', 'Khác'],
+                datasets: [{
+                    data: [120, 80, 50, 30],
+                    backgroundColor: [
+                        '#28a745',
+                        '#2c5aa0',
+                        '#ffc107',
+                        '#6f42c1'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 10,
+                            usePointStyle: true,
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function setupEventListeners() {
+        const form = document.getElementById('statsForm');
+        const periodSelect = document.getElementById('period');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const tableSection = document.getElementById('tableSection');
+
+        // Handle period selection
+        periodSelect.addEventListener('change', function() {
+            updateDateRange(this.value);
+        });
+
+        // Handle form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Show loading state
+            tableSection.style.display = 'none';
+            loadingSpinner.style.display = 'block';
+
+            // Simulate API call
+            setTimeout(() => {
+                loadingSpinner.style.display = 'none';
+                tableSection.style.display = 'block';
+
+                // Update charts with new data
+                updateCharts();
+
+                // Animate table rows
+                animateTableRows();
+
+                // Scroll to results
+                document.querySelector('.stats-overview').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }, 1500);
+        });
+    }
+
+    function setDefaultDates() {
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        document.getElementById('startDate').value = firstDayOfMonth.toISOString().split('T')[0];
+        document.getElementById('endDate').value = today.toISOString().split('T')[0];
+    }
+
+    function updateDateRange(period) {
+        const today = new Date();
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+
+        endDate.value = today.toISOString().split('T')[0];
+
+        switch(period) {
+            case 'today':
+                startDate.value = today.toISOString().split('T')[0];
+                break;
+            case 'week':
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - 7);
+                startDate.value = weekStart.toISOString().split('T')[0];
+                break;
+            case 'month':
+                const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+                startDate.value = monthStart.toISOString().split('T')[0];
+                break;
+            case 'quarter':
+                const quarterStart = new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3, 1);
+                startDate.value = quarterStart.toISOString().split('T')[0];
+                break;
+            case 'year':
+                const yearStart = new Date(today.getFullYear(), 0, 1);
+                startDate.value = yearStart.toISOString().split('T')[0];
+                break;
+        }
+    }
+
+    function updateCharts() {
+        // Update trend chart with random data (simulate API response)
+        const newTrendData = Array.from({length: 7}, () => Math.floor(Math.random() * 30) + 10);
+        const newPillsData = newTrendData.map(val => val * 10);
+
+        trendChart.data.datasets[0].data = newTrendData;
+        trendChart.data.datasets[1].data = newPillsData;
+        trendChart.update('active');
+
+        // Update pie chart
+        const newPieData = Array.from({length: 4}, () => Math.floor(Math.random() * 100) + 20);
+        pieChart.data.datasets[0].data = newPieData;
+        pieChart.update('active');
+    }
+
+    function animateTableRows() {
+        const rows = document.querySelectorAll('#statsTable tbody tr');
+        rows.forEach((row, index) => {
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-20px)';
+            setTimeout(() => {
+                row.style.transition = 'all 0.5s ease';
+                row.style.opacity = '1';
+                row.style.transform = 'translateX(0)';
+            }, index * 150);
+        });
+    }
+
+    function exportData() {
+        // Simulate export functionality
+        const btn = event.target.closest('.export-btn');
+        const originalText = btn.innerHTML;
+
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xuất...';
+        btn.disabled = true;
+
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-check me-2"></i>Đã xuất!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 1500);
+        }, 2000);
+    }
+</script>
+</body>
+</html>

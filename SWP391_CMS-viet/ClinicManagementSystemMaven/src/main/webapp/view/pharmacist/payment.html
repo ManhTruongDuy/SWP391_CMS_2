@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Thanh toán</title>
+  <link rel="stylesheet" href="../assets/css/bootstrap/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../payos.1.0.61/payos/assets/css/payos-checkout.css">
+  <style>
+    body {
+      font-family: 'Noto Sans', Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5 text-center">
+    <h2>Thanh toán đơn thuốc</h2>
+    <div>
+      <button id="atmBtn" class="btn btn-info m-2">ATM/Chuyển khoản</button>
+      <button id="cashBtn" class="btn btn-success m-2">Tiền mặt</button>
+    </div>
+    <div id="payos-checkout-container" style="margin-top: 30px; display: none;"></div>
+    <div id="qrLoading" style="margin-top: 20px; display: none;">Đang tạo mã QR...</div>
+  </div>
+  <script>
+    function getAmount() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('amount') || 0;
+    }
+    var amount = getAmount();
+
+    document.getElementById('atmBtn').onclick = function() {
+      document.getElementById('payos-checkout-container').style.display = 'none';
+      document.getElementById('qrLoading').style.display = 'block';
+      // Gọi API backend để lấy checkout_url động theo amount
+      fetch('/ClinicManagementSystem_war_exploded/payos', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'amount=' + encodeURIComponent(amount)
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Tìm trường chứa checkout_url
+        let checkout_url = data.checkout_url || (data.data && data.data.checkout_url) || data.qrCode || data.qrData || data.qrImage || data.qrUrl;
+        if (checkout_url) {
+          window.payos_checkout_data = {
+            status: "PENDING",
+            checkout_url: checkout_url,
+            redirect_url: window.location.href,
+            message: "Quét mã QR để thanh toán",
+            icon: "https://payos.vn/logo.png"
+          };
+          document.getElementById('payos-checkout-container').style.display = 'block';
+          document.getElementById('qrLoading').style.display = 'none';
+          // Nạp lại plugin (nếu đã có thì xóa đi trước)
+          var oldScript = document.getElementById('payos-plugin');
+          if (oldScript) oldScript.remove();
+          var script = document.createElement('script');
+          script.src = '../../payos.1.0.61/payos/assets/js/payos-checkout.js';
+          script.id = 'payos-plugin';
+          document.body.appendChild(script);
+        } else {
+          document.getElementById('qrLoading').innerText = 'Không tạo được mã QR!';
+        }
+      })
+      .catch((err) => {
+        document.getElementById('qrLoading').innerText = 'Lỗi khi tạo mã QR!';
+        console.error('Lỗi fetch QR:', err);
+      });
+    };
+    document.getElementById('cashBtn').onclick = function() {
+      window.location.href = 'print-prescription.html?amount=' + encodeURIComponent(amount);
+    };
+  </script>
+</body>
+</html> 

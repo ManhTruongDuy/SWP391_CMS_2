@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử phát thuốc - Hệ thống quản lý bệnh viện</title>
+    <link href="/view/assets/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="/view/assets/css/custom.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c5aa0;
+            --secondary-color: #17a2b8;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            margin: 2rem auto;
+            overflow: hidden;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .search-section {
+            padding: 2rem;
+            background: var(--light-bg);
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .search-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: none;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .table-section {
+            padding: 2rem;
+        }
+
+        .table-container {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.875rem;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(44, 90, 160, 0.05);
+            transform: scale(1.01);
+        }
+
+        .medicine-badge {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .quantity-badge {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #fd7e14 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .patient-name {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .date-text {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .footer-section {
+            padding: 2rem;
+            background: var(--light-bg);
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-back:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-cards {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: var(--white);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .icon-primary { color: var(--primary-color); }
+        .icon-success { color: var(--success-color); }
+        .icon-warning { color: var(--warning-color); }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                border-radius: 15px;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .stats-cards {
+                flex-direction: column;
+            }
+
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="main-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="header-content">
+                <h1 class="page-title">
+                    <i class="fas fa-pills me-3"></i>
+                    Lịch sử phát thuốc
+                </h1>
+                <p class="page-subtitle">Theo dõi và quản lý lịch sử cấp phát thuốc cho bệnh nhân</p>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-card">
+                <form class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                        <label for="patient" class="form-label fw-bold">
+                            <i class="fas fa-user-injured me-2"></i>
+                            Tìm kiếm bệnh nhân
+                        </label>
+                        <input type="text" class="form-control" id="patient" name="patient"
+                               placeholder="Nhập tên hoặc mã bệnh nhân...">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-search w-100">
+                            <i class="fas fa-search me-2"></i>
+                            Xem lịch sử
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="search-section pt-0">
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon icon-primary">
+                        <i class="fas fa-user-injured"></i>
+                    </div>
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Bệnh nhân</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-success">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <div class="stat-number">35</div>
+                    <div class="stat-label">Lượt phát thuốc</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-warning">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Ngày gần đây</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-section">
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th width="8%">
+                                <i class="fas fa-hashtag me-2"></i>STT
+                            </th>
+                            <th width="25%">
+                                <i class="fas fa-user me-2"></i>Tên bệnh nhân
+                            </th>
+                            <th width="15%">
+                                <i class="fas fa-calendar me-2"></i>Ngày phát
+                            </th>
+                            <th width="35%">
+                                <i class="fas fa-pills me-2"></i>Tên thuốc
+                            </th>
+                            <th width="17%">
+                                <i class="fas fa-sort-numeric-up me-2"></i>Số lượng
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="fw-bold">1</td>
+                            <td class="patient-name">
+                                <i class="fas fa-user-circle me-2 text-primary"></i>
+                                Nguyễn Văn A
+                            </td>
+                            <td class="date-text">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                01/06/2024
+                            </td>
+                            <td>
+                                        <span class="medicine-badge">
+                                            <i class="fas fa-capsules me-1"></i>
+                                            Paracetamol 500mg
+                                        </span>
+                            </td>
+                            <td>
+                                        <span class="quantity-badge">
+                                            <i class="fas fa-sort-numeric-up me-1"></i>
+                                            10 viên
+                                        </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">2</td>
+                            <td class="patient-name">
+                                <i class="fas fa-user-circle me-2 text-primary"></i>
+                                Nguyễn Văn A
+                            </td>
+                            <td class="date-text">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                01/06/2024
+                            </td>
+                            <td>
+                                        <span class="medicine-badge">
+                                            <i class="fas fa-tablets me-1"></i>
+                                            Vitamin C 100mg
+                                        </span>
+                            </td>
+                            <td>
+                                        <span class="quantity-badge">
+                                            <i class="fas fa-sort-numeric-up me-1"></i>
+                                            5 viên
+                                        </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">3</td>
+                            <td class="patient-name">
+                                <i class="fas fa-user-circle me-2 text-primary"></i>
+                                Trần Thị B
+                            </td>
+                            <td class="date-text">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                02/06/2024
+                            </td>
+                            <td>
+                                        <span class="medicine-badge">
+                                            <i class="fas fa-pills me-1"></i>
+                                            Amoxicillin 500mg
+                                        </span>
+                            </td>
+                            <td>
+                                        <span class="quantity-badge">
+                                            <i class="fas fa-sort-numeric-up me-1"></i>
+                                            20 viên
+                                        </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="mt-3 text-muted">Đang tải dữ liệu...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state d-none" id="emptyState">
+                <i class="fas fa-search"></i>
+                <h4>Không tìm thấy dữ liệu</h4>
+                <p>Vui lòng thử lại với từ khóa khác hoặc kiểm tra lại thông tin tìm kiếm.</p>
+            </div>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer-section">
+            <a href="dashboard-pharmacist.html" class="btn-back">
+                <i class="fas fa-arrow-left me-2"></i>
+                Quay lại Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="/view/assets/js/core/bootstrap.bundle.min.js"></script>
+<script>
+    // Enhanced form functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const tableContainer = document.querySelector('.table-container');
+        const emptyState = document.getElementById('emptyState');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Show loading state
+            tableContainer.style.display = 'none';
+            loadingSpinner.style.display = 'block';
+            emptyState.classList.add('d-none');
+
+            // Simulate API call
+            setTimeout(() => {
+                loadingSpinner.style.display = 'none';
+                tableContainer.style.display = 'block';
+
+                // Add animation to table rows
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach((row, index) => {
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        row.style.transition = 'all 0.3s ease';
+                        row.style.opacity = '1';
+                        row.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }, 1500);
+        });
+
+        // Add smooth scrolling for better UX
+        const searchButton = document.querySelector('.btn-search');
+        searchButton.addEventListener('click', function() {
+            setTimeout(() => {
+                document.querySelector('.table-section').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }, 100);
+        });
+    });
+</script>
+</body>
+</html>

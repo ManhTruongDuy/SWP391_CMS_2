@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Dược sĩ | Hệ thống Quản lý Phát thuốc</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hospital-primary: #2563eb;
+            --hospital-secondary: #1e40af;
+            --hospital-accent: #3b82f6;
+            --hospital-success: #059669;
+            --hospital-warning: #d97706;
+            --hospital-danger: #dc2626;
+            --hospital-info: #0891b2;
+            --hospital-light: #f8fafc;
+            --hospital-dark: #1e293b;
+            --hospital-bg: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            --hospital-card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --hospital-card-hover-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--hospital-bg);
+            color: var(--hospital-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .hospital-header {
+            background: linear-gradient(135deg, var(--hospital-primary) 0%, var(--hospital-secondary) 100%);
+            color: white;
+            padding: 3rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+        }
+
+        .hospital-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(ellipse, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(-15deg);
+        }
+
+        .hospital-header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981, #f59e0b);
+        }
+
+        .hospital-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .hospital-subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.95;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 1rem;
+        }
+
+        .hospital-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* Main Dashboard Container */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: -2rem auto 0;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Main Options Grid */
+        .main-options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .option-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: var(--hospital-card-shadow);
+            border: 1px solid rgba(255,255,255,0.8);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .option-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--card-accent, var(--hospital-primary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .option-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .option-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--hospital-card-hover-shadow);
+        }
+
+        .option-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: var(--icon-bg, linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(37, 99, 235, 0.2)));
+            color: var(--icon-color, var(--hospital-primary));
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-icon::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .option-card:hover .option-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .option-card:hover .option-icon::before {
+            opacity: 1;
+        }
+
+        .option-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--hospital-dark);
+        }
+
+        .option-description {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .option-btn {
+            background: var(--btn-bg, var(--hospital-primary));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .option-btn:hover::before {
+            left: 100%;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Card Specific Styles */
+        .prescription-card {
+            --card-accent: var(--hospital-primary);
+            --icon-bg: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(37, 99, 235, 0.2));
+            --icon-color: var(--hospital-primary);
+            --btn-bg: var(--hospital-primary);
+        }
+
+        .statistics-card {
+            --card-accent: var(--hospital-success);
+            --icon-bg: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(5, 150, 105, 0.2));
+            --icon-color: var(--hospital-success);
+            --btn-bg: var(--hospital-success);
+        }
+
+        .history-card {
+            --card-accent: var(--hospital-info);
+            --icon-bg: linear-gradient(135deg, rgba(8, 145, 178, 0.1), rgba(8, 145, 178, 0.2));
+            --icon-color: var(--hospital-info);
+            --btn-bg: var(--hospital-info);
+        }
+
+        .print-card {
+            --card-accent: var(--hospital-warning);
+            --icon-bg: linear-gradient(135deg, rgba(217, 119, 6, 0.1), rgba(217, 119, 6, 0.2));
+            --icon-color: var(--hospital-warning);
+            --btn-bg: var(--hospital-warning);
+        }
+
+        /* Secondary Options */
+        .secondary-options {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--hospital-card-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .secondary-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--hospital-dark);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .secondary-title::after {
+            content: "";
+            position: absolute;
+            bottom: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--hospital-primary), var(--hospital-accent));
+            border-radius: 2px;
+        }
+
+        .secondary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .secondary-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            color: var(--hospital-dark);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .secondary-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--hospital-primary), var(--hospital-accent));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .secondary-btn:hover::before {
+            opacity: 1;
+        }
+
+        .secondary-btn:hover {
+            color: white;
+            border-color: var(--hospital-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+            text-decoration: none;
+        }
+
+        .secondary-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* Footer */
+        .hospital-footer {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #94a3b8;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-logo {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .footer-divider {
+            width: 1px;
+            height: 20px;
+            background: #475569;
+        }
+
+        .footer-text {
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .option-card {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .option-card:nth-child(1) { animation-delay: 0.1s; }
+        .option-card:nth-child(2) { animation-delay: 0.2s; }
+        .option-card:nth-child(3) { animation-delay: 0.3s; }
+        .option-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .secondary-options {
+            animation: fadeInUp 0.6s ease forwards;
+            animation-delay: 0.5s;
+            opacity: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hospital-title {
+                font-size: 2rem;
+            }
+
+            .main-options-grid {
+                gap: 1.5rem;
+            }
+
+            .option-card {
+                padding: 2rem;
+            }
+
+            .option-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hospital-header {
+                padding: 2rem 0;
+            }
+
+            .hospital-title {
+                font-size: 1.8rem;
+            }
+
+            .hospital-subtitle {
+                font-size: 1rem;
+            }
+
+            .main-options-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .option-card {
+                padding: 1.5rem;
+            }
+
+            .option-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8rem;
+            }
+
+            .option-title {
+                font-size: 1.2rem;
+            }
+
+            .secondary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dashboard-container {
+                padding: 0 0.5rem;
+            }
+
+            .option-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .secondary-btn {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid var(--hospital-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<!-- Header -->
+<header class="hospital-header">
+    <div class="container text-center">
+        <div class="hospital-title">
+            <i class="fas fa-hospital-user me-3"></i>
+            DASHBOARD DƯỢC SĨ
+        </div>
+        <div class="hospital-subtitle">
+            Hệ thống quản lý phát thuốc chuyên nghiệp
+        </div>
+        <div class="hospital-badge">
+            <i class="fas fa-shield-alt me-2"></i>
+            Phiên bản 2.0 - Bảo mật cao
+        </div>
+    </div>
+</header>
+
+<!-- Main Dashboard -->
+<div class="dashboard-container">
+    <!-- Main Options Grid (2x2) -->
+    <div class="main-options-grid">
+        <!-- Prescription Management -->
+        <div class="option-card prescription-card">
+            <div class="option-icon">
+                <i class="fas fa-prescription-bottle-medical"></i>
+            </div>
+            <div class="option-title">Quản lý Đơn thuốc</div>
+            <div class="option-description">
+                Xử lý và phát thuốc theo đơn của bác sĩ với quy trình chuẩn hóa
+            </div>
+            <a href="prescription.html" class="option-btn">
+                <i class="fas fa-pills"></i>
+                Xử lý đơn thuốc
+            </a>
+        </div>
+
+        <!-- Statistics & Reports -->
+        <div class="option-card statistics-card">
+            <div class="option-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="option-title">Thống kê & Báo cáo</div>
+            <div class="option-description">
+                Phân tích dữ liệu phát thuốc và tạo báo cáo chi tiết theo thời gian
+            </div>
+            <a href="statistic-pharmacist.html" class="option-btn">
+                <i class="fas fa-analytics"></i>
+                Xem thống kê
+            </a>
+        </div>
+
+        <!-- History & Search -->
+        <div class="option-card history-card">
+            <div class="option-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <div class="option-title">Lịch sử & Tra cứu</div>
+            <div class="option-description">
+                Tra cứu lịch sử phát thuốc và thông tin bệnh nhân một cách nhanh chóng
+            </div>
+            <a href="history-pharmacist.html" class="option-btn">
+                <i class="fas fa-search"></i>
+                Tra cứu lịch sử
+            </a>
+        </div>
+
+        <!-- Print & Documentation -->
+        <div class="option-card print-card">
+            <div class="option-icon">
+                <i class="fas fa-print"></i>
+            </div>
+            <div class="option-title">In ấn & Tài liệu</div>
+            <div class="option-description">
+                In phiếu hướng dẫn sử dụng thuốc và các tài liệu cần thiết
+            </div>
+            <a href="print-prescription.html" class="option-btn">
+                <i class="fas fa-file-medical"></i>
+                In tài liệu
+            </a>
+        </div>
+    </div>
+
+    <!-- Secondary Options -->
+    <div class="secondary-options">
+        <div class="secondary-title">
+            <i class="fas fa-tools me-2"></i>
+            Công cụ hỗ trợ
+        </div>
+        <div class="secondary-grid">
+            <a href="alternative-medicine.html" class="secondary-btn">
+                <i class="fas fa-exchange-alt"></i>
+                Thay thế thuốc
+            </a>
+            <a href="payment.html" class="secondary-btn">
+                <i class="fas fa-qrcode"></i>
+                Thanh toán QR
+            </a>
+            <a href="counter.html" class="secondary-btn">
+                <i class="fas fa-store"></i>
+                Quầy thuốc
+            </a>
+            <a href="inventory.html" class="secondary-btn">
+                <i class="fas fa-warehouse"></i>
+                Kho thuốc
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="hospital-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-hospital me-2"></i>
+                Hospital Pharmacy System
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-text">
+                © 2023 Hệ thống Quản lý Phát thuốc - Phiên bản 2.0
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-text">
+                <i class="fas fa-shield-alt me-1"></i>
+                Bảo mật & Tin cậy
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Loading animation
+    window.addEventListener('load', function() {
+        setTimeout(() => {
+            document.getElementById('loadingOverlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }, 500);
+        }, 1000);
+    });
+
+    // Enhanced card interactions
+    document.querySelectorAll('.option-card').forEach(card => {
+        const icon = card.querySelector('.option-icon');
+        const btn = card.querySelector('.option-btn');
+
+        card.addEventListener('mouseenter', function() {
+            // Add subtle rotation to icon
+            if (icon) {
+                icon.style.transform = 'scale(1.1) rotate(5deg)';
+            }
+
+            // Add glow effect to button
+            if (btn) {
+                btn.style.boxShadow = '0 8px 25px rgba(37, 99, 235, 0.4)';
+            }
+        });
+
+        card.addEventListener('mouseleave', function() {
+            if (icon) {
+                icon.style.transform = '';
+            }
+            if (btn) {
+                btn.style.boxShadow = '';
+            }
+        });
+    });
+
+    // Secondary button interactions
+    document.querySelectorAll('.secondary-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            // Add ripple effect
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.cssText = `
+          position: absolute;
+          width: ${size}px;
+          height: ${size}px;
+          left: ${x}px;
+          top: ${y}px;
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          transform: scale(0);
+          animation: ripple 0.6s ease-out;
+          pointer-events: none;
+        `;
+
+            this.appendChild(ripple);
+
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+
+    // Add ripple animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ripple {
+        to {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Smooth scroll for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            document.body.classList.add('keyboard-navigation');
+        }
+    });
+
+    document.addEventListener('mousedown', function() {
+        document.body.classList.remove('keyboard-navigation');
+    });
+
+    // Performance monitoring
+    if ('performance' in window) {
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const perfData = performance.getEntriesByType('navigation')[0];
+                console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
+            }, 0);
+        });
+    }
+</script>
+</body>
+</html>
