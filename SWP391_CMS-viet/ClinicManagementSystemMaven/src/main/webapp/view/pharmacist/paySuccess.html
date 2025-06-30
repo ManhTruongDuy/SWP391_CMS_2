@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh toán thành công</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #56ccf2, #2f80ed);
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            color: #333;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 450px;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        .error-icon {
+            font-size: 64px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+
+        .home-btn {
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+<div class="card" id="resultCard">
+    <div id="statusIcon" class="success-icon"><i class="fas fa-spinner fa-spin"></i></div>
+    <h3 id="statusMessage">Đang xác nhận thanh toán...</h3>
+    <a href="print-prescription.html" id="homeButton" class="btn btn-primary home-btn" style="display: none;">
+        <i class="fas fa-home"></i> Xuất hóa đơn
+    </a>
+</div>
+
+<script>
+    const baseUrl = window.location.origin + '/ClinicManagementSystem_war';
+    const params = new URLSearchParams(window.location.search);
+    const orderCode = params.get('orderCode');
+
+    const iconEl = document.getElementById("statusIcon");
+    const messageEl = document.getElementById("statusMessage");
+    const homeButton = document.getElementById("homeButton");
+
+    if (!orderCode) {
+        iconEl.className = "error-icon";
+        iconEl.innerHTML = '<i class="fas fa-times-circle"></i>';
+        messageEl.textContent = "Không tìm thấy mã đơn hàng!";
+        homeButton.style.display = "inline-block";
+    } else {
+        fetch(`${baseUrl}/api/update-payment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                orderCode: parseInt(orderCode),
+                status: "paid"
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                iconEl.className = "success-icon";
+                iconEl.innerHTML = '<i class="fas fa-check-circle"></i>';
+                messageEl.textContent = "✅ Cập nhật trạng thái đơn hàng thành công!";
+                homeButton.style.display = "inline-block";
+            })
+            .catch(err => {
+                console.error(err);
+                iconEl.className = "error-icon";
+                iconEl.innerHTML = '<i class="fas fa-times-circle"></i>';
+                messageEl.textContent = "❌ Lỗi khi cập nhật trạng thái đơn hàng!";
+                homeButton.style.display = "inline-block";
+            });
+    }
+</script>
+</body>
+</html>

@@ -15,23 +15,294 @@
             --warning-color: #ffc107;
             --danger-color: #dc3545;
             --light-bg: #f8f9fa;
+            --dark-bg: #343a40;
             --white: #ffffff;
             --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+            --border-radius: 10px;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
         }
 
-        .main-container {
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            margin: 2rem auto;
-            overflow: hidden;
+        /* Layout Container */
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Left Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--dark-bg) 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-brand {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-brand .brand-text {
+            display: none;
+        }
+
+        .sidebar-brand:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .brand-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: -15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            display: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 0;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+
+        .sidebar.collapsed .nav-link .nav-text {
+            display: none;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar.collapsed .nav-link:hover {
+            transform: none;
+        }
+
+        .nav-link.active {
+            color: white;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+            border-right: 3px solid white;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: white;
+        }
+
+        .nav-icon {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-text {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-footer {
+            position: relative;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .user-info {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .user-details {
+            display: none;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.1rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .logout-btn {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: #ff6b6b;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .sidebar.collapsed .logout-btn .logout-text {
+            display: none;
+        }
+
+        .logout-btn:hover {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        /* Right Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            background: var(--light-bg);
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
         }
 
         .header-section {
@@ -105,11 +376,13 @@
             font-weight: 600;
             transition: all 0.3s ease;
             box-shadow: var(--shadow);
+            color: white;
         }
 
         .btn-search:hover {
             transform: translateY(-2px);
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            color: white;
         }
 
         .table-section {
@@ -249,25 +522,6 @@
         .icon-success { color: var(--success-color); }
         .icon-warning { color: var(--warning-color); }
 
-        @media (max-width: 768px) {
-            .main-container {
-                margin: 1rem;
-                border-radius: 15px;
-            }
-
-            .page-title {
-                font-size: 2rem;
-            }
-
-            .stats-cards {
-                flex-direction: column;
-            }
-
-            .table-responsive {
-                font-size: 0.875rem;
-            }
-        }
-
         .loading-spinner {
             display: none;
             text-align: center;
@@ -285,11 +539,166 @@
             margin-bottom: 1rem;
             opacity: 0.5;
         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: var(--sidebar-collapsed-width);
+            }
+
+            .main-content {
+                margin-left: var(--sidebar-collapsed-width);
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .stats-cards {
+                flex-direction: column;
+            }
+
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+
+            .sidebar-nav .nav-section-title,
+            .sidebar .nav-text,
+            .sidebar .brand-text,
+            .sidebar .user-details,
+            .sidebar .logout-text {
+                display: none;
+            }
+
+            .sidebar .nav-link {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+
+            .sidebar .user-info {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
-<div class="container-fluid">
-    <div class="main-container">
+<div class="layout-container">
+    <!-- Left Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-chevron-left" id="toggleIcon"></i>
+        </button>
+
+        <div class="sidebar-header">
+            <a href="dashboard-pharmacist.html" class="sidebar-brand">
+                <div class="brand-icon">
+                    <i class="fas fa-hospital"></i>
+                </div>
+                <span class="brand-text">MediCare System</span>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Chính</div>
+                <div class="nav-item">
+                    <a href="dashboard-pharmacist.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        <span class="nav-text">Chức năng</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Quản lý</div>
+                <div class="nav-item">
+                    <a href="prescription.html" class="nav-link">
+                        <i class="fas fa-file-prescription nav-icon"></i>
+                        <span class="nav-text">Đơn thuốc</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="counter.html" class="nav-link">
+                        <i class="fas fa-cash-register nav-icon"></i>
+                        <span class="nav-text">Quầy thuốc</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="alternative-medicine.html" class="nav-link">
+                        <i class="fas fa-exchange-alt nav-icon"></i>
+                        <span class="nav-text">Thuốc thay thế</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="patients.html" class="nav-link">
+                        <i class="fas fa-user-injured nav-icon"></i>
+                        <span class="nav-text">Bệnh nhân</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="medicines.html" class="nav-link">
+                        <i class="fas fa-pills nav-icon"></i>
+                        <span class="nav-text">Thuốc</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="inventory.html" class="nav-link">
+                        <i class="fas fa-boxes nav-icon"></i>
+                        <span class="nav-text">Kho thuốc</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Báo cáo</div>
+                <div class="nav-item">
+                    <a href="statistic-pharmacist.html" class="nav-link">
+                        <i class="fas fa-chart-bar nav-icon"></i>
+                        <span class="nav-text">Thống kê</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="history-pharmacist.html" class="nav-link active">
+                        <i class="fas fa-chart-line nav-icon"></i>
+                        <span class="nav-text">Lịch sử & Tra cứu</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Hệ thống</div>
+                <div class="nav-item">
+                    <a href="settings.html" class="nav-link">
+                        <i class="fas fa-cog nav-icon"></i>
+                        <span class="nav-text">Cài đặt</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="users.html" class="nav-link">
+                        <i class="fas fa-users nav-icon"></i>
+                        <span class="nav-text">Người dùng</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">DT</div>
+                <div class="user-details">
+                    <div class="user-name">Dược sĩ Thảo</div>
+                    <div class="user-role">Quầy thuốc</div>
+                </div>
+            </div>
+            <a href="login.html" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="logout-text">Đăng xuất</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Right Main Content -->
+    <div class="main-content" id="mainContent">
         <!-- Header Section -->
         <div class="header-section">
             <div class="header-content">
@@ -354,96 +763,19 @@
         <div class="table-section">
             <div class="table-container">
                 <div class="table-responsive">
-                    <table class="table">
-                        <thead>
+                    <table class="table table-hover table-bordered align-middle text-center">
+                        <thead class="table-light">
                         <tr>
-                            <th width="8%">
-                                <i class="fas fa-hashtag me-2"></i>STT
-                            </th>
-                            <th width="25%">
-                                <i class="fas fa-user me-2"></i>Tên bệnh nhân
-                            </th>
-                            <th width="15%">
-                                <i class="fas fa-calendar me-2"></i>Ngày phát
-                            </th>
-                            <th width="35%">
-                                <i class="fas fa-pills me-2"></i>Tên thuốc
-                            </th>
-                            <th width="17%">
-                                <i class="fas fa-sort-numeric-up me-2"></i>Số lượng
-                            </th>
+                            <th>STT</th>
+                            <th>Tên bệnh nhân</th>
+                            <th>Tên bác sĩ</th>
+                            <th>Ngày phát</th>
+                            <th>Số tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr>
-                            <td class="fw-bold">1</td>
-                            <td class="patient-name">
-                                <i class="fas fa-user-circle me-2 text-primary"></i>
-                                Nguyễn Văn A
-                            </td>
-                            <td class="date-text">
-                                <i class="fas fa-calendar-alt me-2"></i>
-                                01/06/2024
-                            </td>
-                            <td>
-                                        <span class="medicine-badge">
-                                            <i class="fas fa-capsules me-1"></i>
-                                            Paracetamol 500mg
-                                        </span>
-                            </td>
-                            <td>
-                                        <span class="quantity-badge">
-                                            <i class="fas fa-sort-numeric-up me-1"></i>
-                                            10 viên
-                                        </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">2</td>
-                            <td class="patient-name">
-                                <i class="fas fa-user-circle me-2 text-primary"></i>
-                                Nguyễn Văn A
-                            </td>
-                            <td class="date-text">
-                                <i class="fas fa-calendar-alt me-2"></i>
-                                01/06/2024
-                            </td>
-                            <td>
-                                        <span class="medicine-badge">
-                                            <i class="fas fa-tablets me-1"></i>
-                                            Vitamin C 100mg
-                                        </span>
-                            </td>
-                            <td>
-                                        <span class="quantity-badge">
-                                            <i class="fas fa-sort-numeric-up me-1"></i>
-                                            5 viên
-                                        </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">3</td>
-                            <td class="patient-name">
-                                <i class="fas fa-user-circle me-2 text-primary"></i>
-                                Trần Thị B
-                            </td>
-                            <td class="date-text">
-                                <i class="fas fa-calendar-alt me-2"></i>
-                                02/06/2024
-                            </td>
-                            <td>
-                                        <span class="medicine-badge">
-                                            <i class="fas fa-pills me-1"></i>
-                                            Amoxicillin 500mg
-                                        </span>
-                            </td>
-                            <td>
-                                        <span class="quantity-badge">
-                                            <i class="fas fa-sort-numeric-up me-1"></i>
-                                            20 viên
-                                        </span>
-                            </td>
-                        </tr>
+                        <tbody id="invoiceTableBody">
                         </tbody>
                     </table>
                 </div>
@@ -474,9 +806,89 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
 
 <script src="/view/assets/js/core/bootstrap.bundle.min.js"></script>
 <script>
+    const baseUrl = window.location.origin + '/ClinicManagementSystem_war';
+
+    fetch(`${baseUrl}/api/historyPay`)
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('invoiceTableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6">Không có đơn nào!</td></tr>`;
+                return;
+            }
+
+            data.forEach((invoice, index) => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                      <td>${index + 1}</td>
+                      <td><i class="fas fa-user-circle text-primary me-2"></i>${invoice.patientName || 'N/A'}</td>
+                      <td><i class="fas fa-user-circle text-primary me-2"></i>${invoice.phaName || 'N/A'}</td>
+                      <td><i class="fas fa-calendar-alt me-2"></i>${formatDate(invoice.issueDate)}</td>
+                      <td><i class="fas fa-coins me-2"></i>${formatCurrency(invoice.totalAmount)}</td>
+                      <td>
+                        <span class="badge bg-${invoice.status === 'paid' ? 'success' : 'secondary'}">
+                          ${invoice.status === 'paid' ? 'Đã thanh toán' : invoice.status}
+                        </span>
+                      </td>
+                      <td>
+                        <a href="invoice-detail.html?invoiceId=${invoice.invoiceId}" class="btn btn-outline-primary btn-sm">
+                          <i class="fas fa-eye"></i>
+                        </a>
+                          <button class="btn btn-outline-success btn-sm print-btn"
+                              data-id="${invoice.invoiceId}"
+                              data-patient="${invoice.patientName}"
+                              data-pharmacist="${invoice.phaName}"
+                              data-date="${formatDate(invoice.issueDate)}"
+                              data-total="${formatCurrency(invoice.totalAmount)}">
+                              <i class="fas fa-print"></i>
+                            </button>
+                      </td>
+                    `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(err => {
+            console.error("❌ Lỗi khi load lịch sử:", err);
+            document.getElementById('invoiceTableBody').innerHTML =
+                `<tr><td colspan="6">Lỗi khi tải dữ liệu!</td></tr>`;
+        });
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '---';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('vi-VN');
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(amount || 0);
+    }
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+
+        if (sidebar.classList.contains('collapsed')) {
+            toggleIcon.classList.remove('fa-chevron-left');
+            toggleIcon.classList.add('fa-chevron-right');
+        } else {
+            toggleIcon.classList.remove('fa-chevron-right');
+            toggleIcon.classList.add('fa-chevron-left');
+        }
+    }
+
     // Enhanced form functionality
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.querySelector('form');
@@ -521,6 +933,50 @@
             }, 100);
         });
     });
+    document.addEventListener("click", function (e) {
+        const btn = e.target.closest(".print-btn");
+        if (!btn) return;
+
+        const invoiceId = btn.getAttribute("data-id");
+        const patientName = btn.getAttribute("data-patient");
+        const pharmacistName = btn.getAttribute("data-pharmacist");
+        const issueDate = btn.getAttribute("data-date");
+        const totalAmount = btn.getAttribute("data-total");
+
+        // Debug
+        console.log("Clicked invoiceId:", invoiceId);
+
+        fetch(`/ClinicManagementSystem_war/api/historyPayDetail?id=${invoiceId}`)
+            .then(res => res.json())
+            .then(items => {
+                const exportData = {
+                    data : {
+                        doctor: { fullName: pharmacistName },
+                        id: invoiceId,
+                        medicineRecord: { patient: { fullName: patientName } },
+                        prescriptionDate: (() => {
+                            const parts = issueDate.split("/");
+                            const dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                            return dateObj;
+                        })(),
+                        totalAmount: totalAmount
+
+                    },
+                    items: items,
+                };
+
+                localStorage.setItem("printPrescription", JSON.stringify(exportData));
+                console.log(exportData);
+                console.log("id" + invoiceId);
+
+                window.location.href = "print-prescription.html";
+            })
+            .catch(err => {
+                console.error("Lỗi fetch:", err);
+                alert("Không thể lấy dữ liệu hóa đơn để in.");
+            });
+    });
 </script>
+
 </body>
 </html>

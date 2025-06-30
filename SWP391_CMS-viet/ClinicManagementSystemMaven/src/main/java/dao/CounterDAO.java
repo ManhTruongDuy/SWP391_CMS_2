@@ -1,9 +1,6 @@
 package dao;
 
-import model.Category;
-import model.Unit;
-import model.MedicineCounter;
-import model.Warehouse;
+import model.*;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -65,8 +62,8 @@ public class CounterDAO extends DBContext {
     public int getMedicineCount() {
         String sql = "SELECT COUNT(*) FROM Medicine";
         try (
-             PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = connection.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -78,7 +75,7 @@ public class CounterDAO extends DBContext {
     public int insertPrescriptionInvoice(int invoiceId, int prescriptionId) {
         String sql = "INSERT INTO PrescriptionInvoice (invoice_id,pharmacist_id, prescription_id) VALUES (?,1,?)";
         try (
-             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, invoiceId);
             ps.setInt(2, prescriptionId);
@@ -99,7 +96,7 @@ public class CounterDAO extends DBContext {
         String sql = "INSERT INTO Medicines (prescription_invoice_id, medicine_id, quantity, dosage) VALUES (?, ?, ?, ?)";
 
         try (
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+                PreparedStatement ps = connection.prepareStatement(sql)) {
 
             for (MedicineCounter item : items) {
                 ps.setInt(1, prescriptionInvoiceId);
@@ -116,19 +113,19 @@ public class CounterDAO extends DBContext {
             e.printStackTrace();
         }
     }
-    public int insertInvoice(int patientId, int medicineRecordId, double totalAmount, String status) {
-        String sql = "INSERT INTO Invoice (patient_id, medicineRecord_id, issue_date, total_amount, status) " +
-                "VALUES (?, ?, ?, ?, ?)";
+    public int insertInvoice(int patientId, int medicineRecordId, double totalAmount, String status,Long pid) {
+        String sql = "INSERT INTO Invoice (patient_id, medicineRecord_id, issue_date, total_amount, status,pid) " +
+                "VALUES (?, ?, ?, ?, ?,?)";
 
         try (
-             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, patientId);
             ps.setInt(2, medicineRecordId);
             ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
             ps.setDouble(4, totalAmount);
             ps.setString(5, status);
-
+            ps.setLong(6, pid);
             ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
@@ -141,5 +138,135 @@ public class CounterDAO extends DBContext {
         }
 
         return -1; // Trả về -1 nếu lỗi
+    }
+    public int updateInvoiceStatus(int invoiceId, String status) {
+        String sql = "UPDATE Invoice SET status = ? WHERE invoice_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, invoiceId);
+            return ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    public int findInvoiceIdByPid(Long pid) {
+        String sql = "SELECT invoice_id FROM Invoice WHERE pid = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, pid);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("invoice_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    public int findPrescriptionIdByInvoiceId(int id) {
+        String sql = "SELECT prescription_id FROM PrescriptionInvoice WHERE invoice_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("prescription_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public int updatePrescriptionStatus(int prescriptionId, String status) {
+        String sql = "UPDATE Prescription SET status = ? WHERE prescription_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, prescriptionId);
+            return ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    public List<Invoice> getAllWithPid() {
+        List<Invoice> list = new ArrayList<>();
+        String sql = "SELECT i.invoice_id, i.patient_id, medicineRecord_id, issue_date, total_amount, status ,p.full_name AS patientName,pha.full_name AS phaName \n" +
+                "FROM Invoice i JOIN Patient p ON i.patient_id = p.patient_id \n" +
+                "JOIN PrescriptionInvoice pre ON pre.invoice_id = i.invoice_id\n" +
+                "JOIN Pharmacist pha ON pha.pharmacist_id = pre.pharmacist_id\n" +
+                "WHERE pid IS NOT NULL ORDER BY issue_date DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Invoice invoice = new Invoice(
+                        rs.getInt("invoice_id"),
+                        rs.getInt("patient_id"),
+                        rs.getInt("medicineRecord_id"),
+                        rs.getTimestamp("issue_date").toLocalDateTime(),
+                        rs.getBigDecimal("total_amount"),
+                        rs.getString("status"),
+                        rs.getString("patientName"),
+                        rs.getString("phaName")
+                );
+                list.add(invoice);
+            }
+        } catch (SQLException e) {
+        }
+        return list;
+    }
+    public List<MedicineRes> getMedicineByInvoiceId(int invoiceId) {
+        List<MedicineRes> list = new ArrayList<>();
+        String sql = "SELECT med.medicine_id,med.name,med.price,med.manuDate,med.expDate,me.quantity FROM PrescriptionInvoice pre \n" +
+                "JOIN Medicines me ON me.prescription_invoice_id = pre.prescription_invoice_id\n" +
+                "JOIN Medicine med ON med.medicine_id = me.medicine_id\n" +
+                "WHERE pre.invoice_id = ?";
+        try {
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, invoiceId);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                MedicineRes medicine = new MedicineRes(
+                        rs.getInt("medicine_id"),
+                        rs.getString("name"),
+                        rs.getDouble("price"),
+                        rs.getDate("manuDate"),
+                        rs.getDate("expDate"),
+                        rs.getInt("quantity")
+                );
+                list.add(medicine);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+    public List<MedicineCounter> findByUsage(String usage) {
+        List<MedicineCounter> medicines = new ArrayList<>();
+        String sql = "SELECT * FROM Medicine WHERE [usage] LIKE N?";
+
+        try (
+                PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setString(1, "%" + usage + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    MedicineCounter med = new MedicineCounter();
+                    med.setId(rs.getInt("medicine_id"));
+                    med.setName(rs.getString("name"));
+                    med.setManuDate(rs.getDate("manuDate"));
+                    med.setExpDate(rs.getDate("expDate"));
+                    med.setUsage(rs.getString("usage"));
+                    med.setIngredient(rs.getString("ingredient"));
+
+                    medicines.add(med);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return medicines;
     }
 }

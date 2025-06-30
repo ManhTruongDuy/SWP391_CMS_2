@@ -16,25 +16,302 @@
             --danger-color: #dc3545;
             --info-color: #6f42c1;
             --light-bg: #f8f9fa;
+            --dark-bg: #343a40;
             --white: #ffffff;
             --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
             --border-radius: 15px;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Layout Container */
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Left Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--dark-bg) 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-brand {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-brand .brand-text {
+            display: none;
+        }
+
+        .sidebar-brand:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .brand-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: -15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            display: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 0;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+
+        .sidebar.collapsed .nav-link .nav-text {
+            display: none;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar.collapsed .nav-link:hover {
+            transform: none;
+        }
+
+        .nav-link.active {
+            color: white;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+            border-right: 3px solid white;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: white;
+        }
+
+        .nav-icon {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-text {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-footer {
+            position: relative;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .user-info {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .user-details {
+            display: none;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.1rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .logout-btn {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: #ff6b6b;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .sidebar.collapsed .logout-btn .logout-text {
+            display: none;
+        }
+
+        .logout-btn:hover {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        /* Right Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            background: var(--light-bg);
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
         }
 
         .main-container {
             background: var(--white);
             border-radius: 20px;
             box-shadow: var(--shadow-lg);
-            margin: 2rem auto;
+            margin: 2rem;
             overflow: hidden;
-            max-width: 1200px;
         }
 
         .header-section {
@@ -384,7 +661,16 @@
             transform: translateY(-2px);
         }
 
+        /* Responsive Design */
         @media (max-width: 768px) {
+            .sidebar {
+                width: var(--sidebar-collapsed-width);
+            }
+
+            .main-content {
+                margin-left: var(--sidebar-collapsed-width);
+            }
+
             .main-container {
                 margin: 1rem;
                 border-radius: 15px;
@@ -411,249 +697,479 @@
             .search-card {
                 padding: 1.5rem;
             }
-        }
 
-        .highlight-match {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.3) 0%, rgba(255, 152, 0, 0.3) 100%);
-            padding: 0.125rem 0.25rem;
-            border-radius: 4px;
-            font-weight: 600;
+            .sidebar-nav .nav-section-title,
+            .sidebar .nav-text,
+            .sidebar .brand-text,
+            .sidebar .user-details,
+            .sidebar .logout-text {
+                display: none;
+            }
+
+            .sidebar .nav-link {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+
+            .sidebar .user-info {
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container-fluid">
-    <div class="main-container">
-        <!-- Header Section -->
-        <div class="header-section">
-            <div class="header-content">
-                <h1 class="page-title">
-                    <i class="fas fa-exchange-alt me-3"></i>
-                    Gợi ý thay thế thuốc
-                </h1>
-                <p class="page-subtitle">Tìm kiếm thuốc thay thế cùng hoạt chất và hàm lượng</p>
-            </div>
-        </div>
+<div class="layout-container">
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-chevron-left" id="toggleIcon"></i>
+        </button>
 
-        <!-- Search Section -->
-        <div class="search-section">
-            <div class="search-card">
-                <form class="row g-3 align-items-end" id="searchForm">
-                    <div class="col-md-8">
-                        <label for="medicine" class="form-label fw-bold">
-                            <i class="fas fa-pills me-2"></i>
-                            Tên thuốc cần tìm thay thế
-                        </label>
-                        <input type="text" class="form-control" id="medicine" name="medicine"
-                               placeholder="Nhập tên thuốc (VD: Paracetamol, Amoxicillin...)">
-                    </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-search w-100">
-                            <i class="fas fa-search me-2"></i>
-                            Tìm gợi ý
-                        </button>
-                    </div>
-                </form>
-
-                <div class="search-suggestions">
-                    <small class="text-muted">Gợi ý tìm kiếm:</small>
-                    <div class="mt-2">
-                        <span class="suggestion-tag" data-medicine="Paracetamol">Paracetamol</span>
-                        <span class="suggestion-tag" data-medicine="Amoxicillin">Amoxicillin</span>
-                        <span class="suggestion-tag" data-medicine="Ibuprofen">Ibuprofen</span>
-                        <span class="suggestion-tag" data-medicine="Aspirin">Aspirin</span>
-                    </div>
+        <div class="sidebar-header">
+            <a href="dashboard-pharmacist.html" class="sidebar-brand">
+                <div class="brand-icon">
+                    <i class="fas fa-hospital"></i>
                 </div>
-            </div>
-        </div>
-
-        <!-- Info Section -->
-        <div class="info-section">
-            <div class="info-cards">
-                <div class="info-card">
-                    <i class="fas fa-atom info-icon" style="color: var(--success-color);"></i>
-                    <div class="info-title">Cùng hoạt chất</div>
-                    <div class="info-text">Tìm thuốc có cùng thành phần hoạt chất chính</div>
-                </div>
-                <div class="info-card">
-                    <i class="fas fa-balance-scale info-icon" style="color: var(--warning-color);"></i>
-                    <div class="info-title">Cùng hàm lượng</div>
-                    <div class="info-text">Đảm bảo liều lượng tương đương</div>
-                </div>
-                <div class="info-card">
-                    <i class="fas fa-industry info-icon" style="color: var(--info-color);"></i>
-                    <div class="info-title">Nhiều nhà sản xuất</div>
-                    <div class="info-text">So sánh từ các nhà sản xuất khác nhau</div>
-                </div>
-                <div class="info-card">
-                    <i class="fas fa-shield-alt info-icon" style="color: var(--primary-color);"></i>
-                    <div class="info-title">An toàn thay thế</div>
-                    <div class="info-text">Đảm bảo hiệu quả điều trị tương tự</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Loading State -->
-        <div class="loading-spinner" id="loadingSpinner">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="visually-hidden">Đang tìm kiếm...</span>
-            </div>
-            <h5 class="mt-3 text-primary">Đang tìm kiếm thuốc thay thế...</h5>
-            <p class="text-muted">Vui lòng chờ trong giây lát</p>
-        </div>
-
-        <!-- Table Section -->
-        <div class="table-section" id="resultsSection">
-            <div class="table-header">
-                <h3 class="table-title">
-                    <i class="fas fa-list-alt me-2"></i>
-                    Kết quả tìm kiếm
-                </h3>
-                <span class="results-count">
-                        <i class="fas fa-check-circle me-1"></i>
-                        3 thuốc thay thế
-                    </span>
-            </div>
-
-            <div class="table-container">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th width="8%">
-                                <i class="fas fa-hashtag me-2"></i>STT
-                            </th>
-                            <th width="30%">
-                                <i class="fas fa-pills me-2"></i>Tên thuốc
-                            </th>
-                            <th width="25%">
-                                <i class="fas fa-atom me-2"></i>Hoạt chất
-                            </th>
-                            <th width="15%">
-                                <i class="fas fa-weight me-2"></i>Hàm lượng
-                            </th>
-                            <th width="22%">
-                                <i class="fas fa-industry me-2"></i>Nhà sản xuất
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody id="resultsTableBody">
-                        <tr>
-                            <td>
-                                <div class="row-number">1</div>
-                            </td>
-                            <td>
-                                <div class="medicine-name">
-                                    <i class="fas fa-capsules me-2 text-primary"></i>
-                                    Paracetamol 500mg
-                                </div>
-                            </td>
-                            <td>
-                                        <span class="active-ingredient">
-                                            <i class="fas fa-atom me-1"></i>
-                                            Paracetamol
-                                        </span>
-                            </td>
-                            <td>
-                                        <span class="dosage-badge">
-                                            <i class="fas fa-weight me-1"></i>
-                                            500mg
-                                        </span>
-                            </td>
-                            <td>
-                                <div class="manufacturer">
-                                    <i class="fas fa-building me-1"></i>
-                                    DHG Pharma
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="row-number">2</div>
-                            </td>
-                            <td>
-                                <div class="medicine-name">
-                                    <i class="fas fa-tablets me-2 text-primary"></i>
-                                    Hapacol 500
-                                </div>
-                            </td>
-                            <td>
-                                        <span class="active-ingredient">
-                                            <i class="fas fa-atom me-1"></i>
-                                            Paracetamol
-                                        </span>
-                            </td>
-                            <td>
-                                        <span class="dosage-badge">
-                                            <i class="fas fa-weight me-1"></i>
-                                            500mg
-                                        </span>
-                            </td>
-                            <td>
-                                <div class="manufacturer">
-                                    <i class="fas fa-building me-1"></i>
-                                    Dược Hậu Giang
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="row-number">3</div>
-                            </td>
-                            <td>
-                                <div class="medicine-name">
-                                    <i class="fas fa-pills me-2 text-primary"></i>
-                                    Efferalgan 500
-                                </div>
-                            </td>
-                            <td>
-                                        <span class="active-ingredient">
-                                            <i class="fas fa-atom me-1"></i>
-                                            Paracetamol
-                                        </span>
-                            </td>
-                            <td>
-                                        <span class="dosage-badge">
-                                            <i class="fas fa-weight me-1"></i>
-                                            500mg
-                                        </span>
-                            </td>
-                            <td>
-                                <div class="manufacturer">
-                                    <i class="fas fa-building me-1"></i>
-                                    UPSA
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Empty State -->
-        <div class="empty-state" id="emptyState">
-            <i class="fas fa-search-minus"></i>
-            <h4>Không tìm thấy thuốc thay thế</h4>
-            <p>Không có thuốc nào có cùng hoạt chất và hàm lượng với thuốc bạn tìm kiếm.</p>
-            <p class="text-muted">Vui lòng thử lại với tên thuốc khác hoặc liên hệ dược sĩ để được tư vấn.</p>
-        </div>
-
-        <!-- Footer Section -->
-        <div class="footer-section">
-            <a href="dashboard-pharmacist.html" class="btn-back">
-                <i class="fas fa-arrow-left me-2"></i>
-                Quay lại Dashboard
+                <span class="brand-text">MediCare System</span>
             </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Chính</div>
+                <div class="nav-item">
+                    <a href="dashboard-pharmacist.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        <span class="nav-text">Chức năng</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Quản lý</div>
+                <div class="nav-item">
+                    <a href="prescription.html" class="nav-link">
+                        <i class="fas fa-file-prescription nav-icon"></i>
+                        <span class="nav-text">Đơn thuốc</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="counter.html" class="nav-link">
+                        <i class="fas fa-cash-register nav-icon"></i>
+                        <span class="nav-text">Quầy thuốc</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="alternative-medicine.html" class="nav-link active">
+                        <i class="fas fa-exchange-alt nav-icon"></i>
+                        <span class="nav-text">Thuốc thay thế</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="patients.html" class="nav-link">
+                        <i class="fas fa-user-injured nav-icon"></i>
+                        <span class="nav-text">Bệnh nhân</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="medicines.html" class="nav-link">
+                        <i class="fas fa-pills nav-icon"></i>
+                        <span class="nav-text">Thuốc</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="inventory.html" class="nav-link">
+                        <i class="fas fa-boxes nav-icon"></i>
+                        <span class="nav-text">Kho thuốc</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Báo cáo</div>
+                <div class="nav-item">
+                    <a href="statistic-pharmacist.html" class="nav-link">
+                        <i class="fas fa-chart-bar nav-icon"></i>
+                        <span class="nav-text">Thống kê</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="history-pharmacist.html" class="nav-link">
+                        <i class="fas fa-chart-line nav-icon"></i>
+                        <span class="nav-text">Lịch sử & Tra cứu</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Hệ thống</div>
+                <div class="nav-item">
+                    <a href="settings.html" class="nav-link">
+                        <i class="fas fa-cog nav-icon"></i>
+                        <span class="nav-text">Cài đặt</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="users.html" class="nav-link">
+                        <i class="fas fa-users nav-icon"></i>
+                        <span class="nav-text">Người dùng</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">DT</div>
+                <div class="user-details">
+                    <div class="user-name">Dược sĩ Thảo</div>
+                    <div class="user-role">Quầy thuốc</div>
+                </div>
+            </div>
+            <a href="login.html" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="logout-text">Đăng xuất</span>
+            </a>
+        </div>
+    </div>
+    <div class="main-content" id="mainContent">
+        <div class="main-container">
+            <!-- Header Section -->
+            <div class="header-section">
+                <div class="header-content">
+                    <h1 class="page-title">
+                        <i class="fas fa-exchange-alt me-3"></i>
+                        Gợi ý thay thế thuốc
+                    </h1>
+                    <p class="page-subtitle">Tìm kiếm thuốc thay thế theo công dụng và hoạt chất</p>
+                </div>
+            </div>
+
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="search-card">
+                    <form class="row g-3 align-items-end" id="searchForm">
+                        <div class="col-md-8">
+                            <label for="searchInput" class="form-label fw-bold">
+                                <i class="fas fa-search me-2"></i>
+                                Tìm kiếm theo công dụng hoặc tên thuốc
+                            </label>
+                            <input type="text" class="form-control" id="searchInput" name="searchInput"
+                                   placeholder="VD: Giảm đau, hạ sốt, Paracetamol, kháng sinh...">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-search w-100">
+                                <i class="fas fa-search me-2"></i>
+                                Tìm kiếm
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="search-suggestions">
+                        <small class="text-muted">Gợi ý tìm kiếm:</small>
+                        <div class="mt-2">
+                            <span class="suggestion-tag" data-search="giảm đau">Giảm đau</span>
+                            <span class="suggestion-tag" data-search="hạ sốt">Hạ sốt</span>
+                            <span class="suggestion-tag" data-search="kháng sinh">Kháng sinh</span>
+                            <span class="suggestion-tag" data-search="tiêu hóa">Tiêu hóa</span>
+                            <span class="suggestion-tag" data-search="cảm cúm">Cảm cúm</span>
+                            <span class="suggestion-tag" data-search="vitamin">Vitamin</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-section">
+                <div class="info-cards">
+                    <div class="info-card">
+                        <i class="fas fa-atom info-icon" style="color: var(--success-color);"></i>
+                        <div class="info-title">Tìm theo công dụng</div>
+                        <div class="info-text">Tìm thuốc có cùng tác dụng điều trị</div>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-pills info-icon" style="color: var(--warning-color);"></i>
+                        <div class="info-title">Tìm theo tên thuốc</div>
+                        <div class="info-text">Tìm thuốc thay thế cùng hoạt chất</div>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-industry info-icon" style="color: var(--info-color);"></i>
+                        <div class="info-title">Nhiều lựa chọn</div>
+                        <div class="info-text">So sánh từ các nhà sản xuất khác nhau</div>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-shield-alt info-icon" style="color: var(--primary-color);"></i>
+                        <div class="info-title">An toàn thay thế</div>
+                        <div class="info-text">Đảm bảo hiệu quả điều trị tương tự</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Đang tìm kiếm...</span>
+                </div>
+                <h5 class="mt-3 text-primary">Đang tìm kiếm thuốc...</h5>
+                <p class="text-muted">Vui lòng chờ trong giây lát</p>
+            </div>
+
+            <!-- Table Section -->
+            <div class="table-section" id="resultsSection" style="display:none">
+                <div class="table-header">
+                    <h3 class="table-title">
+                        <i class="fas fa-list-alt me-2"></i>
+                        Kết quả tìm kiếm
+                    </h3>
+                    <span class="results-count">
+                        <i class="fas fa-check-circle me-1"></i>
+                        <span id="resultCount">0</span> thuốc tìm thấy
+                    </span>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th width="8%"><i class="fas fa-hashtag me-2"></i>STT</th>
+                                <th width="25%"><i class="fas fa-pills me-2"></i>Tên thuốc</th>
+                                <th width="15%"><i class="fas fa-calendar-day me-2"></i>Ngày SX</th>
+                                <th width="15%"><i class="fas fa-calendar-times me-2"></i>HSD</th>
+                                <th width="25%"><i class="fas fa-align-left me-2"></i>Công dụng</th>
+                                <th width="12%"><i class="fas fa-dna me-2"></i>Hoạt chất</th>
+                            </tr>
+                            </thead>
+                            <tbody id="resultsTableBody">
+                            <!-- JavaScript sẽ thêm dòng vào đây -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-search-minus"></i>
+                <h4>Không tìm thấy thuốc phù hợp</h4>
+                <p>Không có thuốc nào phù hợp với từ khóa tìm kiếm của bạn.</p>
+                <p class="text-muted">Vui lòng thử lại với từ khóa khác hoặc liên hệ dược sĩ để được tư vấn.</p>
+            </div>
+
+            <!-- Footer Section -->
+            <div class="footer-section">
+                <a href="dashboard-pharmacist.html" class="btn-back">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Quay lại Dashboard
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="/view/assets/js/core/bootstrap.bundle.min.js"></script>
 <script>
+    // Sample medicine data for demonstration
+    const medicineDatabase = [
+        {
+            id: 1,
+            name: "Paracetamol 500mg",
+            manuDate: "2024-01-15",
+            expDate: "2026-01-15",
+            usage: "Giảm đau, hạ sốt",
+            ingredient: "Paracetamol"
+        },
+        {
+            id: 2,
+            name: "Acetaminophen 500mg",
+            manuDate: "2024-02-10",
+            expDate: "2026-02-10",
+            usage: "Giảm đau, hạ sốt",
+            ingredient: "Paracetamol"
+        },
+        {
+            id: 3,
+            name: "Ibuprofen 400mg",
+            manuDate: "2024-01-20",
+            expDate: "2025-12-20",
+            usage: "Giảm đau, chống viêm",
+            ingredient: "Ibuprofen"
+        },
+        {
+            id: 4,
+            name: "Aspirin 325mg",
+            manuDate: "2024-03-05",
+            expDate: "2026-03-05",
+            usage: "Giảm đau, chống viêm, ngăn ngừa đột quỵ",
+            ingredient: "Aspirin"
+        },
+        {
+            id: 5,
+            name: "Amoxicillin 500mg",
+            manuDate: "2024-02-15",
+            expDate: "2025-08-15",
+            usage: "Kháng sinh, điều trị nhiễm khuẩn",
+            ingredient: "Amoxicillin"
+        },
+        {
+            id: 6,
+            name: "Cephalexin 500mg",
+            manuDate: "2024-01-30",
+            expDate: "2025-07-30",
+            usage: "Kháng sinh, điều trị nhiễm khuẩn",
+            ingredient: "Cephalexin"
+        },
+        {
+            id: 7,
+            name: "Vitamin C 1000mg",
+            manuDate: "2024-04-01",
+            expDate: "2026-04-01",
+            usage: "Bổ sung vitamin C, tăng cường miễn dịch",
+            ingredient: "Ascorbic Acid"
+        },
+        {
+            id: 8,
+            name: "Omeprazole 20mg",
+            manuDate: "2024-02-20",
+            expDate: "2025-11-20",
+            usage: "Điều trị loét dạ dày, trào ngược dạ dày",
+            ingredient: "Omeprazole"
+        },
+        {
+            id: 9,
+            name: "Lansoprazole 30mg",
+            manuDate: "2024-03-10",
+            expDate: "2025-12-10",
+            usage: "Điều trị loét dạ dày, trào ngược dạ dày",
+            ingredient: "Lansoprazole"
+        },
+        {
+            id: 10,
+            name: "Cetirizine 10mg",
+            manuDate: "2024-01-25",
+            expDate: "2026-01-25",
+            usage: "Chống dị ứng, điều trị viêm mũi dị ứng",
+            ingredient: "Cetirizine"
+        }
+    ];
+
+    // Sidebar toggle functionality
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+
+        if (sidebar.classList.contains('collapsed')) {
+            toggleIcon.classList.remove('fa-chevron-left');
+            toggleIcon.classList.add('fa-chevron-right');
+        } else {
+            toggleIcon.classList.remove('fa-chevron-right');
+            toggleIcon.classList.add('fa-chevron-left');
+        }
+    }
+
+    // Format date function
+    function formatDate(dateStr) {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('vi-VN');
+    }
+
+    // Search function
+    function searchMedicines(searchTerm) {
+        const term = searchTerm.toLowerCase().trim();
+        return medicineDatabase.filter(medicine =>
+            medicine.name.toLowerCase().includes(term) ||
+            medicine.usage.toLowerCase().includes(term) ||
+            medicine.ingredient.toLowerCase().includes(term)
+        );
+    }
+
+    // Display results function
+    function displayResults(results, searchTerm) {
+        const tbody = document.getElementById('resultsTableBody');
+        const resultCount = document.getElementById('resultCount');
+        const resultsSection = document.getElementById('resultsSection');
+        const emptyState = document.getElementById('emptyState');
+
+        tbody.innerHTML = '';
+        resultCount.textContent = results.length;
+
+        if (results.length > 0) {
+            resultsSection.style.display = 'block';
+            emptyState.style.display = 'none';
+
+            results.forEach((medicine, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="row-number">${index + 1}</div>
+                    </td>
+                    <td>
+                        <div class="medicine-name">${highlightText(medicine.name, searchTerm)}</div>
+                    </td>
+                    <td>
+                        <span class="text-muted">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            ${formatDate(medicine.manuDate)}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="text-muted">
+                            <i class="fas fa-calendar-times me-1"></i>
+                            ${formatDate(medicine.expDate)}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="text-info">${highlightText(medicine.usage, searchTerm)}</span>
+                    </td>
+                    <td>
+                        <span class="active-ingredient">${medicine.ingredient}</span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Add animation to table rows
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    row.style.transition = 'all 0.5s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Smooth scroll to results
+            setTimeout(() => {
+                resultsSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 500);
+        } else {
+            resultsSection.style.display = 'none';
+            emptyState.style.display = 'block';
+            emptyState.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+    }
+
+    // Highlight search terms
+    function highlightText(text, searchTerm) {
+        if (!searchTerm) return text;
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+        return text.replace(regex, '<span class="highlight-match">$1</span>');
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('searchForm');
-        const medicineInput = document.getElementById('medicine');
+        const searchInput = document.getElementById('searchInput');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const resultsSection = document.getElementById('resultsSection');
         const emptyState = document.getElementById('emptyState');
@@ -662,19 +1178,27 @@
         // Handle suggestion tags
         suggestionTags.forEach(tag => {
             tag.addEventListener('click', function() {
-                const medicine = this.getAttribute('data-medicine');
-                medicineInput.value = medicine;
+                const searchTerm = this.getAttribute('data-search');
+                searchInput.value = searchTerm;
                 form.dispatchEvent(new Event('submit'));
             });
+
+            // Add keyboard support
+            tag.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    this.click();
+                }
+            });
+            tag.setAttribute('tabindex', '0');
         });
 
         // Handle form submission
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const searchTerm = medicineInput.value.trim();
+            const searchTerm = searchInput.value.trim();
             if (!searchTerm) {
-                medicineInput.focus();
+                searchInput.focus();
                 return;
             }
 
@@ -683,71 +1207,25 @@
             emptyState.style.display = 'none';
             loadingSpinner.style.display = 'block';
 
-            // Simulate API call
+            // Simulate API call delay
             setTimeout(() => {
                 loadingSpinner.style.display = 'none';
 
-                // Simulate search results (you can replace this with actual API call)
-                const hasResults = Math.random() > 0.3; // 70% chance of having results
-
-                if (hasResults) {
-                    resultsSection.style.display = 'block';
-
-                    // Add animation to table rows
-                    const rows = document.querySelectorAll('#resultsTableBody tr');
-                    rows.forEach((row, index) => {
-                        row.style.opacity = '0';
-                        row.style.transform = 'translateY(20px)';
-                        setTimeout(() => {
-                            row.style.transition = 'all 0.5s ease';
-                            row.style.opacity = '1';
-                            row.style.transform = 'translateY(0)';
-                        }, index * 150);
-                    });
-
-                    // Highlight search term in results
-                    highlightSearchTerm(searchTerm);
-
-                    // Smooth scroll to results
-                    setTimeout(() => {
-                        resultsSection.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }, 500);
-                } else {
-                    emptyState.style.display = 'block';
-                    emptyState.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                }
-            }, 2000);
+                // Search medicines
+                const results = searchMedicines(searchTerm);
+                displayResults(results, searchTerm);
+            }, 1500);
         });
 
-        // Function to highlight search terms
-        function highlightSearchTerm(term) {
-            const medicineNames = document.querySelectorAll('.medicine-name');
-            medicineNames.forEach(element => {
-                const text = element.textContent;
-                const regex = new RegExp(`(${term})`, 'gi');
-                if (regex.test(text)) {
-                    element.innerHTML = element.innerHTML.replace(regex, '<span class="highlight-match">$1</span>');
-                }
-            });
-        }
+        // Auto-focus on search input
+        searchInput.focus();
 
-        // Auto-focus on medicine input
-        medicineInput.focus();
-
-        // Add enter key support for suggestion tags
-        suggestionTags.forEach(tag => {
-            tag.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    this.click();
-                }
-            });
-            tag.setAttribute('tabindex', '0');
+        // Add real-time search suggestions (optional)
+        searchInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            if (value.length >= 2) {
+                // You can add real-time suggestions here
+            }
         });
     });
 </script>

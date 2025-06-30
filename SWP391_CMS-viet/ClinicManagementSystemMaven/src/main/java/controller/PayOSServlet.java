@@ -27,10 +27,10 @@ public class PayOSServlet extends HttpServlet {
         }
         try {
             int amount = Integer.parseInt(amountStr);
-            // TODO: Thay thế các thông tin bên dưới bằng thông tin PayOS thực tế của bạn
+            //
             String payosApiUrl = "https://api.payos.vn/v1/payment-qr"; // Ví dụ, thay bằng endpoint thực tế
-            String apiKey = "c4918efa-f45a-400c-9366-60e8b0ce400a"; // TODO
-            String accountId = "ae019f41-d3ea-4478-8a0e-836e499fd3b4"; // TODO
+            String apiKey = "c4918efa-f45a-400c-9366-60e8b0ce400a"; //
+            String accountId = "ae019f41-d3ea-4478-8a0e-836e499fd3b4"; //
             String orderInfo = "Thanh toan don thuoc";
 
             // Tạo JSON body gửi lên PayOS

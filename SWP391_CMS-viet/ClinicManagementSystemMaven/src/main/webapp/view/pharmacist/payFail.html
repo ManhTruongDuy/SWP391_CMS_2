@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh toán thất bại</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8d7da;
+            color: #721c24;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            margin-top: 100px;
+            max-width: 500px;
+            background-color: #fff;
+            border-radius: 10px;
+            border: 1px solid #f5c6cb;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .btn-home {
+            margin-top: 20px;
+            background-color: #721c24;
+            color: white;
+            border: none;
+        }
+        .btn-home:hover {
+            background-color: #501417;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>❌ Thanh toán thất bại</h2>
+    <p>Đơn hàng của bạn đã bị hủy hoặc thanh toán không thành công.</p>
+    <button class="btn btn-home" onclick="goToHistory()">Về lịch sử đơn hàng</button>
+</div>
+
+<script>
+    function goToHistory() {
+        window.location.href = 'history-pharmacist.html.html'; // 👉 thay bằng đường dẫn thực tế đến trang lịch sử
+    }
+</script>
+</body>
+</html>
