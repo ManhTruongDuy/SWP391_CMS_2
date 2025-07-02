@@ -703,6 +703,16 @@
             color: var(--danger-color);
         }
 
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border: 1px solid #f5c6cb;
+            display: none;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
@@ -917,28 +927,16 @@
                                 <i class="fas fa-calendar-alt me-2"></i>
                                 Từ ngày
                             </label>
-                            <input type="date" class="form-control" id="startDate" name="startDate">
+                            <input type="date" class="form-control" id="startDate" name="startDate" required>
                         </div>
                         <div class="col-md-3">
                             <label for="endDate" class="form-label fw-bold">
                                 <i class="fas fa-calendar-alt me-2"></i>
                                 Đến ngày
                             </label>
-                            <input type="date" class="form-control" id="endDate" name="endDate">
+                            <input type="date" class="form-control" id="endDate" name="endDate" required>
                         </div>
-                        <div class="col-md-3">
-                            <label for="period" class="form-label fw-bold">
-                                <i class="fas fa-clock me-2"></i>
-                                Khoảng thời gian
-                            </label>
-                            <select class="form-control" id="period" name="period">
-                                <option value="today">Hôm nay</option>
-                                <option value="week">Tuần này</option>
-                                <option value="month" selected>Tháng này</option>
-                                <option value="quarter">Quý này</option>
-                                <option value="year">Năm này</option>
-                            </select>
-                        </div>
+
                         <div class="col-md-3">
                             <button type="submit" class="btn btn-stats w-100">
                                 <i class="fas fa-chart-line me-2"></i>
@@ -949,6 +947,12 @@
                 </div>
             </div>
 
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="errorText"></span>
+            </div>
+
             <!-- Statistics Overview -->
             <div class="stats-overview">
                 <div class="stats-cards">
@@ -956,44 +960,40 @@
                         <div class="stat-icon icon-primary">
                             <i class="fas fa-file-prescription"></i>
                         </div>
-                        <div class="stat-number">25</div>
-                        <div class="stat-label">Tổng đơn thuốc</div>
+                        <div class="stat-number" id="totalInvoices">0</div>
+                        <div class="stat-label">Tổng hóa đơn</div>
                         <div class="trend-indicator trend-up">
                             <i class="fas fa-arrow-up"></i>
-                            +12%
                         </div>
                     </div>
                     <div class="stat-card success">
                         <div class="stat-icon icon-success">
-                            <i class="fas fa-pills"></i>
+                            <i class="fas fa-dollar-sign"></i>
                         </div>
-                        <div class="stat-number">250</div>
-                        <div class="stat-label">Tổng viên thuốc</div>
+                        <div class="stat-number" id="totalAmount">0 VNĐ</div>
+                        <div class="stat-label">Tổng doanh thu</div>
                         <div class="trend-indicator trend-up">
                             <i class="fas fa-arrow-up"></i>
-                            +8%
                         </div>
                     </div>
                     <div class="stat-card warning">
                         <div class="stat-icon icon-warning">
-                            <i class="fas fa-capsules"></i>
+                            <i class="fas fa-user-injured"></i>
                         </div>
-                        <div class="stat-number">15</div>
-                        <div class="stat-label">Loại thuốc</div>
+                        <div class="stat-number" id="totalPatients">0</div>
+                        <div class="stat-label">Tổng bệnh nhân</div>
                         <div class="trend-indicator trend-up">
                             <i class="fas fa-arrow-up"></i>
-                            +3
                         </div>
                     </div>
                     <div class="stat-card info">
                         <div class="stat-icon icon-info">
-                            <i class="fas fa-user-injured"></i>
+                            <i class="fas fa-chart-line"></i>
                         </div>
-                        <div class="stat-number">18</div>
-                        <div class="stat-label">Bệnh nhân</div>
+                        <div class="stat-number" id="avgAmount">0 VNĐ</div>
+                        <div class="stat-label">Trung bình/hóa đơn</div>
                         <div class="trend-indicator trend-up">
                             <i class="fas fa-arrow-up"></i>
-                            +5
                         </div>
                     </div>
                 </div>
@@ -1006,7 +1006,7 @@
                         <div class="chart-container">
                             <h4 class="chart-title">
                                 <i class="fas fa-chart-line me-2"></i>
-                                Xu hướng phát thuốc theo thời gian
+                                Xu hướng theo thời gian
                             </h4>
                             <div class="chart-wrapper">
                                 <canvas id="trendChart"></canvas>
@@ -1017,7 +1017,7 @@
                         <div class="chart-container">
                             <h4 class="chart-title">
                                 <i class="fas fa-chart-pie me-2"></i>
-                                Phân bố theo loại thuốc
+                                Trạng thái hóa đơn
                             </h4>
                             <div class="mini-chart-wrapper">
                                 <canvas id="pieChart"></canvas>
@@ -1041,12 +1041,8 @@
                 <div class="table-header">
                     <h3 class="table-title">
                         <i class="fas fa-table me-2"></i>
-                        Chi tiết thống kê
+                        Chi tiết hóa đơn
                     </h3>
-                    <button class="export-btn" onclick="exportData()">
-                        <i class="fas fa-download me-2"></i>
-                        Xuất Excel
-                    </button>
                 </div>
 
                 <div class="table-container">
@@ -1054,90 +1050,22 @@
                         <table class="table" id="statsTable">
                             <thead>
                             <tr>
-                                <th width="8%">
-                                    <i class="fas fa-hashtag me-2"></i>STT
+                                <th width="10%">
+                                    <i class="fas fa-hashtag me-2"></i>Mã HĐ
                                 </th>
-                                <th width="40%">
-                                    <i class="fas fa-pills me-2"></i>Tên thuốc
+                                <th width="20%">
+                                    <i class="fas fa-calendar me-2"></i>Ngày tạo
                                 </th>
-                                <th width="26%">
-                                    <i class="fas fa-file-prescription me-2"></i>Số đơn đã phát
+                                <th width="20%">
+                                    <i class="fas fa-dollar-sign me-2"></i>Tổng tiền
                                 </th>
-                                <th width="26%">
-                                    <i class="fas fa-sort-numeric-up me-2"></i>Số viên đã cấp
+                                <th width="15%">
+                                    <i class="fas fa-info-circle me-2"></i>Trạng thái
                                 </th>
                             </tr>
                             </thead>
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <div class="row-number">1</div>
-                                </td>
-                                <td>
-                                    <div class="medicine-name">
-                                        <i class="fas fa-capsules me-2 text-primary"></i>
-                                        Paracetamol 500mg
-                                    </div>
-                                </td>
-                                <td>
-                                        <span class="prescription-count">
-                                            <i class="fas fa-file-prescription me-1"></i>
-                                            12 đơn
-                                        </span>
-                                </td>
-                                <td>
-                                        <span class="pills-count">
-                                            <i class="fas fa-pills me-1"></i>
-                                            120 viên
-                                        </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="row-number">2</div>
-                                </td>
-                                <td>
-                                    <div class="medicine-name">
-                                        <i class="fas fa-tablets me-2 text-primary"></i>
-                                        Amoxicillin 500mg
-                                    </div>
-                                </td>
-                                <td>
-                                        <span class="prescription-count">
-                                            <i class="fas fa-file-prescription me-1"></i>
-                                            8 đơn
-                                        </span>
-                                </td>
-                                <td>
-                                        <span class="pills-count">
-                                            <i class="fas fa-pills me-1"></i>
-                                            80 viên
-                                        </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="row-number">3</div>
-                                </td>
-                                <td>
-                                    <div class="medicine-name">
-                                        <i class="fas fa-pills me-2 text-primary"></i>
-                                        Vitamin C 100mg
-                                    </div>
-                                </td>
-                                <td>
-                                        <span class="prescription-count">
-                                            <i class="fas fa-file-prescription me-1"></i>
-                                            5 đơn
-                                        </span>
-                                </td>
-                                <td>
-                                        <span class="pills-count">
-                                            <i class="fas fa-pills me-1"></i>
-                                            50 viên
-                                        </span>
-                                </td>
-                            </tr>
+                            <tbody id="invoiceTableBody">
+                            <!-- Data will be populated by JavaScript -->
                             </tbody>
                         </table>
                     </div>
@@ -1157,6 +1085,11 @@
 
 <script src="/view/assets/js/core/bootstrap.bundle.min.js"></script>
 <script>
+    // Global variables
+    const baseUrl = window.location.origin + '/ClinicManagementSystem_war';
+    let trendChart, pieChart;
+    let currentData = null;
+
     // Sidebar toggle functionality
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
@@ -1175,25 +1108,209 @@
         }
     }
 
-    // Initialize charts
-    let trendChart, pieChart;
-
+    // Initialize page
     document.addEventListener('DOMContentLoaded', function() {
         initializeCharts();
         setupEventListeners();
         setDefaultDates();
+        loadInitialData();
     });
 
+    // Set default dates (first day of current month to today)
+    function setDefaultDates() {
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        document.getElementById('startDate').value = firstDayOfMonth.toISOString().split('T')[0];
+        document.getElementById('endDate').value = today.toISOString().split('T')[0];
+    }
+
+    // Load initial data on page load
+    function loadInitialData() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (startDate && endDate) {
+            fetchStatistics(startDate, endDate);
+        }
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+        const form = document.getElementById('statsForm');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                showError('Vui lòng chọn ngày bắt đầu và ngày kết thúc');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                showError('Ngày bắt đầu không thể lớn hơn ngày kết thúc');
+                return;
+            }
+
+            fetchStatistics(startDate, endDate);
+        });
+    }
+
+    // Fetch statistics from API
+    async function fetchStatistics(startDate, endDate) {
+        try {
+            showLoading(true);
+            hideError();
+
+            const response = await fetch(`${baseUrl}/api/statistic-counter?startDate=${startDate}&endDate=${endDate}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            currentData = data;
+
+            updateStatistics(data);
+            updateCharts(data);
+            updateTable(data.invoices || []);
+
+            showLoading(false);
+
+            // Scroll to results
+            document.querySelector('.stats-overview').scrollIntoView({
+                behavior: 'smooth'
+            });
+
+        } catch (error) {
+            console.error('Error fetching statistics:', error);
+            showError('Không thể tải dữ liệu thống kê. Vui lòng thử lại sau.');
+            showLoading(false);
+        }
+    }
+
+    // Update statistics cards
+    function updateStatistics(data) {
+        document.getElementById('totalInvoices').textContent = data.total_invoice || 0;
+        document.getElementById('totalAmount').textContent = formatCurrency(data.total_amount || 0);
+        document.getElementById('totalPatients').textContent = data.total_patient || 0;
+
+        // Calculate average amount per invoice
+        const avgAmount = data.total_invoice > 0 ? (data.total_amount / data.total_invoice) : 0;
+        document.getElementById('avgAmount').textContent = formatCurrency(avgAmount);
+    }
+
+    // Update charts with new data
+    function updateCharts(data) {
+        updateTrendChart(data.invoices || []);
+        updatePieChart(data.invoices || []);
+    }
+
+    // Update trend chart
+    function updateTrendChart(invoices) {
+        // Group invoices by date
+        const dateGroups = {};
+        invoices.forEach(invoice => {
+            const date = new Date(invoice.issueDate).toLocaleDateString('vi-VN');
+            if (!dateGroups[date]) {
+                dateGroups[date] = { count: 0, amount: 0 };
+            }
+            dateGroups[date].count++;
+            dateGroups[date].amount += parseFloat(invoice.totalAmount || 0);
+        });
+
+        const dates = Object.keys(dateGroups).sort();
+        const counts = dates.map(date => dateGroups[date].count);
+        const amounts = dates.map(date => dateGroups[date].amount);
+
+        trendChart.data.labels = dates;
+        trendChart.data.datasets[0].data = counts;
+        trendChart.data.datasets[1].data = amounts;
+        trendChart.update('active');
+    }
+
+    // Update pie chart
+    function updatePieChart(invoices) {
+        // Group by status
+        const statusGroups = {};
+        invoices.forEach(invoice => {
+            const status = invoice.status || 'Không xác định';
+            statusGroups[status] = (statusGroups[status] || 0) + 1;
+        });
+
+        const labels = Object.keys(statusGroups);
+        const data = Object.values(statusGroups);
+        const colors = ['#28a745', '#2c5aa0', '#ffc107', '#dc3545', '#6f42c1'];
+
+        pieChart.data.labels = labels;
+        pieChart.data.datasets[0].data = data;
+        pieChart.data.datasets[0].backgroundColor = colors.slice(0, labels.length);
+        pieChart.update('active');
+    }
+
+    // Update table with invoice data
+    function updateTable(invoices) {
+        const tbody = document.getElementById('invoiceTableBody');
+        tbody.innerHTML = '';
+
+        if (invoices.length === 0) {
+            tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">
+                            <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                            Không có dữ liệu trong khoảng thời gian đã chọn
+                        </td>
+                    </tr>
+                `;
+            return;
+        }
+
+        invoices.forEach((invoice, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                    <td>
+                        <div class="row-number">${invoice.invoiceId}</div>
+                    </td>
+                    <td>
+                        <div class="medicine-name">
+                            <i class="fas fa-calendar me-2 text-primary"></i>
+                            ${formatDate(invoice.issueDate)}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="prescription-count">
+                            <i class="fas fa-dollar-sign me-1"></i>
+                            ${formatCurrency(invoice.totalAmount)}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="pills-count ${getStatusClass(invoice.status)}">
+                            <i class="fas fa-info-circle me-1"></i>
+                            ${invoice.status || 'Không xác định'}
+                        </span>
+                    </td>
+                `;
+            tbody.appendChild(row);
+        });
+
+        // Animate table rows
+        animateTableRows();
+    }
+
+    // Initialize charts
     function initializeCharts() {
-        // Trend Chart - Smaller and more compact
+        // Trend Chart
         const trendCtx = document.getElementById('trendChart').getContext('2d');
         trendChart = new Chart(trendCtx, {
             type: 'line',
             data: {
-                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                labels: [],
                 datasets: [{
-                    label: 'Số đơn thuốc',
-                    data: [12, 19, 15, 25, 22, 18, 20],
+                    label: 'Số hóa đơn',
+                    data: [],
                     borderColor: '#28a745',
                     backgroundColor: 'rgba(40, 167, 69, 0.1)',
                     tension: 0.4,
@@ -1202,15 +1319,16 @@
                     pointRadius: 3,
                     pointHoverRadius: 5
                 }, {
-                    label: 'Số viên thuốc',
-                    data: [120, 190, 150, 250, 220, 180, 200],
+                    label: 'Tổng tiền (VNĐ)',
+                    data: [],
                     borderColor: '#2c5aa0',
                     backgroundColor: 'rgba(44, 90, 160, 0.1)',
                     tension: 0.4,
                     fill: true,
                     borderWidth: 2,
                     pointRadius: 3,
-                    pointHoverRadius: 5
+                    pointHoverRadius: 5,
+                    yAxisID: 'y1'
                 }]
             },
             options: {
@@ -1229,6 +1347,9 @@
                 },
                 scales: {
                     y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
                         beginAtZero: true,
                         grid: {
                             color: 'rgba(0,0,0,0.1)'
@@ -1236,6 +1357,23 @@
                         ticks: {
                             font: {
                                 size: 10
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            },
+                            callback: function(value) {
+                                return formatCurrency(value);
                             }
                         }
                     },
@@ -1253,18 +1391,19 @@
             }
         });
 
-        // Pie Chart - Smaller and more compact
+        // Pie Chart
         const pieCtx = document.getElementById('pieChart').getContext('2d');
         pieChart = new Chart(pieCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Paracetamol', 'Amoxicillin', 'Vitamin C', 'Khác'],
+                labels: [],
                 datasets: [{
-                    data: [120, 80, 50, 30],
+                    data: [],
                     backgroundColor: [
                         '#28a745',
                         '#2c5aa0',
                         '#ffc107',
+                        '#dc3545',
                         '#6f42c1'
                     ],
                     borderWidth: 2,
@@ -1290,96 +1429,70 @@
         });
     }
 
-    function setupEventListeners() {
-        const form = document.getElementById('statsForm');
-        const periodSelect = document.getElementById('period');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const tableSection = document.getElementById('tableSection');
+    // Utility functions
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(amount || 0);
+    }
 
-        // Handle period selection
-        periodSelect.addEventListener('change', function() {
-            updateDateRange(this.value);
-        });
-
-        // Handle form submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Show loading state
-            tableSection.style.display = 'none';
-            loadingSpinner.style.display = 'block';
-
-            // Simulate API call
-            setTimeout(() => {
-                loadingSpinner.style.display = 'none';
-                tableSection.style.display = 'block';
-
-                // Update charts with new data
-                updateCharts();
-
-                // Animate table rows
-                animateTableRows();
-
-                // Scroll to results
-                document.querySelector('.stats-overview').scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }, 1500);
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
         });
     }
 
-    function setDefaultDates() {
-        const today = new Date();
-        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-        document.getElementById('startDate').value = firstDayOfMonth.toISOString().split('T')[0];
-        document.getElementById('endDate').value = today.toISOString().split('T')[0];
-    }
-
-    function updateDateRange(period) {
-        const today = new Date();
-        const startDate = document.getElementById('startDate');
-        const endDate = document.getElementById('endDate');
-
-        endDate.value = today.toISOString().split('T')[0];
-
-        switch(period) {
-            case 'today':
-                startDate.value = today.toISOString().split('T')[0];
-                break;
-            case 'week':
-                const weekStart = new Date(today);
-                weekStart.setDate(today.getDate() - 7);
-                startDate.value = weekStart.toISOString().split('T')[0];
-                break;
-            case 'month':
-                const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-                startDate.value = monthStart.toISOString().split('T')[0];
-                break;
-            case 'quarter':
-                const quarterStart = new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3, 1);
-                startDate.value = quarterStart.toISOString().split('T')[0];
-                break;
-            case 'year':
-                const yearStart = new Date(today.getFullYear(), 0, 1);
-                startDate.value = yearStart.toISOString().split('T')[0];
-                break;
+    function getStatusClass(status) {
+        switch (status?.toLowerCase()) {
+            case 'paid':
+            case 'đã thanh toán':
+                return 'bg-success';
+            case 'pending':
+            case 'chờ thanh toán':
+                return 'bg-warning';
+            case 'cancelled':
+            case 'đã hủy':
+                return 'bg-danger';
+            default:
+                return 'bg-secondary';
         }
     }
 
-    function updateCharts() {
-        // Update trend chart with random data (simulate API response)
-        const newTrendData = Array.from({length: 7}, () => Math.floor(Math.random() * 30) + 10);
-        const newPillsData = newTrendData.map(val => val * 10);
+    function showLoading(show) {
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const tableSection = document.getElementById('tableSection');
 
-        trendChart.data.datasets[0].data = newTrendData;
-        trendChart.data.datasets[1].data = newPillsData;
-        trendChart.update('active');
+        if (show) {
+            loadingSpinner.style.display = 'block';
+            tableSection.style.display = 'none';
+        } else {
+            loadingSpinner.style.display = 'none';
+            tableSection.style.display = 'block';
+        }
+    }
 
-        // Update pie chart
-        const newPieData = Array.from({length: 4}, () => Math.floor(Math.random() * 100) + 20);
-        pieChart.data.datasets[0].data = newPieData;
-        pieChart.update('active');
+    function showError(message) {
+        const errorDiv = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+
+        errorText.textContent = message;
+        errorDiv.style.display = 'block';
+
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+            hideError();
+        }, 5000);
+    }
+
+    function hideError() {
+        const errorDiv = document.getElementById('errorMessage');
+        errorDiv.style.display = 'none';
     }
 
     function animateTableRows() {
@@ -1393,23 +1506,6 @@
                 row.style.transform = 'translateX(0)';
             }, index * 150);
         });
-    }
-
-    function exportData() {
-        // Simulate export functionality
-        const btn = event.target.closest('.export-btn');
-        const originalText = btn.innerHTML;
-
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xuất...';
-        btn.disabled = true;
-
-        setTimeout(() => {
-            btn.innerHTML = '<i class="fas fa-check me-2"></i>Đã xuất!';
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }, 1500);
-        }, 2000);
     }
 </script>
 </body>

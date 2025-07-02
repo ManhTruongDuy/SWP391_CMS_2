@@ -656,6 +656,9 @@
             <p><strong>Thời gian in:</strong> <span id="print-time"></span></p>
             <p><em>Đơn thuốc này được tạo bởi Hệ thống quản lý bệnh viện MediCare</em></p>
         </div>
+        <a href="history-pharmacist.html" id="homeButton" class="btn btn-primary home-btn" style="display: none;">
+            <i class="fas fa-home"></i> Ve Lich Su
+        </a>
     </div>
 </div>
 
@@ -665,7 +668,7 @@
 
     // Get prescription data
     const data = JSON.parse(localStorage.getItem("printPrescription"));
-
+    console.log(data)
     if (!data) {
         document.body.innerHTML = `
                 <div class="error-message">
@@ -705,7 +708,7 @@
                     </td>
                     <td class="medicine-name">${item.name}</td>
                     <td>
-                        <span class="medicine-category">${item.category.name}</span>
+                        <span class="medicine-category">${item.category?.name || "N/A"}</span>
                     </td>
                     <td class="medicine-price">${parseInt(item.price).toLocaleString('vi-VN')}₫</td>
                     <td>
@@ -744,8 +747,7 @@
     });
 
     window.addEventListener('afterprint', function() {
-        // Optional: Close window after printing
-        // window.close();
+        window.location.href = 'history-pharmacist.html';
     });
 </script>
 </body>

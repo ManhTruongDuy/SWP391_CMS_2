@@ -31,6 +31,9 @@ public class Invoice {
         this.status = status;
     }
 
+    public Invoice() {
+    }
+
     // Getter & Setter
     public int getInvoiceId() {
         return invoiceId;

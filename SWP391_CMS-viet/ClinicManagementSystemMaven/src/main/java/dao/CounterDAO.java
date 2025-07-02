@@ -190,11 +190,12 @@ public class CounterDAO extends DBContext {
     }
     public List<Invoice> getAllWithPid() {
         List<Invoice> list = new ArrayList<>();
-        String sql = "SELECT i.invoice_id, i.patient_id, medicineRecord_id, issue_date, total_amount, status ,p.full_name AS patientName,pha.full_name AS phaName \n" +
-                "FROM Invoice i JOIN Patient p ON i.patient_id = p.patient_id \n" +
-                "JOIN PrescriptionInvoice pre ON pre.invoice_id = i.invoice_id\n" +
-                "JOIN Pharmacist pha ON pha.pharmacist_id = pre.pharmacist_id\n" +
-                "WHERE pid IS NOT NULL ORDER BY issue_date DESC";
+        String sql = "SELECT i.invoice_id, i.patient_id, i.medicineRecord_id, issue_date, total_amount, i.status ,p.full_name AS patientName,doc.full_name AS phaName \n" +
+                "                FROM Invoice i JOIN Patient p ON i.patient_id = p.patient_id\n" +
+                "                JOIN PrescriptionInvoice pre ON pre.invoice_id = i.invoice_id\n" +
+                "\t\t\t\tJOIN Prescription prec ON pre.prescription_id = prec.prescription_id\n" +
+                "\t\t\t\tJOIN Doctor doc ON doc.doctor_id = prec.doctor_id\n" +
+                "                WHERE pid IS NOT NULL ORDER BY issue_date DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -269,4 +270,71 @@ public class CounterDAO extends DBContext {
 
         return medicines;
     }
+    public StatisticCounter getStatisticCounter(Date startDate, Date endDate) {
+        String statSql = "SELECT " +
+                "COUNT(i.invoice_id) AS total_invoices, " +
+                "SUM(i.total_amount) AS total_amount, " +
+                "COUNT(DISTINCT i.patient_id) AS total_patient " +
+                "FROM Invoice AS i " +
+                "WHERE i.status = 'Paid' AND i.pid IS NOT NULL " +
+                "AND issue_date >= ? AND issue_date <= ?";
+
+        String listSql = "SELECT invoice_id, issue_date, total_amount, status " +
+                "FROM Invoice " +
+                "WHERE  pid IS NOT NULL " +
+                "AND issue_date >= ? AND issue_date <= ?";
+
+        PreparedStatement statStmt = null;
+        PreparedStatement listStmt = null;
+        ResultSet statRs = null;
+        ResultSet listRs = null;
+
+        try {
+            statStmt = connection.prepareStatement(statSql);
+            statStmt.setDate(1, startDate);
+            statStmt.setDate(2, endDate);
+            statRs = statStmt.executeQuery();
+
+            int totalInvoices = 0;
+            double totalAmount = 0;
+            int totalPatients = 0;
+
+            if (statRs.next()) {
+                totalInvoices = statRs.getInt("total_invoices");
+                totalAmount = statRs.getDouble("total_amount");
+                totalPatients = statRs.getInt("total_patient");
+            }
+
+            // Danh sách hóa đơn
+            listStmt = connection.prepareStatement(listSql);
+            listStmt.setDate(1, startDate);
+            listStmt.setDate(2, endDate);
+            listRs = listStmt.executeQuery();
+
+            List<Invoice> invoices = new ArrayList<>();
+            while (listRs.next()) {
+                Invoice invoice = new Invoice();
+                invoice.setInvoiceId(listRs.getInt("invoice_id"));
+                invoice.setIssueDate(listRs.getTimestamp("issue_date").toLocalDateTime());
+                invoice.setTotalAmount(listRs.getBigDecimal("total_amount"));
+                invoice.setStatus(listRs.getString("status"));
+                invoices.add(invoice);
+            }
+
+            return new StatisticCounter(totalInvoices, totalAmount, totalPatients, invoices);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (statRs != null) statRs.close();
+                if (listRs != null) listRs.close();
+                if (statStmt != null) statStmt.close();
+                if (listStmt != null) listStmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
 }
