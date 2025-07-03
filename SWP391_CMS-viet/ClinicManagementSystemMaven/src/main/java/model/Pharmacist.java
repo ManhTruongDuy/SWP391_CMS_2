@@ -6,7 +6,7 @@ package model;
 import java.time.LocalDate;
 /**
  *
- * @author admin
+ * @author admin duy manh
  */
 public class Pharmacist {
     private int ID;
