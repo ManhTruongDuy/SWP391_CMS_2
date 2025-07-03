@@ -69,14 +69,11 @@
                 <a href="./index.html" class="navbar-brand">
 
                     <!--Logo start-->
-                    <div class="logo-main">
-                        <img class="logo-normal img-fluid" src="./assets/images/logo.png" height="30" alt="logo">
-                        <img class="logo-normal dark-normal img-fluid" src="./assets/images/logo-dark.png" height="30" alt="logo">
-                        <img class="logo-normal white-normal img-fluid" src="./assets/images/logo-white.png" height="30" alt="logo">
-                        <img class="logo-mini img-fluid" src="./assets/images/logo-mini.png" height="30" alt="logo">
-                        <img class="logo-mini dark-mini img-fluid" src="./assets/images/logo-mini-dark.png" height="30" alt="logo">
-                        <img class="logo-mini white-mini img-fluid" src="./assets/images/logo-mini-white.png" height="30" alt="logo">
-                    </div>
+                    <a href="AdminDashboard.jsp">    
+                        <div class="logo-main">
+                            <img class="logo-normal img-fluid" src="./assets/images/logo.png" height="30" alt="logo">
+                        </div>
+                    </a>
                     <!--logo End-->        </a>
                 <div class="sidebar-toggle" data-toggle="sidebar" data-active="true">
                     <i class="icon">               
@@ -118,8 +115,8 @@
                             </a>
                             <ul class="sub-nav collapse" id="dashboard" data-bs-parent="#sidebar-menu">
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page"
-                                       href="./index.html">
+                                    <a class="nav-link " aria-current="page"
+                                       href="./AdminDashboard.jsp">
                                         <i class="icon" data-bs-toggle="tooltip" title="Dashboard" data-bs-placement="right">
                                             <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none"
                                                  xmlns="http://www.w3.org/2000/svg">
@@ -131,27 +128,6 @@
                                         <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Admin Dashboard"
                                            data-bs-placement="right">AD</i>
                                         <span class="item-name">Admin Dashboard</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link " aria-current="page"
-                                       href="./patient-dashboard.html">
-                                        <i class="icon" data-bs-toggle="tooltip" title="Dashboard" data-bs-placement="right">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 24 24" fill="none">
-                                            <path opacity="0.4"
-                                                  d="M2 4C2 2.89543 2.89543 2 4 2H9C10.1046 2 11 2.89543 11 4V20C11 21.1046 10.1046 22 9 22H4C2.89543 22 2 21.1046 2 20V4Z"
-                                                  fill="currentColor"></path>
-                                            <path
-                                                d="M13 4C13 2.89543 13.8954 2 15 2H20C21.1046 2 22 2.89543 22 4V9C22 10.1046 21.1046 11 20 11H15C13.8954 11 13 10.1046 13 9V4Z"
-                                                fill="currentColor"></path>
-                                            <path
-                                                d="M13 15C13 13.8954 13.8954 13 15 13H20C21.1046 13 22 13.8954 22 15V20C22 21.1046 21.1046 22 20 22H15C13.8954 22 13 21.1046 13 20V15Z"
-                                                fill="currentColor"></path>
-                                            </svg>
-                                        </i>
-                                        <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="patient dashboard"
-                                           data-bs-placement="right">PD</i>
-                                        <span class="item-name">patient dashboard</span>
                                     </a>
                                 </li>
                             </ul>
@@ -180,7 +156,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link " aria-current="page"
-                               href="./report.html">
+                               href="./Report.jsp">
                                 <i class="icon" data-bs-toggle="tooltip" title="Report" data-bs-placement="right">
                                     <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path opacity="0.4"
@@ -230,6 +206,25 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link " aria-current="page"
+                               href="./Pharmacist.jsp">
+                                <i class="icon" data-bs-toggle="tooltip" title="Doctors" data-bs-placement="right">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g opacity="0.4">
+                                    <path
+                                        d="M7.9999 0C6.27589 0 4.87366 1.40261 4.87366 3.12663V4.74646C4.87366 6.4706 6.27589 7.87322 7.9999 7.87322C9.72405 7.87322 11.1262 6.4706 11.1262 4.74646V3.12663C11.1262 1.40261 9.72405 0 7.9999 0Z"
+                                        fill="currentColor" />
+                                    </g>
+                                    <path
+                                        d="M14.8945 11.9476C13.8934 10.2416 12.2933 8.97685 10.389 8.38626C10.3448 8.37256 10.297 8.38421 10.2642 8.41672C9.37827 9.29019 8.27748 9.97165 8.00228 10.1363C7.70852 9.94849 6.47116 9.14196 5.73555 8.41672C5.70278 8.38421 5.65465 8.37256 5.61075 8.38626C3.70612 8.97697 2.10614 10.2417 1.10544 11.9477C1.08253 11.9867 1.08253 12.0353 1.10544 12.0743C2.52649 14.4958 5.16826 16 7.99985 16C10.8316 16 13.4735 14.4958 14.8945 12.0743C14.9176 12.0351 14.9176 11.9866 14.8945 11.9476ZM12.2518 12.8802C12.2518 12.9492 12.1862 13.0019 12.1173 13.0019H11.2706C11.2016 13.0019 11.1264 13.0612 11.1264 13.1303V14.0059C11.1264 14.0748 11.0895 14.1274 11.0205 14.1274H10.2601C10.1911 14.1274 10.126 14.0748 10.126 14.0059V13.1303C10.1258 13.0613 10.0787 13.0019 10.0097 13.0019H9.1265C9.05751 13.0019 9.00042 12.949 9.00042 12.8802V12.1263C9.00042 12.0573 9.05751 12.0016 9.1265 12.0016H10.0097C10.0787 12.0016 10.1258 11.9453 10.1258 11.8762V10.9995C10.1258 10.9305 10.1908 10.8761 10.2598 10.8761H11.012C11.0809 10.8761 11.1262 10.9305 11.1262 10.9995V11.8787C11.1262 11.9478 11.193 12.0015 11.2622 12.0015H12.1173C12.1862 12.0015 12.2518 12.0598 12.2518 12.1288V12.8802Z"
+                                        fill="currentColor" />
+                                    </svg>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Doctors" data-bs-placement="right">DR</i>
+                                <span class="item-name">Pharmacists</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page"
                                href="./patient.html">
                                 <i class="icon" data-bs-toggle="tooltip" title="Patient" data-bs-placement="right">
                                     <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -275,7 +270,7 @@
                                           fill="currentColor"></path>
                                     </svg>
                                 </i>
-                                <span class="item-name">Products</span>
+                                <span class="item-name">Medicine</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -346,7 +341,8 @@
 
                     </ul>
 
-                    <!-- Sidebar Menu End -->        </div>
+                    <!-- Sidebar Menu End -->        
+                </div>
             </div>
             <div class="sidebar-footer"></div>
         </aside>
@@ -355,7 +351,7 @@
                 <!--Nav Start-->
                 <nav class="nav navbar navbar-expand-xl navbar-light iq-navbar">
                     <div class="container-fluid navbar-inner">
-                        <a href="./index.html" class="navbar-brand">
+                        <a href="AdminDashboard.jsp" class="navbar-brand">
 
                             <!--Logo start-->
                             <div class="logo-main">
@@ -381,233 +377,13 @@
                                     <ul class="iq-nav-menu list-unstyled">
                                         <li class="nav-item">
                                             <a class="nav-link menu-arrow justify-content-start active"
-                                               href="./index.html">
+                                               href="./AdminDashboard.jsp">
                                                 <span class="nav-text">Home</span>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link menu-arrow justify-content-start" data-bs-toggle="collapse" href="#allPagesData"
-                                               role="button" aria-expanded="false" aria-controls="allPagesData">
-                                                <span class="nav-text">Pages</span>
-                                            </a>
-                                            <ul class="iq-header-sub-menu list-unstyled collapse" id="allPagesData">
-                                                <li class="nav-item">
-                                                    <a class="nav-link" href="./component.html">Components</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" href="./ui-color.html">UI Color</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link menu-arrow" data-bs-toggle="collapse" href="#authSkins" role="button"
-                                                       aria-expanded="false">
-                                                        Auth skins
-                                                        <i class="right-icon">
-                                                            <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none"
-                                                                 xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M8.5 5L15.5 12L8.5 19" stroke="currentColor" stroke-width="1.5"
-                                                                  stroke-linecap="round" stroke-linejoin="round"></path>
-                                                            </svg>
-                                                        </i>
-                                                    </a>
-                                                    <ul aria-expanded="false" class="iq-header-sub-menu left list-unstyled collapse"
-                                                        id="defaultAuth">
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./auth/sign-in.html">Sign In</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./auth/sign-up.html">Sign Up</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./auth/confirm-mail.html">Email Verified</a></li>
-                                                        <li class="nav-item"><a class="nav-link " href="./auth/recoverpw.html">Reset
-                                                                Password</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./auth/lock-screen.html">Lock Screen</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link menu-arrow" data-bs-toggle="collapse" href="#userApps" role="button"
-                                                       aria-expanded="false" aria-controls="userApps">
-                                                        User
-                                                        <i class="right-icon">
-                                                            <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none"
-                                                                 xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M8.5 5L15.5 12L8.5 19" stroke="currentColor" stroke-width="1.5"
-                                                                  stroke-linecap="round" stroke-linejoin="round"></path>
-                                                            </svg>
-                                                        </i>
-                                                    </a>
-                                                    <ul aria-expanded="false" class="iq-header-sub-menu left list-unstyled collapse"
-                                                        id="userApps">
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./app/user-profile.html">User Profile</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./app/user-add.html">User Add</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./app/user-list.html">User List</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link menu-arrow" data-bs-toggle="collapse" href="#utilities" role="button"
-                                                       aria-expanded="false" aria-controls="utilities">
-                                                        Utilities
-                                                        <i class="right-icon">
-                                                            <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none"
-                                                                 xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M8.5 5L15.5 12L8.5 19" stroke="currentColor" stroke-width="1.5"
-                                                                  stroke-linecap="round" stroke-linejoin="round"></path>
-                                                            </svg>
-                                                        </i>
-                                                    </a>
-                                                    <ul aria-expanded="false" class="iq-header-sub-menu left list-unstyled collapse"
-                                                        id="utilities">
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./errors/maintenance.html">Maintenance</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./errors/error404.html">404</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./errors/error500.html">500</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link menu-arrow" data-bs-toggle="collapse" href="#widgetsPage" role="button"
-                                                       aria-expanded="false" aria-controls="widgetsPage">
-                                                        Widgets
-                                                        <i class="right-icon">
-                                                            <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none"
-                                                                 xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M8.5 5L15.5 12L8.5 19" stroke="currentColor" stroke-width="1.5"
-                                                                  stroke-linecap="round" stroke-linejoin="round"></path>
-                                                            </svg>
-                                                        </i>
-                                                    </a>
-                                                    <ul aria-expanded="false" class="iq-header-sub-menu left list-unstyled collapse"
-                                                        id="widgetsPage">
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./widget/widgetbasic.html">Widget Basic</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./widget/widgetchart.html">Widget Chart</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./widget/widgetcard.html">Widget Card</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link menu-arrow" data-bs-toggle="collapse" href="#mapPages" role="button"
-                                                       aria-expanded="false" aria-controls="mapPages">
-                                                        Map
-                                                        <i class="right-icon">
-                                                            <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none"
-                                                                 xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M8.5 5L15.5 12L8.5 19" stroke="currentColor" stroke-width="1.5"
-                                                                  stroke-linecap="round" stroke-linejoin="round"></path>
-                                                            </svg>
-                                                        </i>
-                                                    </a>
-                                                    <ul aria-expanded="false" class="iq-header-sub-menu left list-unstyled collapse"
-                                                        id="mapPages">
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./maps/google.html">Google</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./maps/vector.html">Vector</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link menu-arrow" data-bs-toggle="collapse" href="#formsPages" role="button"
-                                                       aria-expanded="false" aria-controls="formsPages">
-                                                        Form
-                                                        <i class="right-icon">
-                                                            <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none"
-                                                                 xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M8.5 5L15.5 12L8.5 19" stroke="currentColor" stroke-width="1.5"
-                                                                  stroke-linecap="round" stroke-linejoin="round"></path>
-                                                            </svg>
-                                                        </i>
-                                                    </a>
-                                                    <ul aria-expanded="false" class="iq-header-sub-menu left list-unstyled collapse"
-                                                        id="formsPages">
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./form/form-element.html">Element</a></li>
-
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./form/form-validation.html">Validation</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link menu-arrow" data-bs-toggle="collapse" href="#tablesPages" role="button"
-                                                       aria-expanded="false" aria-controls="tablesPages">
-                                                        Table
-                                                        <i class="right-icon">
-                                                            <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none"
-                                                                 xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M8.5 5L15.5 12L8.5 19" stroke="currentColor" stroke-width="1.5"
-                                                                  stroke-linecap="round" stroke-linejoin="round"></path>
-                                                            </svg>
-                                                        </i>
-                                                    </a>
-                                                    <ul aria-expanded="false" class="iq-header-sub-menu left list-unstyled collapse"
-                                                        id="tablesPages">
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./table/bootstrap-table.html">Bootstrap Table</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./table/table-data.html">Data Table</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./table/border-table.html">Bordered Table</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./table/fancy-table.html">Fancy Table</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./table/fixed-table.html">Fixed Table</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link menu-arrow" data-bs-toggle="collapse" href="#iconsPages" role="button"
-                                                       aria-expanded="false" aria-controls="iconsPages">
-                                                        Icons
-                                                        <i class="right-icon">
-                                                            <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none"
-                                                                 xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M8.5 5L15.5 12L8.5 19" stroke="currentColor" stroke-width="1.5"
-                                                                  stroke-linecap="round" stroke-linejoin="round"></path>
-                                                            </svg>
-                                                        </i>
-                                                    </a>
-                                                    <ul aria-expanded="false" class="iq-header-sub-menu left list-unstyled collapse"
-                                                        id="iconsPages">
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./icons/solid.html">Solid</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./icons/outline.html">Outlined</a></li>
-                                                        <li class="nav-item"><a
-                                                                class="nav-link "
-                                                                href="./icons/dual-tone.html">Dual Tone</a></li>
-                                                    </ul>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li class="nav-item">
                                             <a class="nav-link menu-arrow justify-content-start "
-                                               href="./setting.html">
+                                               href="./Setting.jsp">
                                                 <span class="nav-text">Setting </span>
                                             </a>
                                         </li>
@@ -768,225 +544,8 @@
                                         </div>
                                     </div>
                                 </li>
-                                <li class="nav-item dropdown">
-                                    <a href="#" class="nav-link" id="notification-cart" data-bs-toggle="dropdown">
-                                        <div class="btn-action position-relative nav-list-icon">
-                                            <span class="btn-inner">
-                                                <svg class="cart-icons icon-20" xmlns="http://www.w3.org/2000/svg" width="18" height="17"
-                                                     viewBox="0 0 18 17" fill="none">
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                      d="M4.27385 4.95616L4.77635 10.9328C4.81302 11.3928 5.18885 11.7378 5.64802 11.7378H5.65135H14.7439H14.7455C15.1797 11.7378 15.5505 11.4145 15.6122 10.9853L16.4039 5.51949C16.4222 5.38949 16.3897 5.25949 16.3105 5.15449C16.2322 5.04866 16.1172 4.98033 15.9872 4.96199C15.813 4.96866 8.58552 4.95866 4.27385 4.95616ZM5.64631 12.9878C4.54881 12.9878 3.61964 12.1311 3.53047 11.0353L2.76714 1.95695L1.51131 1.74028C1.17048 1.68028 0.942975 1.35778 1.00131 1.01695C1.06131 0.676117 1.39047 0.45445 1.72381 0.507784L3.45714 0.807784C3.73631 0.85695 3.94881 1.08862 3.97297 1.37195L4.16881 3.70612C16.0655 3.71112 16.1038 3.71695 16.1613 3.72362C16.6255 3.79112 17.0338 4.03362 17.3121 4.40695C17.5905 4.77945 17.7071 5.23862 17.6405 5.69862L16.8496 11.1636C16.7005 12.2036 15.7971 12.9878 14.7471 12.9878H14.743H5.65297H5.64631Z"
-                                                      fill="currentColor"></path>
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                      d="M13.4077 8.03638H11.0977C10.7518 8.03638 10.4727 7.75638 10.4727 7.41138C10.4727 7.06638 10.7518 6.78638 11.0977 6.78638H13.4077C13.7527 6.78638 14.0327 7.06638 14.0327 7.41138C14.0327 7.75638 13.7527 8.03638 13.4077 8.03638Z"
-                                                      fill="currentColor"></path>
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                      d="M5.28815 15.2516C5.53898 15.2516 5.74148 15.4541 5.74148 15.7049C5.74148 15.9558 5.53898 16.1591 5.28815 16.1591C5.03648 16.1591 4.83398 15.9558 4.83398 15.7049C4.83398 15.4541 5.03648 15.2516 5.28815 15.2516Z"
-                                                      fill="currentColor"></path>
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                      d="M5.28732 16.784C4.69232 16.784 4.20898 16.2998 4.20898 15.7048C4.20898 15.1098 4.69232 14.6265 5.28732 14.6265C5.88232 14.6265 6.36648 15.1098 6.36648 15.7048C6.36648 16.2998 5.88232 16.784 5.28732 16.784"
-                                                      fill="currentColor"></path>
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                      d="M14.6877 16.784C14.0927 16.784 13.6094 16.2998 13.6094 15.7048C13.6094 15.1098 14.0927 14.6265 14.6877 14.6265C15.2835 14.6265 15.7677 15.1098 15.7677 15.7048C15.7677 16.2998 15.2835 16.784 14.6877 16.784"
-                                                      fill="currentColor"></path>
-                                                </svg>
-                                            </span>
-                                            <span class="badge-notification">4</span>
-                                        </div>
-                                    </a>
-                                    <div class="p-0 sub-drop dropdown-menu dropdown-menu-end" aria-labelledby="notification-cart">
-                                        <div class="m-0 shadow-none card">
-                                            <div class="py-3 card-header d-flex justify-content-between bg-primary mb-0">
-                                                <div class="header-title">
-                                                    <h5 class="mb-0 text-white">All Carts</h5>
-                                                </div>
-                                            </div>
-                                            <div class="p-0 card-body max-17 scroll-thin">
-                                                <div class="iq-sub-card">
-                                                    <div class="d-flex align-items-center">
-                                                        <img class="p-1 avatar-40 rounded-pill bg-primary-subtle"
-                                                             src="./assets/images/shapes/01.png" loading="lazy" />
-                                                        <div class="ms-3 flex-grow-1 text-start">
-                                                            <h6 class="mb-0 ">Biker?s Jacket</h6>
-                                                            <p class="mb-0">$56.00</p>
-                                                        </div>
-                                                        <button type="button" class="btn btn-icon text-danger btn-sm">
-                                                            <span class="btn-inner">
-                                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path opacity="0.4"
-                                                                      d="M19.643 9.48851C19.643 9.5565 19.11 16.2973 18.8056 19.1342C18.615 20.8751 17.4927 21.9311 15.8092 21.9611C14.5157 21.9901 13.2494 22.0001 12.0036 22.0001C10.6809 22.0001 9.38741 21.9901 8.13185 21.9611C6.50477 21.9221 5.38147 20.8451 5.20057 19.1342C4.88741 16.2873 4.36418 9.5565 4.35445 9.48851C4.34473 9.28351 4.41086 9.08852 4.54507 8.93053C4.67734 8.78453 4.86796 8.69653 5.06831 8.69653H18.9388C19.1382 8.69653 19.3191 8.78453 19.4621 8.93053C19.5953 9.08852 19.6624 9.28351 19.643 9.48851Z"
-                                                                      fill="currentColor"></path>
-                                                                <path
-                                                                    d="M21 5.97686C21 5.56588 20.6761 5.24389 20.2871 5.24389H17.3714C16.7781 5.24389 16.2627 4.8219 16.1304 4.22692L15.967 3.49795C15.7385 2.61698 14.9498 2 14.0647 2H9.93624C9.0415 2 8.26054 2.61698 8.02323 3.54595L7.87054 4.22792C7.7373 4.8219 7.22185 5.24389 6.62957 5.24389H3.71385C3.32386 5.24389 3 5.56588 3 5.97686V6.35685C3 6.75783 3.32386 7.08982 3.71385 7.08982H20.2871C20.6761 7.08982 21 6.75783 21 6.35685V5.97686Z"
-                                                                    fill="currentColor"></path>
-                                                                </svg>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="iq-sub-card">
-                                                    <div class="d-flex align-items-center">
-                                                        <img class="p-1 avatar-40 rounded-pill bg-primary-subtle"
-                                                             src="./assets/images/shapes/02.png" loading="lazy" />
-                                                        <div class="ms-3 flex-grow-1 text-start">
-                                                            <h6 class="mb-0 ">Casual Shoes</h6>
-                                                            <p class="mb-0">$56.00</p>
-                                                        </div>
-                                                        <button type="button" class="btn btn-icon text-danger btn-sm">
-                                                            <span class="btn-inner">
-                                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path opacity="0.4"
-                                                                      d="M19.643 9.48851C19.643 9.5565 19.11 16.2973 18.8056 19.1342C18.615 20.8751 17.4927 21.9311 15.8092 21.9611C14.5157 21.9901 13.2494 22.0001 12.0036 22.0001C10.6809 22.0001 9.38741 21.9901 8.13185 21.9611C6.50477 21.9221 5.38147 20.8451 5.20057 19.1342C4.88741 16.2873 4.36418 9.5565 4.35445 9.48851C4.34473 9.28351 4.41086 9.08852 4.54507 8.93053C4.67734 8.78453 4.86796 8.69653 5.06831 8.69653H18.9388C19.1382 8.69653 19.3191 8.78453 19.4621 8.93053C19.5953 9.08852 19.6624 9.28351 19.643 9.48851Z"
-                                                                      fill="currentColor"></path>
-                                                                <path
-                                                                    d="M21 5.97686C21 5.56588 20.6761 5.24389 20.2871 5.24389H17.3714C16.7781 5.24389 16.2627 4.8219 16.1304 4.22692L15.967 3.49795C15.7385 2.61698 14.9498 2 14.0647 2H9.93624C9.0415 2 8.26054 2.61698 8.02323 3.54595L7.87054 4.22792C7.7373 4.8219 7.22185 5.24389 6.62957 5.24389H3.71385C3.32386 5.24389 3 5.56588 3 5.97686V6.35685C3 6.75783 3.32386 7.08982 3.71385 7.08982H20.2871C20.6761 7.08982 21 6.75783 21 6.35685V5.97686Z"
-                                                                    fill="currentColor"></path>
-                                                                </svg>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="iq-sub-card">
-                                                    <div class="d-flex align-items-center">
-                                                        <img class="p-1 avatar-40 rounded-pill bg-primary-subtle"
-                                                             src="./assets/images/shapes/03.png" loading="lazy" />
-                                                        <div class="ms-3 flex-grow-1 text-start">
-                                                            <h6 class="mb-0 ">Knitted Shrug</h6>
-                                                            <p class="mb-0">$56.00</p>
-                                                        </div>
-                                                        <button type="button" class="btn btn-icon text-danger btn-sm">
-                                                            <span class="btn-inner">
-                                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path opacity="0.4"
-                                                                      d="M19.643 9.48851C19.643 9.5565 19.11 16.2973 18.8056 19.1342C18.615 20.8751 17.4927 21.9311 15.8092 21.9611C14.5157 21.9901 13.2494 22.0001 12.0036 22.0001C10.6809 22.0001 9.38741 21.9901 8.13185 21.9611C6.50477 21.9221 5.38147 20.8451 5.20057 19.1342C4.88741 16.2873 4.36418 9.5565 4.35445 9.48851C4.34473 9.28351 4.41086 9.08852 4.54507 8.93053C4.67734 8.78453 4.86796 8.69653 5.06831 8.69653H18.9388C19.1382 8.69653 19.3191 8.78453 19.4621 8.93053C19.5953 9.08852 19.6624 9.28351 19.643 9.48851Z"
-                                                                      fill="currentColor"></path>
-                                                                <path
-                                                                    d="M21 5.97686C21 5.56588 20.6761 5.24389 20.2871 5.24389H17.3714C16.7781 5.24389 16.2627 4.8219 16.1304 4.22692L15.967 3.49795C15.7385 2.61698 14.9498 2 14.0647 2H9.93624C9.0415 2 8.26054 2.61698 8.02323 3.54595L7.87054 4.22792C7.7373 4.8219 7.22185 5.24389 6.62957 5.24389H3.71385C3.32386 5.24389 3 5.56588 3 5.97686V6.35685C3 6.75783 3.32386 7.08982 3.71385 7.08982H20.2871C20.6761 7.08982 21 6.75783 21 6.35685V5.97686Z"
-                                                                    fill="currentColor"></path>
-                                                                </svg>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="iq-sub-card">
-                                                    <div class="d-flex align-items-center">
-                                                        <img class="p-1 avatar-40 rounded-pill bg-primary-subtle"
-                                                             src="./assets/images/shapes/04.png" loading="lazy" />
-                                                        <div class="ms-3 flex-grow-1 text-start">
-                                                            <h6 class="mb-0 ">Blue Handbag</h6>
-                                                            <p class="mb-0">$56.00</p>
-                                                        </div>
-                                                        <button type="button" class="btn btn-icon text-danger btn-sm">
-                                                            <span class="btn-inner">
-                                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path opacity="0.4"
-                                                                      d="M19.643 9.48851C19.643 9.5565 19.11 16.2973 18.8056 19.1342C18.615 20.8751 17.4927 21.9311 15.8092 21.9611C14.5157 21.9901 13.2494 22.0001 12.0036 22.0001C10.6809 22.0001 9.38741 21.9901 8.13185 21.9611C6.50477 21.9221 5.38147 20.8451 5.20057 19.1342C4.88741 16.2873 4.36418 9.5565 4.35445 9.48851C4.34473 9.28351 4.41086 9.08852 4.54507 8.93053C4.67734 8.78453 4.86796 8.69653 5.06831 8.69653H18.9388C19.1382 8.69653 19.3191 8.78453 19.4621 8.93053C19.5953 9.08852 19.6624 9.28351 19.643 9.48851Z"
-                                                                      fill="currentColor"></path>
-                                                                <path
-                                                                    d="M21 5.97686C21 5.56588 20.6761 5.24389 20.2871 5.24389H17.3714C16.7781 5.24389 16.2627 4.8219 16.1304 4.22692L15.967 3.49795C15.7385 2.61698 14.9498 2 14.0647 2H9.93624C9.0415 2 8.26054 2.61698 8.02323 3.54595L7.87054 4.22792C7.7373 4.8219 7.22185 5.24389 6.62957 5.24389H3.71385C3.32386 5.24389 3 5.56588 3 5.97686V6.35685C3 6.75783 3.32386 7.08982 3.71385 7.08982H20.2871C20.6761 7.08982 21 6.75783 21 6.35685V5.97686Z"
-                                                                    fill="currentColor"></path>
-                                                                </svg>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="iq-sub-card">
-                                                    <div class="d-flex align-items-center">
-                                                        <img class="p-1 avatar-40 rounded-pill bg-primary-subtle"
-                                                             src="./assets/images/shapes/01.png" loading="lazy" />
-                                                        <div class="ms-3 flex-grow-1 text-start">
-                                                            <h6 class="mb-0 ">Biker?s Jacket</h6>
-                                                            <p class="mb-0">$56.00</p>
-                                                        </div>
-                                                        <button type="button" class="btn btn-icon text-danger btn-sm">
-                                                            <span class="btn-inner">
-                                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path opacity="0.4"
-                                                                      d="M19.643 9.48851C19.643 9.5565 19.11 16.2973 18.8056 19.1342C18.615 20.8751 17.4927 21.9311 15.8092 21.9611C14.5157 21.9901 13.2494 22.0001 12.0036 22.0001C10.6809 22.0001 9.38741 21.9901 8.13185 21.9611C6.50477 21.9221 5.38147 20.8451 5.20057 19.1342C4.88741 16.2873 4.36418 9.5565 4.35445 9.48851C4.34473 9.28351 4.41086 9.08852 4.54507 8.93053C4.67734 8.78453 4.86796 8.69653 5.06831 8.69653H18.9388C19.1382 8.69653 19.3191 8.78453 19.4621 8.93053C19.5953 9.08852 19.6624 9.28351 19.643 9.48851Z"
-                                                                      fill="currentColor"></path>
-                                                                <path
-                                                                    d="M21 5.97686C21 5.56588 20.6761 5.24389 20.2871 5.24389H17.3714C16.7781 5.24389 16.2627 4.8219 16.1304 4.22692L15.967 3.49795C15.7385 2.61698 14.9498 2 14.0647 2H9.93624C9.0415 2 8.26054 2.61698 8.02323 3.54595L7.87054 4.22792C7.7373 4.8219 7.22185 5.24389 6.62957 5.24389H3.71385C3.32386 5.24389 3 5.56588 3 5.97686V6.35685C3 6.75783 3.32386 7.08982 3.71385 7.08982H20.2871C20.6761 7.08982 21 6.75783 21 6.35685V5.97686Z"
-                                                                    fill="currentColor"></path>
-                                                                </svg>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="iq-sub-card">
-                                                    <div class="d-flex align-items-center">
-                                                        <img class="p-1 avatar-40 rounded-pill bg-primary-subtle"
-                                                             src="./assets/images/shapes/02.png" loading="lazy" />
-                                                        <div class="ms-3 flex-grow-1 text-start">
-                                                            <h6 class="mb-0 ">Casual Shoes</h6>
-                                                            <p class="mb-0">$56.00</p>
-                                                        </div>
-                                                        <button type="button" class="btn btn-icon text-danger btn-sm">
-                                                            <span class="btn-inner">
-                                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path opacity="0.4"
-                                                                      d="M19.643 9.48851C19.643 9.5565 19.11 16.2973 18.8056 19.1342C18.615 20.8751 17.4927 21.9311 15.8092 21.9611C14.5157 21.9901 13.2494 22.0001 12.0036 22.0001C10.6809 22.0001 9.38741 21.9901 8.13185 21.9611C6.50477 21.9221 5.38147 20.8451 5.20057 19.1342C4.88741 16.2873 4.36418 9.5565 4.35445 9.48851C4.34473 9.28351 4.41086 9.08852 4.54507 8.93053C4.67734 8.78453 4.86796 8.69653 5.06831 8.69653H18.9388C19.1382 8.69653 19.3191 8.78453 19.4621 8.93053C19.5953 9.08852 19.6624 9.28351 19.643 9.48851Z"
-                                                                      fill="currentColor"></path>
-                                                                <path
-                                                                    d="M21 5.97686C21 5.56588 20.6761 5.24389 20.2871 5.24389H17.3714C16.7781 5.24389 16.2627 4.8219 16.1304 4.22692L15.967 3.49795C15.7385 2.61698 14.9498 2 14.0647 2H9.93624C9.0415 2 8.26054 2.61698 8.02323 3.54595L7.87054 4.22792C7.7373 4.8219 7.22185 5.24389 6.62957 5.24389H3.71385C3.32386 5.24389 3 5.56588 3 5.97686V6.35685C3 6.75783 3.32386 7.08982 3.71385 7.08982H20.2871C20.6761 7.08982 21 6.75783 21 6.35685V5.97686Z"
-                                                                    fill="currentColor"></path>
-                                                                </svg>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="iq-sub-card">
-                                                    <div class="d-flex align-items-center">
-                                                        <img class="p-1 avatar-40 rounded-pill bg-primary-subtle"
-                                                             src="./assets/images/shapes/03.png" loading="lazy" />
-                                                        <div class="ms-3 flex-grow-1 text-start">
-                                                            <h6 class="mb-0 ">Knitted Shrug</h6>
-                                                            <p class="mb-0">$56.00</p>
-                                                        </div>
-                                                        <button type="button" class="btn btn-icon text-danger btn-sm">
-                                                            <span class="btn-inner">
-                                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path opacity="0.4"
-                                                                      d="M19.643 9.48851C19.643 9.5565 19.11 16.2973 18.8056 19.1342C18.615 20.8751 17.4927 21.9311 15.8092 21.9611C14.5157 21.9901 13.2494 22.0001 12.0036 22.0001C10.6809 22.0001 9.38741 21.9901 8.13185 21.9611C6.50477 21.9221 5.38147 20.8451 5.20057 19.1342C4.88741 16.2873 4.36418 9.5565 4.35445 9.48851C4.34473 9.28351 4.41086 9.08852 4.54507 8.93053C4.67734 8.78453 4.86796 8.69653 5.06831 8.69653H18.9388C19.1382 8.69653 19.3191 8.78453 19.4621 8.93053C19.5953 9.08852 19.6624 9.28351 19.643 9.48851Z"
-                                                                      fill="currentColor"></path>
-                                                                <path
-                                                                    d="M21 5.97686C21 5.56588 20.6761 5.24389 20.2871 5.24389H17.3714C16.7781 5.24389 16.2627 4.8219 16.1304 4.22692L15.967 3.49795C15.7385 2.61698 14.9498 2 14.0647 2H9.93624C9.0415 2 8.26054 2.61698 8.02323 3.54595L7.87054 4.22792C7.7373 4.8219 7.22185 5.24389 6.62957 5.24389H3.71385C3.32386 5.24389 3 5.56588 3 5.97686V6.35685C3 6.75783 3.32386 7.08982 3.71385 7.08982H20.2871C20.6761 7.08982 21 6.75783 21 6.35685V5.97686Z"
-                                                                    fill="currentColor"></path>
-                                                                </svg>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="iq-sub-card">
-                                                    <div class="d-flex align-items-center">
-                                                        <img class="p-1 avatar-40 rounded-pill bg-primary-subtle"
-                                                             src="./assets/images/shapes/04.png" loading="lazy" />
-                                                        <div class="ms-3 flex-grow-1 text-start">
-                                                            <h6 class="mb-0 ">Blue Handbag</h6>
-                                                            <p class="mb-0">$56.00</p>
-                                                        </div>
-                                                        <button type="button" class="btn btn-icon text-danger btn-sm">
-                                                            <span class="btn-inner">
-                                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path opacity="0.4"
-                                                                      d="M19.643 9.48851C19.643 9.5565 19.11 16.2973 18.8056 19.1342C18.615 20.8751 17.4927 21.9311 15.8092 21.9611C14.5157 21.9901 13.2494 22.0001 12.0036 22.0001C10.6809 22.0001 9.38741 21.9901 8.13185 21.9611C6.50477 21.9221 5.38147 20.8451 5.20057 19.1342C4.88741 16.2873 4.36418 9.5565 4.35445 9.48851C4.34473 9.28351 4.41086 9.08852 4.54507 8.93053C4.67734 8.78453 4.86796 8.69653 5.06831 8.69653H18.9388C19.1382 8.69653 19.3191 8.78453 19.4621 8.93053C19.5953 9.08852 19.6624 9.28351 19.643 9.48851Z"
-                                                                      fill="currentColor"></path>
-                                                                <path
-                                                                    d="M21 5.97686C21 5.56588 20.6761 5.24389 20.2871 5.24389H17.3714C16.7781 5.24389 16.2627 4.8219 16.1304 4.22692L15.967 3.49795C15.7385 2.61698 14.9498 2 14.0647 2H9.93624C9.0415 2 8.26054 2.61698 8.02323 3.54595L7.87054 4.22792C7.7373 4.8219 7.22185 5.24389 6.62957 5.24389H3.71385C3.32386 5.24389 3 5.56588 3 5.97686V6.35685C3 6.75783 3.32386 7.08982 3.71385 7.08982H20.2871C20.6761 7.08982 21 6.75783 21 6.35685V5.97686Z"
-                                                                    fill="currentColor"></path>
-                                                                </svg>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="card-footer p-0 text-center">
-                                                <div class="d-grid">
-                                                    <a href="#" class="btn btn-primary">View All</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
+
+
                                 <li class="nav-item iq-full-screen d-none d-xl-block" id="fullscreen-item">
                                     <a href="#" class="nav-link" id="btnFullscreen" data-bs-toggle="dropdown">
                                         <div class="icon nav-list-icon">
