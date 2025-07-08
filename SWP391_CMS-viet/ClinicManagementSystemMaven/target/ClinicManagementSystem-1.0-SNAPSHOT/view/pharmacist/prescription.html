@@ -113,6 +113,7 @@
 <!--</html>-->
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -506,7 +507,7 @@
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .page-subtitle {
@@ -541,14 +542,16 @@
             background: linear-gradient(90deg, var(--info-color), var(--primary-color), var(--secondary-color));
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             border-radius: 10px;
             border: 2px solid #e9ecef;
             padding: 0.75rem 1rem;
             transition: all 0.3s ease;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--info-color);
             box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
             transform: translateY(-2px);
@@ -616,10 +619,21 @@
             font-weight: 600;
         }
 
-        .icon-pending { color: var(--warning-color); }
-        .icon-dispensed { color: var(--success-color); }
-        .icon-cancelled { color: var(--danger-color); }
-        .icon-total { color: var(--primary-color); }
+        .icon-pending {
+            color: var(--warning-color);
+        }
+
+        .icon-dispensed {
+            color: var(--success-color);
+        }
+
+        .icon-cancelled {
+            color: var(--danger-color);
+        }
+
+        .icon-total {
+            color: var(--primary-color);
+        }
 
         .table-section {
             padding: 2rem;
@@ -930,6 +944,7 @@
         }
     </style>
 </head>
+
 <body>
 <!-- Mobile Overlay -->
 <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
@@ -981,19 +996,19 @@
                 </a>
             </div>
             <div class="nav-item">
-                <a href="patients.html" class="nav-link" >
+                <a href="patients.html" class="nav-link">
                     <i class="fas fa-user-injured nav-icon"></i>
                     <span class="nav-text">Bệnh nhân</span>
                 </a>
             </div>
             <div class="nav-item">
-                <a href="medicines.html" class="nav-link" >
+                <a href="medicines.html" class="nav-link">
                     <i class="fas fa-pills nav-icon"></i>
                     <span class="nav-text">Thuốc</span>
                 </a>
             </div>
             <div class="nav-item">
-                <a href="inventory.html" class="nav-link" >
+                <a href="inventory.html" class="nav-link">
                     <i class="fas fa-boxes nav-icon"></i>
                     <span class="nav-text">Kho thuốc</span>
                 </a>
@@ -1093,11 +1108,11 @@
             <div class="filter-card">
                 <form class="row g-3" id="filterForm">
                     <div class="col-md-3">
-                        <label for="statusFilter" class="form-label fw-bold">
+                        <label for="status" class="form-label fw-bold">
                             <i class="fas fa-filter me-2"></i>
                             Trạng thái
                         </label>
-                        <select class="form-select" id="statusFilter">
+                        <select class="form-select" id="status" name="status">
                             <option value="">Tất cả trạng thái</option>
                             <option value="Pending">Chờ xử lý</option>
                             <option value="Dispensed">Đã cấp phát</option>
@@ -1105,18 +1120,18 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="dateFrom" class="form-label fw-bold">
+                        <label for="startDate" class="form-label fw-bold">
                             <i class="fas fa-calendar-alt me-2"></i>
                             Từ ngày
                         </label>
-                        <input type="date" class="form-control" id="dateFrom">
+                        <input type="date" class="form-control" id="startDate" name="startDate">
                     </div>
                     <div class="col-md-3">
-                        <label for="dateTo" class="form-label fw-bold">
+                        <label for="endDate" class="form-label fw-bold">
                             <i class="fas fa-calendar-alt me-2"></i>
                             Đến ngày
                         </label>
-                        <input type="date" class="form-control" id="dateTo">
+                        <input type="date" class="form-control" id="endDate" name="endDate">
                     </div>
                     <div class="col-md-3 d-flex align-items-end">
                         <button type="submit" class="btn btn-filter w-100">
@@ -1250,14 +1265,14 @@
     let currentFilters = {};
 
     // Initialize page
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         loadPrescriptions(currentPage);
         setupEventListeners();
     });
 
     function setupEventListeners() {
         // Filter form submission
-        document.getElementById('filterForm').addEventListener('submit', function(e) {
+        document.getElementById('filterForm').addEventListener('submit', function (e) {
             e.preventDefault();
             applyFilters();
         });
@@ -1388,7 +1403,7 @@
     }
 
     function getStatusClass(status) {
-        switch(status) {
+        switch (status) {
             case 'Pending': return 'status-pending';
             case 'Dispensed': return 'status-dispensed';
             case 'Cancelled': return 'status-cancelled';
@@ -1397,7 +1412,7 @@
     }
 
     function getStatusIcon(status) {
-        switch(status) {
+        switch (status) {
             case 'Pending': return '<i class="fas fa-clock me-1"></i>';
             case 'Dispensed': return '<i class="fas fa-check-circle me-1"></i>';
             case 'Cancelled': return '<i class="fas fa-times-circle me-1"></i>';
@@ -1406,7 +1421,7 @@
     }
 
     function getStatusText(status) {
-        switch(status) {
+        switch (status) {
             case 'Pending': return 'Chờ xử lý';
             case 'Dispensed': return 'Đã cấp phát';
             case 'Cancelled': return 'Đã hủy';
@@ -1485,9 +1500,9 @@
 
     function applyFilters() {
         currentFilters = {
-            status: document.getElementById('statusFilter').value,
-            dateFrom: document.getElementById('dateFrom').value,
-            dateTo: document.getElementById('dateTo').value
+            status: document.getElementById('status').value,
+            startDate: document.getElementById('startDate').value,
+            endDate: document.getElementById('endDate').value
         };
 
         // Remove empty filters
@@ -1553,5 +1568,5 @@
     }
 </script>
 </body>
-</html>
 
+</html>

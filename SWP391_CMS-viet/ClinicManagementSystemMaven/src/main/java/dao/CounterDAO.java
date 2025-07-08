@@ -8,6 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CounterDAO extends DBContext {
+
+    /**
+     * Truy vấn danh sách thuốc có phân trang.
+     * Kết hợp thông tin từ các bảng Medicine, Unit, Category, Warehouse.
+     */
     public List<MedicineCounter> getMedicineCounter(int page, int pageSize) {
         List<MedicineCounter> medicines = new ArrayList<>();
 
@@ -18,11 +23,9 @@ public class CounterDAO extends DBContext {
                 "JOIN Unit unit ON me.unit_id = unit.unit_id " +
                 "JOIN Category cate ON me.category_id = cate.category_id " +
                 "JOIN Warehouse ware ON me.warehouse_id = ware.warehouse_id " +
-                "ORDER BY medicine_id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                "ORDER BY medicine_id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"; // Sử dụng phân trang
 
-        try (
-                PreparedStatement stmt = connection.prepareStatement(sql)
-        ) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             int offset = (page - 1) * pageSize;
             stmt.setInt(1, offset);
             stmt.setInt(2, pageSize);
@@ -36,9 +39,11 @@ public class CounterDAO extends DBContext {
                     Unit unit = new Unit();
                     unit.setUnitName(rs.getString("unitName"));
                     med.setUnit(unit);
+
                     Category category = new Category();
                     category.setCategoryName(rs.getString("categoryName"));
                     med.setCategory(category);
+
                     med.setIngredient(rs.getString("ingredient"));
                     med.setUsage(rs.getString("usage"));
                     med.setPreservation(rs.getString("preservation"));
@@ -46,37 +51,46 @@ public class CounterDAO extends DBContext {
                     med.setExpDate(rs.getDate("expDate"));
                     med.setQuantity(rs.getInt("quantity"));
                     med.setPrice(rs.getBigDecimal("price"));
+
                     Warehouse ware = new Warehouse();
                     ware.setName(rs.getString("warehouse_name"));
                     ware.setLocation(rs.getString("location"));
                     med.setWarehouse(ware);
+
                     medicines.add(med);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Nên thay bằng logging
         }
 
         return medicines;
     }
+
+    /**
+     * Đếm tổng số thuốc hiện có trong bảng Medicine.
+     */
     public int getMedicineCount() {
         String sql = "SELECT COUNT(*) FROM Medicine";
-        try (
-                PreparedStatement stmt = connection.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery()) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Nên log chi tiết
         }
         return 0;
     }
-    public int insertPrescriptionInvoice(int invoiceId, int prescriptionId) {
-        String sql = "INSERT INTO PrescriptionInvoice (invoice_id,pharmacist_id, prescription_id) VALUES (?,1,?)";
-        try (
-                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
+    /**
+     * Thêm một bản ghi PrescriptionInvoice (liên kết giữa đơn thuốc và hóa đơn).
+     * @return trả về ID được sinh ra nếu thành công, -1 nếu lỗi.
+     */
+    public int insertPrescriptionInvoice(int invoiceId, int prescriptionId) {
+        String sql = "INSERT INTO PrescriptionInvoice (invoice_id, pharmacist_id, prescription_id) VALUES (?, 1, ?)"; // pharmacist_id hardcoded
+
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, invoiceId);
             ps.setInt(2, prescriptionId);
             ps.executeUpdate();
@@ -89,40 +103,43 @@ public class CounterDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return -1; // lỗi
+
+        return -1;
     }
 
+    /**
+     * Thêm danh sách thuốc vào bảng Medicines theo prescriptionInvoiceId.
+     */
     public void insertMedicines(int prescriptionInvoiceId, List<MedicineCounter> items) {
         String sql = "INSERT INTO Medicines (prescription_invoice_id, medicine_id, quantity, dosage) VALUES (?, ?, ?, ?)";
 
-        try (
-                PreparedStatement ps = connection.prepareStatement(sql)) {
-
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             for (MedicineCounter item : items) {
                 ps.setInt(1, prescriptionInvoiceId);
                 ps.setInt(2, item.getId());
                 ps.setInt(3, item.getQuantity());
-                ps.setString(4, "");
+                ps.setString(4, ""); // dosage đang để trống - cần xử lý sau
 
-                ps.addBatch();
+                ps.addBatch(); // Thêm vào batch để xử lý hàng loạt
             }
 
-            ps.executeBatch(); // Insert hàng loạt
-
+            ps.executeBatch(); // Thực hiện insert hàng loạt
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    public int insertInvoice(int patientId, int medicineRecordId, double totalAmount, String status,Long pid) {
-        String sql = "INSERT INTO Invoice (patient_id, medicineRecord_id, issue_date, total_amount, status,pid) " +
-                "VALUES (?, ?, ?, ?, ?,?)";
 
-        try (
-                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    /**
+     * Thêm một hóa đơn mới.
+     * @return trả về invoice_id nếu thành công.
+     */
+    public int insertInvoice(int patientId, int medicineRecordId, double totalAmount, String status, Long pid) {
+        String sql = "INSERT INTO Invoice (patient_id, medicineRecord_id, issue_date, total_amount, status, pid) VALUES (?, ?, ?, ?, ?, ?)";
 
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, patientId);
             ps.setInt(2, medicineRecordId);
-            ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now())); // Ngày phát hành là thời điểm hiện tại
             ps.setDouble(4, totalAmount);
             ps.setString(5, status);
             ps.setLong(6, pid);
@@ -137,8 +154,12 @@ public class CounterDAO extends DBContext {
             e.printStackTrace();
         }
 
-        return -1; // Trả về -1 nếu lỗi
+        return -1;
     }
+
+    /**
+     * Cập nhật trạng thái hóa đơn.
+     */
     public int updateInvoiceStatus(int invoiceId, String status) {
         String sql = "UPDATE Invoice SET status = ? WHERE invoice_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -150,6 +171,10 @@ public class CounterDAO extends DBContext {
         }
         return -1;
     }
+
+    /**
+     * Tìm ID hóa đơn dựa vào pid (lịch khám).
+     */
     public int findInvoiceIdByPid(Long pid) {
         String sql = "SELECT invoice_id FROM Invoice WHERE pid = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -163,6 +188,10 @@ public class CounterDAO extends DBContext {
         }
         return -1;
     }
+
+    /**
+     * Tìm prescription_id từ invoice_id trong bảng PrescriptionInvoice.
+     */
     public int findPrescriptionIdByInvoiceId(int id) {
         String sql = "SELECT prescription_id FROM PrescriptionInvoice WHERE invoice_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -177,6 +206,9 @@ public class CounterDAO extends DBContext {
         return -1;
     }
 
+    /**
+     * Cập nhật trạng thái của đơn thuốc.
+     */
     public int updatePrescriptionStatus(int prescriptionId, String status) {
         String sql = "UPDATE Prescription SET status = ? WHERE prescription_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -188,14 +220,19 @@ public class CounterDAO extends DBContext {
         }
         return -1;
     }
+
+    /**
+     * Lấy danh sách tất cả các hóa đơn có pid, kèm thông tin bệnh nhân và bác sĩ kê đơn.
+     */
     public List<Invoice> getAllWithPid() {
         List<Invoice> list = new ArrayList<>();
-        String sql = "SELECT i.invoice_id, i.patient_id, i.medicineRecord_id, issue_date, total_amount, i.status ,p.full_name AS patientName,doc.full_name AS phaName \n" +
-                "                FROM Invoice i JOIN Patient p ON i.patient_id = p.patient_id\n" +
-                "                JOIN PrescriptionInvoice pre ON pre.invoice_id = i.invoice_id\n" +
-                "\t\t\t\tJOIN Prescription prec ON pre.prescription_id = prec.prescription_id\n" +
-                "\t\t\t\tJOIN Doctor doc ON doc.doctor_id = prec.doctor_id\n" +
-                "                WHERE pid IS NOT NULL ORDER BY issue_date DESC";
+        String sql = "SELECT i.invoice_id, i.patient_id, i.medicineRecord_id, issue_date, total_amount, i.status ,p.full_name AS patientName,doc.full_name AS phaName " +
+                "FROM Invoice i " +
+                "JOIN Patient p ON i.patient_id = p.patient_id " +
+                "JOIN PrescriptionInvoice pre ON pre.invoice_id = i.invoice_id " +
+                "JOIN Prescription prec ON pre.prescription_id = prec.prescription_id " +
+                "JOIN Doctor doc ON doc.doctor_id = prec.doctor_id " +
+                "WHERE pid IS NOT NULL ORDER BY issue_date DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -212,14 +249,20 @@ public class CounterDAO extends DBContext {
                 list.add(invoice);
             }
         } catch (SQLException e) {
+            e.printStackTrace();
         }
         return list;
     }
+
+    /**
+     * Trả về danh sách thuốc theo invoiceId.
+     */
     public List<MedicineRes> getMedicineByInvoiceId(int invoiceId) {
         List<MedicineRes> list = new ArrayList<>();
-        String sql = "SELECT med.medicine_id,med.name,med.price,med.manuDate,med.expDate,me.quantity FROM PrescriptionInvoice pre \n" +
-                "JOIN Medicines me ON me.prescription_invoice_id = pre.prescription_invoice_id\n" +
-                "JOIN Medicine med ON med.medicine_id = me.medicine_id\n" +
+        String sql = "SELECT med.medicine_id,med.name,med.price,med.manuDate,med.expDate,me.quantity " +
+                "FROM PrescriptionInvoice pre " +
+                "JOIN Medicines me ON me.prescription_invoice_id = pre.prescription_invoice_id " +
+                "JOIN Medicine med ON med.medicine_id = me.medicine_id " +
                 "WHERE pre.invoice_id = ?";
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
@@ -241,13 +284,15 @@ public class CounterDAO extends DBContext {
         }
         return list;
     }
+
+    /**
+     * Tìm thuốc theo công dụng (sử dụng LIKE N'%usage%').
+     */
     public List<MedicineCounter> findByUsage(String usage) {
         List<MedicineCounter> medicines = new ArrayList<>();
         String sql = "SELECT * FROM Medicine WHERE [usage] LIKE N?";
 
-        try (
-                PreparedStatement stmt = connection.prepareStatement(sql)) {
-
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, "%" + usage + "%");
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -270,19 +315,20 @@ public class CounterDAO extends DBContext {
 
         return medicines;
     }
+
+    /**
+     * Trả về thống kê tổng hợp trong khoảng thời gian: số hóa đơn, số bệnh nhân, tổng tiền.
+     * Đồng thời trả về danh sách hóa đơn chi tiết.
+     */
     public StatisticCounter getStatisticCounter(Date startDate, Date endDate) {
-        String statSql = "SELECT " +
-                "COUNT(i.invoice_id) AS total_invoices, " +
-                "SUM(i.total_amount) AS total_amount, " +
-                "COUNT(DISTINCT i.patient_id) AS total_patient " +
+        String statSql = "SELECT COUNT(i.invoice_id) AS total_invoices, SUM(i.total_amount) AS total_amount, COUNT(DISTINCT i.patient_id) AS total_patient " +
                 "FROM Invoice AS i " +
                 "WHERE i.status = 'Paid' AND i.pid IS NOT NULL " +
                 "AND issue_date >= ? AND issue_date <= ?";
 
         String listSql = "SELECT invoice_id, issue_date, total_amount, status " +
                 "FROM Invoice " +
-                "WHERE  pid IS NOT NULL " +
-                "AND issue_date >= ? AND issue_date <= ?";
+                "WHERE pid IS NOT NULL AND issue_date >= ? AND issue_date <= ?";
 
         PreparedStatement statStmt = null;
         PreparedStatement listStmt = null;
@@ -305,7 +351,6 @@ public class CounterDAO extends DBContext {
                 totalPatients = statRs.getInt("total_patient");
             }
 
-            // Danh sách hóa đơn
             listStmt = connection.prepareStatement(listSql);
             listStmt.setDate(1, startDate);
             listStmt.setDate(2, endDate);
@@ -325,6 +370,7 @@ public class CounterDAO extends DBContext {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
+            // Đảm bảo đóng các tài nguyên JDBC
             try {
                 if (statRs != null) statRs.close();
                 if (listRs != null) listRs.close();
@@ -334,7 +380,5 @@ public class CounterDAO extends DBContext {
                 e.printStackTrace();
             }
         }
-
     }
-
 }

@@ -497,6 +497,16 @@
             margin-bottom: 0.75rem;
             font-size: 1.1rem;
         }
+        .order-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
         .order-controls {
             display: flex;
@@ -956,8 +966,8 @@
                             <td><strong>${p.id}</strong></td>
                             <td class="medicine-name">${p.name}</td>
                             <td>
-                                <span class="medicine-category">${p.category?.name || ''}</span>
-                            </td>
+                                 <span class="medicine-category">${p.category?.name || ''}</span>
+                             </td>
                             <td class="medicine-price">${p.price.toLocaleString()} ₫</td>
                             <td>
                                 <span class="medicine-quantity">${p.quantity}</span>
@@ -1189,12 +1199,14 @@
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="order-controls">
-                                <div class="me-3">
-                                    <small class="text-muted">Giá đơn vị:</small><br>
+<!--                                <div class="me-3">-->
+                                <div class="control-group">
+                                    <small class="text-muted">Giá đơn vị:</small>
                                     <span class="medicine-price">${item.price.toLocaleString()} ₫</span>
                                 </div>
-                                <div class="me-3">
-                                    <small class="text-muted">Số lượng:</small><br>
+<!--                                <div class="me-3">-->
+                                <div class="control-group">
+                                    <small class="text-muted">Số lượng:</small>
                                     <input type="number" min="1" value="${item.quantity}"
                                            data-id="${item.id}" class="form-control quantity-input" />
                                 </div>
