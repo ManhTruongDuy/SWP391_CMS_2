@@ -10,7 +10,7 @@
         <div>
             <h1> Index </h1>
             <%
-                response.sendRedirect("view/LandingPage.jsp");
+                response.sendRedirect("view/LandingPage.html");
             %>
         </div>
     </body>
