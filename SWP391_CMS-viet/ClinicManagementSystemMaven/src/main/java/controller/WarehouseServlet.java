@@ -48,10 +48,14 @@ public class WarehouseServlet extends HttpServlet {
                         resp.getWriter().write("{\"error\":\"Warehouse not found\"}");
                     }
                 } catch (NumberFormatException e) {
+
                     resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     resp.getWriter().write("{\"error\":\"Invalid ID\"}");
                 }
-            } else if (pathParts.length == 2 && pathParts[1].equals("medicines")) {
+            }else if(pathParts.length == 1 && pathParts[0].equals("name")){
+                String name = pathParts[0];
+            }
+            else if (pathParts.length == 2 && pathParts[1].equals("medicines")) {
                 try {
                     int id = Integer.parseInt(pathParts[0]);
                     List<MedicineWarehouse> medicines = warehouseDAO.getMedicinesByWarehouseId(id);

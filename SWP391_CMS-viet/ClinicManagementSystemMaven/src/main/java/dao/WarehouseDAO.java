@@ -32,6 +32,24 @@ public class WarehouseDAO {
         }
         return null;
     }
+    public Warehouse getWarehouseByName(String name) {
+        String sql = "SELECT warehouse_id, name, location FROM Warehouse WHERE name LIKE '?'";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1,"%" + name.trim() + "%" );
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Warehouse warehouse = new Warehouse();
+                    warehouse.setId(rs.getInt("warehouse_id"));
+                    warehouse.setName(rs.getString("name"));
+                    warehouse.setLocation(rs.getString("location"));
+                    return warehouse;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public List<Warehouse> getAllWarehouses() {
         List<Warehouse> list = new ArrayList<>();
