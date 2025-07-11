@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Medicine API</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    label { display: block; margin-top: 10px; }
+    input, button, select { margin-bottom: 10px; }
+    table, th, td { border: 1px solid #333; border-collapse: collapse; }
+    th, td { padding: 5px 10px; }
+    .row { margin-top: 10px; }
+  </style>
+</head>
+<body>
+<h2>Test Medicine API</h2>
+
+<!-- Search & Paging -->
+<div>
+  <label>Search keyword: <input id="search-keyword"></label>
+  <label>Category ID: <input id="search-category_id"></label>
+  <label>Limit:
+    <select id="search-limit" onchange="updateLimit()">
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="20">20</option>
+    </select>
+  </label>
+  <label>Offset: <input id="search-offset" value="0" style="width:50px"></label>
+  <button onclick="fetchMedicines()">Get Medicines</button>
+</div>
+
+<!-- Add medicine -->
+<div class="row">
+  <h4>Add Medicine</h4>
+  <label>Name: <input id="add-name"></label>
+  <label>Category ID: <input id="add-category_id" type="number"></label>
+  <label>Price: <input id="add-price" type="number" step="0.01"></label>
+  <label>Ingredient: <input id="add-ingredient"></label>
+  <label>Usage: <input id="add-usage"></label>
+  <label>Preservation: <input id="add-preservation"></label>
+  <label>Manufacture Date: <input id="add-manuDate" type="date"></label>
+  <label>Expiration Date: <input id="add-expDate" type="date"></label>
+  <label>Quantity: <input id="add-quantity" type="number"></label>
+  <label>Unit ID: <input id="add-unit_id" type="number"></label>
+  <label>Warehouse ID: <input id="add-warehouse_id" type="number"></label>
+  <div id="add-warehouse-info" style="margin-top: 5px;">
+    <span id="add-warehouse-name"></span><br>
+    <span id="add-warehouse-location"></span>
+  </div>
+  <button onclick="addMedicine()">Add</button>
+</div>
+
+<!-- Medicines Table -->
+<div class="row">
+  <h4>Medicines List</h4>
+  <table id="medicine-table">
+    <thead>
+    <tr>
+      <th>ID</th><th>Name</th><th>Category ID</th><th>Unit ID</th>
+      <th>Price</th><th>Ingredient</th><th>Usage</th><th>Expiration Date</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- Update medicine -->
+<div class="row">
+  <h4>Update Medicine</h4>
+  <label>ID: <input id="update-medicine_id" readonly></label>
+  <label>Name: <input id="update-name"></label>
+  <label>Category ID: <input id="update-category_id" type="number"></label>
+  <label>Price: <input id="update-price" type="number" step="0.01"></label>
+  <label>Ingredient: <input id="update-ingredient"></label>
+  <label>Usage: <input id="update-usage"></label>
+  <label>Preservation: <input id="update-preservation"></label>
+  <label>Manufacture Date: <input id="update-manuDate" type="date"></label>
+  <label>Expiration Date: <input id="update-expDate" type="date"></label>
+  <label>Quantity: <input id="update-quantity" type="number"></label>
+  <label>Unit ID: <input id="update-unit_id" type="number"></label>
+  <label>Warehouse ID: <input id="update-warehouse_id" type="number"></label>
+  <div id="update-warehouse-info" style="margin-top: 5px;">
+    <span id="update-warehouse-name"></span><br>
+    <span id="update-warehouse-location"></span>
+  </div>
+  <button onclick="updateMedicine()">Update</button>
+</div>
+
+<!-- Delete medicine -->
+<div class="row">
+  <h4>Delete Medicine</h4>
+  <label>ID: <input id="delete-medicine_id" type="number"></label>
+  <button onclick="deleteMedicine()">Delete</button>
+</div>
+
+<script>
+  const BASE_URL = "http://localhost:8080/ClinicManagementSystem_war_exploded/api/medicines";
+  const WAREHOUSE_API = "http://localhost:8080/ClinicManagementSystem_war_exploded/api/warehouse";
+
+  function fetchMedicines() {
+    const keyword = document.getElementById("search-keyword").value;
+    const categoryId = document.getElementById("search-category_id").value;
+    const limit = document.getElementById("search-limit").value;
+    const offset = document.getElementById("search-offset").value;
+    let url = BASE_URL + "?limit=" + limit + "&offset=" + offset;
+    if (keyword) url += "&keyword=" + encodeURIComponent(keyword);
+    if (categoryId) url += "&categoryId=" + encodeURIComponent(categoryId);
+
+    fetch(url)
+            .then(res => res.json())
+            .then(data => {
+              const tbody = document.querySelector("#medicine-table tbody");
+              tbody.innerHTML = "";
+              console.log("Response from API:", data);
+              const medicines = data.data || data;
+              medicines.forEach(med => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+            <td>${med.medicine_id}</td>
+            <td>${med.name}</td>
+            <td>${med.category_id}</td>
+            <td>${med.unit_id}</td>
+            <td>${med.price}</td>
+            <td>${med.ingredient}</td>
+            <td>${med.usage}</td>
+            <td>${med.expDate || ""}</td>
+            <td><button class="edit-btn">Edit</button></td>
+          `;
+                tr.querySelector('.edit-btn').addEventListener('click', () => {
+                  fillUpdate(
+                          med.medicine_id,
+                          med.name,
+                          med.category_id,
+                          med.price,
+                          med.ingredient,
+                          med.usage,
+                          med.preservation,
+                          med.manuDate,
+                          med.expDate,
+                          med.quantity,
+                          med.unit_id,
+                          med.warehouse_id
+                  );
+                });
+                tbody.appendChild(tr);
+              });
+            })
+            .catch(e => alert("API error: " + e));
+  }
+
+  function updateLimit() {
+    document.getElementById("search-offset").value = "0";
+    fetchMedicines();
+  }
+
+  function addMedicine() {
+    const med = {
+      name: document.getElementById("add-name").value,
+      category_id: parseInt(document.getElementById("add-category_id").value),
+      price: parseFloat(document.getElementById("add-price").value),
+      ingredient: document.getElementById("add-ingredient").value,
+      usage: document.getElementById("add-usage").value,
+      preservation: document.getElementById("add-preservation").value,
+      manuDate: document.getElementById("add-manuDate").value,
+      expDate: document.getElementById("add-expDate").value,
+      quantity: parseInt(document.getElementById("add-quantity").value),
+      unit_id: parseInt(document.getElementById("add-unit_id").value),
+      warehouse_id: parseInt(document.getElementById("add-warehouse_id").value)
+    };
+    fetch(BASE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(med)
+    })
+            .then(res => res.json())
+            .then(data => {
+              alert("Added! " + JSON.stringify(data));
+              fetchMedicines();
+            })
+            .catch(e => alert("API error: " + e));
+  }
+
+  function fillUpdate(
+          medicine_id, name, category_id, price, ingredient, usage, preservation,
+          manuDate, expDate, quantity, unit_id, warehouse_id
+  ) {
+    document.getElementById("update-medicine_id").value = medicine_id;
+    document.getElementById("update-name").value = name;
+    document.getElementById("update-category_id").value = category_id;
+    document.getElementById("update-price").value = price;
+    document.getElementById("update-ingredient").value = ingredient || "";
+    document.getElementById("update-usage").value = usage || "";
+    document.getElementById("update-preservation").value = preservation || "";
+    document.getElementById("update-manuDate").value = manuDate ? manuDate.split("T")[0] : "";
+    document.getElementById("update-expDate").value = expDate ? expDate.split("T")[0] : "";
+    document.getElementById("update-quantity").value = quantity;
+    document.getElementById("update-unit_id").value = unit_id;
+    document.getElementById("update-warehouse_id").value = warehouse_id;
+    if (warehouse_id) fetchWarehouseInfo(warehouse_id, 'update');
+  }
+
+  function updateMedicine() {
+    const id = document.getElementById("update-medicine_id").value;
+    const med = {
+      name: document.getElementById("update-name").value,
+      category_id: parseInt(document.getElementById("update-category_id").value),
+      price: parseFloat(document.getElementById("update-price").value),
+      ingredient: document.getElementById("update-ingredient").value,
+      usage: document.getElementById("update-usage").value,
+      preservation: document.getElementById("update-preservation").value,
+      manuDate: document.getElementById("update-manuDate").value,
+      expDate: document.getElementById("update-expDate").value,
+      quantity: parseInt(document.getElementById("update-quantity").value),
+      unit_id: parseInt(document.getElementById("update-unit_id").value),
+      warehouse_id: parseInt(document.getElementById("update-warehouse_id").value)
+    };
+    fetch(BASE_URL + "/" + id, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(med)
+    })
+            .then(res => res.json())
+            .then(data => {
+              alert("Updated! " + JSON.stringify(data));
+              fetchMedicines();
+            })
+            .catch(e => alert("API error: " + e));
+  }
+
+  function deleteMedicine() {
+    const id = document.getElementById("delete-medicine_id").value;
+    fetch(BASE_URL + "/" + id, {
+      method: "DELETE"
+    })
+            .then(res => {
+              if (res.status === 204) {
+                alert("Deleted!");
+                fetchMedicines();
+              } else {
+                return res.json().then(data => alert("Delete error: " + JSON.stringify(data)));
+              }
+            })
+            .catch(e => alert("API error: " + e));
+  }
+
+  function fetchWarehouseInfo(id, type = 'add') {
+    fetch(`${WAREHOUSE_API}/${id}`)
+            .then(response => response.json())
+            .then(data => {
+              document.getElementById(`${type}-warehouse-name`).textContent = `Name: ${data.name}`;
+              document.getElementById(`${type}-warehouse-location`).textContent = `Location: ${data.location}`;
+            })
+            .catch(error => {
+              console.error('Error fetching warehouse info:', error);
+              document.getElementById(`${type}-warehouse-name`).textContent = 'Error fetching warehouse info';
+              document.getElementById(`${type}-warehouse-location`).textContent = '';
+            });
+  }
+
+  document.getElementById('add-warehouse_id').addEventListener('change', function() {
+    const id = this.value;
+    if (id) {
+      fetchWarehouseInfo(id, 'add');
+    } else {
+      document.getElementById('add-warehouse-name').textContent = '';
+      document.getElementById('add-warehouse-location').textContent = '';
+    }
+  });
+
+  document.getElementById('update-warehouse_id').addEventListener('change', function() {
+    const id = this.value;
+    if (id) {
+      fetchWarehouseInfo(id, 'update');
+    } else {
+      document.getElementById('update-warehouse-name').textContent = '';
+      document.getElementById('update-warehouse-location').textContent = '';
+    }
+  });
+
+  fetchMedicines();
+</script>
+</body>
+</html>

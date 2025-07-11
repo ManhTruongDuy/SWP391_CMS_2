@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager API</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: whitesmoke;
+        }
+
+        #manager-table-body tr:hover {
+            background-color: #e0f0ff !important;
+            cursor: pointer;
+        }
+
+        #manager-table-body tr.selected {
+            background-color: #cce5ff !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h4 class="mb-3">List of Managers</h4>
+    <table class="table table-bordered table-hover">
+        <thead class="table-primary">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Department</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="manager-table-body">
+        <!-- rows will be dynamically injected here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
+    let selectedRow = null;
+
+    // Hiển thị danh sách quan ly
+    function displayManagers(data) {
+        const tbody = document.getElementById('manager-table-body');
+        console.log('Rendering managers:', data); // Debug
+        tbody.innerHTML = '';
+        selectedRow = null;
+
+        const managers = data;
+        if (managers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center">No managers found</td></tr>';
+            return;
+        }
+
+        managers.forEach((manager, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${manager.admin_id ?? 'N/A'}</td>
+                <td>${manager.fullName || 'N/A'}</td>
+                <td>${manager.phone || 'N/A'}</td>
+                <td>${manager.department || 'N/A'}</td>
+                <td>${manager.email || 'N/A'}</td>
+                <td>${manager.username || 'N/A'}</td>
+                <td>${manager.password || 'N/A'}</td>
+                <td>${manager.status || 'N/A'}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm delete-btn" data-id="${manager.id}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    <button class="btn btn-info btn-sm select-btn" data-id="${manager.id}">
+                        <i class="bi bi-eye"></i> Select
+                    </button>
+                </td>
+            `;
+
+
+            tbody.appendChild(row);
+
+
+
+            if (index === 0) {
+                row.classList.add('selected');
+                selectedRow = row;
+            }
+        });
+    }
+
+    // Hiển thị thông báo lỗi
+    function displayError(message) {
+        const tbody = document.getElementById('manager-table-body');
+        console.error('Error:', message); // Debug
+        tbody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">${message}</td></tr>`;
+    }
+
+    // Lấy tất cả duoc si
+    async function getAllManagers() {
+        try {
+            const response = await fetch(`${baseUrl}/api/system-admin?action=managers`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();  // handle non-JSON error
+                throw new Error(`HTTP error ${response.status}: ${errorText}`);
+            }
+
+            const text = await response.text(); // read response as text first
+            if (!text) {
+                throw new Error("Empty response from server");
+            }
+
+            const data = JSON.parse(text); // now safely parse
+            console.log('Data received:', data);
+            displayManagers(data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+            displayError(error.message);
+        }
+    }
+
+    // Tải danh sách duoc si khi trang được tải
+    getAllManagers();
+</script>
+</body>
+</html>

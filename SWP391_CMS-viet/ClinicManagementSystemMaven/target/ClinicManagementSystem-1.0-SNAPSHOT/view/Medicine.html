@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse API Tester</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: whitesmoke;
+        }
+
+        .card {
+            height: auto;
+        }
+
+        #warehouse-table-body tr:hover {
+            background-color: #e0f0ff !important;
+            cursor: pointer;
+        }
+
+        #warehouse-table-body tr.selected {
+            background-color: #cce5ff !important;
+        }
+
+        #medicine-table-body {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            border-radius: 10px;
+        }
+
+        #warehouse-table-body:empty::after,
+        #medicine-table-body:empty::after {
+            content: 'No data available';
+            display: block;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid mt-3">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Manufacture Date</th>
+            <th>Expiration Date</th>
+            <th>Price</th>
+        </tr>
+        </thead>
+        <tbody id="medicine-table-body">
+        <!-- Medicine rows will be injected here -->
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
+
+    // Hiển thị danh sách thuốc
+    function displayMedicines(data) {
+        const tbody = document.getElementById('medicine-table-body');
+        console.log('Rendering medicines:', data);
+        tbody.innerHTML = '';
+
+        const medicines = Array.isArray(data) ? data : [data];
+        if (medicines.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No medicines found</td></tr>';
+            return;
+        }
+
+        medicines.forEach((medicine, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${medicine.medicine_id || 'N/A'}</td>
+                <td>${medicine.name || 'N/A'}</td>
+                <td>${medicine.quantity || 'N/A'}</td>
+                <td>${medicine.manuDate || 'N/A'}</td>
+                <td>${medicine.expDate || 'N/A'}</td>
+                <td>${medicine.price?.toFixed(2) || 'N/A'}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Hiển thị lỗi
+    function displayError(message) {
+        const tbody = document.getElementById('medicine-table-body');
+        console.error('Error:', message);
+        tbody.innerHTML = `<tr><td colspan="6" class="text-danger text-center">${message}</td></tr>`;
+    }
+
+    // Lấy tất cả thuốc
+    async function getAllMedicines() {
+        try {
+            const response = await fetch(`${baseUrl}/api/medicine`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `HTTP error ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('Medicines received:', data);
+            displayMedicines(data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+            displayError(error.message);
+        }
+    }
+
+    // Tự động gọi khi trang tải
+    getAllMedicines();
+</script>
+</body>
+</html>

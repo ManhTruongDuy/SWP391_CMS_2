@@ -1,0 +1,63 @@
+body {
+    background: #f8f9fa;
+}
+
+
+
+
+.landing-container {
+    min-height: 35vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero {
+    text-align: center;
+    padding: 10px 20px;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: #6c757d;
+}
+
+.btn-custom {
+    padding: 10px 25px;
+    font-size: 1rem;
+    border-radius: 25px;
+}
+
+.specialist-card {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.specialist-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+.specialist-icon {
+    font-size: 2rem;
+}
+
+.active-card {
+    background-color: #007bff;
+    color: white;
+    border: none;
+}
+
+.active-card .specialist-icon i {
+    color: white !important;
+}
+
+
+
