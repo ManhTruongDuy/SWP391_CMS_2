@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharmacist API</title>
+    <title>Patient API</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,12 +13,12 @@
             font-family: 'Inter', sans-serif;
         }
 
-        #pharmacist-table-body tr:hover {
+        #patient-table-body tr:hover {
             background-color: #e0f0ff !important;
             cursor: pointer;
         }
 
-        #pharmacist-table-body tr.selected {
+        #patient-table-body tr.selected {
             background-color: #bfdbfe !important;
             font-weight: 500;
         }
@@ -199,7 +199,7 @@
     <!-- Content Area -->
     <main class="flex-1 p-6 md:ml-64">
         <div class="container mt-5">
-            <h4 class="mb-3">List of Pharmacists</h4>
+            <h4 class="mb-3">List of Patients</h4>
             <table class="table table-bordered table-hover">
                 <thead class="table-primary">
                 <tr>
@@ -209,11 +209,12 @@
                     <th>Email</th>
                     <th>Username</th>
                     <th>Password</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
-                <tbody id="pharmacist-table-body">
-                <!-- Pharmacist rows will be dynamically injected here -->
+                <tbody id="patient-table-body">
+                <!-- rows will be dynamically injected here -->
                 </tbody>
             </table>
         </div>
@@ -258,38 +259,39 @@
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
     let selectedRow = null;
 
-    // Display pharmacists
-    function displayPharmacists(data) {
-        const tbody = document.getElementById('pharmacist-table-body');
-        console.log('Rendering pharmacists:', data); // Debug
-        tbody.innerHTML = '';
+    // Display patients
+    function displayPatients(data) {
+        const tummy = document.getElementById('patient-table-body');
+        console.log('Rendering patients:', data); // Debug
+        tummy.innerHTML = '';
         selectedRow = null;
 
-        const pharmacists = data;
-        if (pharmacists.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center">No pharmacists found</td></tr>';
+        const patients = data;
+        if (patients.length === 0) {
+            tummy.innerHTML = '<tr><td colspan="8" class="text-center">No patients found</td></tr>';
             return;
         }
 
-        pharmacists.forEach((pharmacist, index) => {
+        patients.forEach((patient, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${pharmacist.ID ?? 'N/A'}</td>
-                <td>${pharmacist.name || 'N/A'}</td>
-                <td>${pharmacist.mobile || 'N/A'}</td>
-                <td>${pharmacist.email || 'N/A'}</td>
-                <td>${pharmacist.username || 'N/A'}</td>
-                <td>${pharmacist.password || 'N/A'}</td>
+                <td>${patient.patient_id ?? 'N/A'}</td>
+                <td>${patient.fullName || 'N/A'}</td>
+                <td>${patient.phone || 'N/A'}</td>
+                <td>${patient.email || 'N/A'}</td>
+                <td>${patient.username || 'N/A'}</td>
+                <td>${patient.password || 'N/A'}</td>
+                <td>${patient.status || 'N/A'}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm delete-btn" data-id="${pharmacist.id}">
+                    <button class="btn btn-danger btn-sm delete-btn" data-id="${patient.id}">
                         <i class="bi bi-trash"></i>
                     </button>
-                    <button class="btn btn-info btn-sm select-btn" data-id="${pharmacist.id}">
+                    <button class="btn btn-info btn-sm select-btn" data-id="${patient.id}">
                         <i class="bi bi-eye"></i> Select
                     </button>
                 </td>
             `;
-            tbody.appendChild(row);
+            tummy.appendChild(row);
 
             if (index === 0) {
                 row.classList.add('selected');
@@ -300,15 +302,15 @@
 
     // Display error message
     function displayError(message) {
-        const tbody = document.getElementById('pharmacist-table-body');
+        const tbody = document.getElementById('patient-table-body');
         console.error('Error:', message); // Debug
-        tbody.innerHTML = `<tr><td colspan="7" class="text-danger text-center">${message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">${message}</td></tr>`;
     }
 
-    // Fetch all pharmacists
-    async function getAllPharmacists() {
+    // Fetch all patients
+    async function getAllPatients() {
         try {
-            const response = await fetch(`${baseUrl}/api/system-admin?action=pharmacists`, {
+            const response = await fetch(`${baseUrl}/api/system-admin?action=patients`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -325,15 +327,15 @@
 
             const data = JSON.parse(text); // now safely parse
             console.log('Data received:', data);
-            displayPharmacists(data);
+            displayPatients(data);
         } catch (error) {
             console.error('Fetch error:', error);
             displayError(error.message);
         }
     }
 
-    // Load pharmacist list on page load
-    getAllPharmacists();
+    // Load patient list on page load
+    getAllPatients();
 </script>
 </body>
 </html>
