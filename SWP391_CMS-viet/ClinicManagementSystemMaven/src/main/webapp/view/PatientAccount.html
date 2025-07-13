@@ -130,6 +130,41 @@
             transform: scale(1.05);
         }
 
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-container input {
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-container button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .search-container button:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -142,6 +177,13 @@
             }
             .btn-sm {
                 padding: 6px 10px;
+            }
+            .search-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .search-container input {
+                max-width: 100%;
             }
         }
     </style>
@@ -159,9 +201,9 @@
 
         <!-- Desktop Menu -->
         <div class="hidden md:flex space-x-8">
-            <a href="AdminDashboard.html" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Home</a>
-            <a href="#profile" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Profile</a>
-            <a href="#logout" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Logout</a>
+            <a href="AdminDashboard.html" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Trang chủ</a>
+            <a href="#profile" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
+            <a href="#logout" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Đăng xuất</a>
         </div>
 
         <!-- Mobile Menu Button -->
@@ -174,9 +216,9 @@
 
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="md:hidden hidden bg-blue-700 p-6 rounded-b-lg shadow-lg">
-        <a href="AdminDashboard.html" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Home</a>
-        <a href="#profile" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Profile</a>
-        <a href="#logout" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Logout</a>
+        <a href="AdminDashboard.html" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Trang chủ</a>
+        <a href="#profile" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Hồ sơ</a>
+        <a href="#logout" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Đăng xuất</a>
     </div>
 </nav>
 
@@ -185,13 +227,13 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar w-64 h-screen fixed md:static shadow-xl">
         <div class="p-6">
-            <h2 class="text-xl font-semibold text-blue-800 mb-6 tracking-wide">Account Control</h2>
+            <h2 class="text-xl font-semibold text-blue-800 mb-6 tracking-wide">Kiểm soát tài khoản</h2>
             <ul class="space-y-3">
-                <li><a href="PharmacistAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Pharmacist</a></li>
-                <li><a href="DoctorAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-stethoscope"></i> Doctor</a></li>
-                <li><a href="ManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person-workspace"></i> Manager</a></li>
-                <li><a href="SysAdminAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-gear"></i> System Admin</a></li>
-                <li><a href="PatientAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person"></i> Patient</a></li>
+                <li><a href="PharmacistAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Dược sĩ</a></li>
+                <li><a href="DoctorAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-heart-pulse"></i> Bác sĩ</a></li>
+                <li><a href="ManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person-workspace"></i> Quản lý</a></li>
+                <li><a href="SysAdminAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-gear"></i> Quản trị hệ thống</a></li>
+                <li><a href="PatientAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person"></i> Bệnh nhân</a></li>
             </ul>
         </div>
     </aside>
@@ -200,6 +242,12 @@
     <main class="flex-1 p-6 md:ml-64">
         <div class="container mt-5">
             <h4 class="mb-3">List of Patients</h4>
+
+            <div class="search-container">
+                <input type="text" id="patient-id-search" placeholder="Nhập ID bệnh nhân" class="form-control">
+                <button id="search-btn" class="btn">Tìm kiếm</button>
+            </div>
+
             <table class="table table-bordered table-hover">
                 <thead class="table-primary">
                 <tr>
@@ -333,6 +381,58 @@
             displayError(error.message);
         }
     }
+
+    // Search for patient by ID
+    async function searchPatientById(id) {
+        try {
+            if (!id) {
+                getAllPatients(); // If no ID, show all patients
+                return;
+            }
+
+            const response = await fetch(`${baseUrl}/api/system-admin?action=patientid&id=${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error ${response.status}: ${errorText}`);
+            }
+
+            const text = await response.text();
+            if (!text) {
+                throw new Error("Phản hồi từ máy chủ rỗng");
+            }
+
+            const data = JSON.parse(text);
+            console.log('Search result:', data);
+            if (!data || Object.keys(data).length === 0) {
+                displayError('Không bệnh nhân nào có ID này!');
+            } else {
+                displayManagers([data]);
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            displayError(error.message);
+        }
+    }
+
+    // Search bar event listener
+    const searchBtn = document.getElementById('search-btn');
+    const searchInput = document.getElementById('patient-id-search');
+    searchBtn.addEventListener('click', () => {
+        const patientId = searchInput.value.trim();
+        searchPatientById(patientId);
+    });
+
+    // Allow pressing Enter to search
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const patientId = searchInput.value.trim();
+            searchPatientById(patientId);
+        }
+    });
 
     // Load patient list on page load
     getAllPatients();

@@ -154,5 +154,122 @@ public class SysAdminDAO {
         return list;
     }
 
+    //Lấy bác sĩ theo id
+    public DoctorAccount getDoctorById(int id) {
+        String sql = "SELECT * FROM Doctor d JOIN AccountStaff ast ON d.account_staff_id = ast.account_staff_id WHERE d.doctor_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    DoctorAccount da = new DoctorAccount();
+                        da.setId(rs.getInt("doctor_id"));
+                        da.setName(rs.getString("full_name"));
+                        da.setPhone(rs.getString("phone"));
+                        da.setEmail(rs.getString("email"));
+                        da.setUsername(rs.getString("username"));
+                        da.setPassword(rs.getString("password"));
+                        da.setStatus(rs.getString("status"));
+                    return da;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
+    //Lấy dược sĩ theo id
+    public PharmacistAccount getPharmacistById(int id) {
+        String sql = "SELECT * FROM Pharmacist p JOIN AccountPharmacist ap ON p.account_pharmacist_id = ap.account_pharmacist_id WHERE p.pharmacist_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    PharmacistAccount pa = new PharmacistAccount();
+                        pa.setID(rs.getInt("pharmacist_id"));
+                        pa.setName(rs.getString("full_name"));
+                        pa.setMobile(rs.getString("phone"));
+                        pa.setEmail(rs.getString("email"));
+                        pa.setUsername(rs.getString("username"));
+                        pa.setPassword(rs.getString("password"));
+                    return pa;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //Lấy quản lý theo id
+    public ManagerAccount getManagerById(int id) {
+        String sql = "SELECT * FROM AdminBusiness ab JOIN AccountStaff ast ON ab.account_staff_id = ast.account_staff_id WHERE ab.admin_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    ManagerAccount ma = new ManagerAccount();
+                        ma.setAdmin_id(rs.getInt("doctor_id"));
+                        ma.setFullName(rs.getString("full_name"));
+                        ma.setPhone(rs.getString("phone"));
+                        ma.setEmail(rs.getString("email"));
+                        ma.setUsername(rs.getString("username"));
+                        ma.setPassword(rs.getString("password"));
+                        ma.setStatus(rs.getString("status"));
+                    return ma;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //Lấy quản trị hệ thống theo id
+    public SysAdminAccount getSysAdminById(int id) {
+        String sql = "SELECT * FROM AdminSystem asy JOIN AccountStaff ast ON asy.account_staff_id = ast.account_staff_id WHERE asy.admin_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    SysAdminAccount sa = new SysAdminAccount();
+                        sa.setAdmin_id(rs.getInt("admin_id"));
+                        sa.setFullName(rs.getString("full_name"));
+                        sa.setPhone(rs.getString("phone"));
+                        sa.setEmail(rs.getString("email"));
+                        sa.setUsername(rs.getString("username"));
+                        sa.setPassword(rs.getString("password"));
+                        sa.setStatus(rs.getString("status"));
+                    return sa;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //Lấy bệnh nhân theo id
+    public PatientAccount getPatientById(int id) {
+        String sql = "SELECT * FROM ((Patient p JOIN Patient_AccountPatient pap ON p.patient_id = pap.patient_id) JOIN AccountPatient ap ON pap.account_patient_id = ap.account_patient_id) WHERE p.patient_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    PatientAccount pa = new PatientAccount();
+                        pa.setPatient_id(rs.getInt("patient_id"));
+                        pa.setFullName(rs.getString("full_name"));
+                        pa.setPhone(rs.getString("phone"));
+                        pa.setEmail(rs.getString("email"));
+                        pa.setUsername(rs.getString("username"));
+                        pa.setPassword(rs.getString("password"));
+                        pa.setStatus(rs.getString("status"));
+                    return pa;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

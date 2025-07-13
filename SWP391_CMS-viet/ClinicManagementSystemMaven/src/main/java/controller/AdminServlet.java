@@ -3,15 +3,12 @@ package controller;
 import com.google.gson.Gson;
 import dao.AdminDAO;
 import jakarta.servlet.ServletException;
-import model.*;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import model.accounts.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 
 @WebServlet("/api/admin")
 public class AdminServlet extends HttpServlet {
@@ -38,6 +35,27 @@ public class AdminServlet extends HttpServlet {
             switch (action) {
                 case "pharmacists" -> out.print(gson.toJson(dao.getAllPharmacists()));
                 case "medicines"     -> out.print(gson.toJson(dao.getAllMedicines()));
+                case "medicineid"   -> {
+                    String idParam = request.getParameter("id");
+                    if (idParam == null || idParam.trim().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Medicine ID is missing\"}");
+                        return;
+                    }
+                    try {
+                        int medicineId = Integer.parseInt(idParam);
+                        Object medicine = dao.getMedicineById(medicineId);
+                        if (medicine == null) {
+                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                            out.print("{\"error\":\"Medicine not found\"}");
+                        } else {
+                            out.print(gson.toJson(medicine));
+                        }
+                    } catch (NumberFormatException e) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Invalid Medicine ID format\"}");
+                    }
+                }
                 default -> {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     out.print("{\"error\":\"Unknown or missing action\"}");
