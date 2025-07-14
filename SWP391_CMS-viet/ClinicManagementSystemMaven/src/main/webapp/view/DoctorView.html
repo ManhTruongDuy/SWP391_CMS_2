@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medicine API</title>
+    <title>Doctor API</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,12 +13,12 @@
             font-family: 'Inter', sans-serif;
         }
 
-        #medicine-table-body tr:hover {
+        #doctor-table-body tr:hover {
             background-color: #e0f0ff !important;
             cursor: pointer;
         }
 
-        #medicine-table-body tr.selected {
+        #doctor-table-body tr.selected {
             background-color: #bfdbfe !important;
             font-weight: 500;
         }
@@ -164,6 +164,7 @@
             background-color: #2563eb;
             transform: translateY(-1px);
         }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -228,7 +229,7 @@
         <div class="p-6">
             <h2 class="text-xl font-semibold text-blue-800 mb-6 tracking-wide">Kiểm soát tài khoản</h2>
             <ul class="space-y-3">
-                <li><a href="Medicine.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Xem thuốc</a></li>
+                <li><a href="PharmacistAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Dược sĩ</a></li>
                 <li><a href="DoctorAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-heart-pulse"></i> Bác sĩ</a></li>
                 <li><a href="ManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person-workspace"></i> Quản lý</a></li>
                 <li><a href="SysAdminAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-gear"></i> Quản trị hệ thống</a></li>
@@ -240,10 +241,10 @@
     <!-- Content Area -->
     <main class="flex-1 p-6 md:ml-64">
         <div class="container mt-5">
-            <h4 class="mb-3">Danh sách thuốc</h4>
+            <h4 class="mb-3">Danh sách bác sĩ</h4>
 
             <div class="search-container">
-                <input type="text" id="medicine-id-search" placeholder="Nhập ID thuốc" class="form-control">
+                <input type="text" id="doctor-id-search" placeholder="Nhập ID bác sĩ" class="form-control">
                 <button id="search-btn" class="btn">Tìm kiếm</button>
             </div>
 
@@ -251,14 +252,15 @@
                 <thead class="table-primary">
                 <tr>
                     <th>ID</th>
-                    <th>Tên thuốc</th>
-                    <th>Ngày sản xuất</th>
-                    <th>Ngày hết hạn</th>
-                    <th>Số lượng</th>
-                    <th>Giá thành</th>
+                    <th>Họ và tên</th>
+                    <th>SDT</th>
+                    <th>Email</th>
+                    <th>Tên người dùng</th>
+                    <th>Mật khẩu</th>
+                    <th>Trạng thái</th>
                 </tr>
                 </thead>
-                <tbody id="medicine-table-body">
+                <tbody id="doctor-table-body">
                 <!-- rows will be dynamically injected here -->
                 </tbody>
             </table>
@@ -303,38 +305,29 @@
 
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
     let selectedRow = null;
-    let allMedicines = []; // Store all medicines for filtering
 
-    // Display medicines
-    function displayMedicines(data) {
-        const tbody = document.getElementById('medicine-table-body');
-        console.log('Rendering medicines:', data); // Debug
+    function displayDoctors(data) {
+        const tbody = document.getElementById('doctor-table-body');
+        console.log('Rendering doctors:', data); // Debug
         tbody.innerHTML = '';
         selectedRow = null;
 
-        const medicines = Array.isArray(data) ? data : [data];
-        if (medicines.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Không tìm thấy thuốc</td></tr>';
+        const doctors = data;
+        if (doctors.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No doctors found</td></tr>';
             return;
         }
 
-        medicines.forEach((medicine, index) => {
+        doctors.forEach((doctor, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${medicine.id ?? 'N/A'}</td>
-                <td>${medicine.name || 'N/A'}</td>
-                <td>${medicine.manuDate || 'N/A'}</td>
-                <td>${medicine.expDate || 'N/A'}</td>
-                <td>${medicine.quantity || 'N/A'}</td>
-                <td>${medicine.price || 'N/A'}</td>
-                <td>
-                    <button class="btn btn-danger btn-sm delete-btn" data-id="${medicine.id}">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                    <button class="btn btn-info btn-sm select-btn" data-id="${medicine.id}">
-                        <i class="bi bi-eye"></i> Chọn
-                    </button>
-                </td>
+                <td>${doctor.id ?? 'N/A'}</td>
+                <td>${doctor.name || 'N/A'}</td>
+                <td>${doctor.phone || 'N/A'}</td>
+                <td>${doctor.email || 'N/A'}</td>
+                <td>${doctor.username || 'N/A'}</td>
+                <td>${doctor.password || 'N/A'}</td>
+                <td>${doctor.status || 'N/A'}</td>
             `;
             tbody.appendChild(row);
 
@@ -347,55 +340,54 @@
 
     // Display error message
     function displayError(message) {
-        const tbody = document.getElementById('medicine-table-body');
+        const tbody = document.getElementById('doctor-table-body');
         console.error('Error:', message); // Debug
-        tbody.innerHTML = `<tr><td colspan="7" class="text-danger text-center">${message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">${message}</td></tr>`;
     }
 
-    // Fetch all pharmacists
-    async function getAllMedicines() {
+    // Fetch all doctors
+    async function getAllDoctors() {
         try {
-            const response = await fetch(`${baseUrl}/api/admin?action=medicines`, {
+            const response = await fetch(`${baseUrl}/api/system-admin?action=doctors`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
+                const errorText = await response.text();  // handle non-JSON error
+                throw new Error(`HTTP error ${response.status}: ${errorText}`);
             }
 
-            const text = await response.text();
+            const text = await response.text(); // read response as text first
             if (!text) {
-                throw new Error("Phản hồi từ máy chủ rỗng");
+                throw new Error("Empty response from server");
             }
 
-            const data = JSON.parse(text);
+            const data = JSON.parse(text); // now safely parse
             console.log('Data received:', data);
-            allMedicines = data; // Store all pharmacists
-            displayMedicines(data);
+            displayDoctors(data);
         } catch (error) {
             console.error('Fetch error:', error);
             displayError(error.message);
         }
     }
 
-    // Search for medicine by ID
-    async function searchMedicineById(id) {
+    // Search for doctor by ID
+    async function searchDoctorById(id) {
         try {
             if (!id) {
-                displayMedicines(allMedicines); // If no ID, show all
+                getAllDoctors(); // If no ID, show all doctors
                 return;
             }
 
-            const response = await fetch(`${baseUrl}/api/admin?action=medicineid&id=${id}`, {
+            const response = await fetch(`${baseUrl}/api/system-admin?action=doctorid&id=${id}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
+                throw new Error(`HTTP error ${response.status}: ${errorText}`);
             }
 
             const text = await response.text();
@@ -406,9 +398,9 @@
             const data = JSON.parse(text);
             console.log('Search result:', data);
             if (!data || Object.keys(data).length === 0) {
-                displayError('Không tìm thấy thuốc với ID này');
+                displayError('Không bác sĩ nào có ID này!');
             } else {
-                displayMedicines([data]);
+                displayDoctors([data]); // Wrap in array to match displayDoctors expectation
             }
         } catch (error) {
             console.error('Search error:', error);
@@ -418,22 +410,22 @@
 
     // Search bar event listener
     const searchBtn = document.getElementById('search-btn');
-    const searchInput = document.getElementById('medicine-id-search');
+    const searchInput = document.getElementById('doctor-id-search');
     searchBtn.addEventListener('click', () => {
-        const medicineId = searchInput.value.trim();
-        searchMedicineById(medicineId);
+        const doctorId = searchInput.value.trim();
+        searchDoctorById(doctorId);
     });
 
     // Allow pressing Enter to search
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            const medicineId = searchInput.value.trim();
-            searchMedicineById(medicineId);
+            const doctorId = searchInput.value.trim();
+            searchDoctorById(doctorId);
         }
     });
 
-    // Load pharmacist list on page load
-    getAllMedicines();
+    // Load doctor list on page load
+    getAllDoctors();
 </script>
 </body>
 </html>
