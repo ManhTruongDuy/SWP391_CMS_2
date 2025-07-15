@@ -24,9 +24,10 @@ public class CreatePaymentServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        // Đọc toàn bộ nội dung body của request (dạng JSON) và ghép lại thành một chuỗi
         JSONObject json = new JSONObject(req.getReader().lines().collect(Collectors.joining()));
-        Long orderCode = json.getLong("orderCode");
-        int amount = json.getInt("amount");
+        Long orderCode = json.getLong("orderCode"); // Lấy giá trị trường "orderCode" từ JSON, kiểu Long
+        int amount = json.getInt("amount"); //// Lấy giá trị trường "amount" từ JSON, kiểu int
 
         ItemData item = ItemData.builder()
                 .name("thuốc tổng hợp")
