@@ -19,11 +19,11 @@ public class UpdatePaymentServlet extends HttpServlet {
         resp.setContentType("application/json; charset=UTF-8");
 
         try {
-            JSONObject json = new JSONObject(req.getReader().lines().collect(Collectors.joining()));
-            Long orderCode = json.getLong("orderCode");
+            JSONObject json = new JSONObject(req.getReader().lines().collect(Collectors.joining())); // Đọc toàn bộ nội dung JSON từ body của request và chuyển thành một đối tượng JSONObject
+            Long orderCode = json.getLong("orderCode"); // Trích xuất trường "orderCode" từ JSON, kiểu Long (mã đơn hàng)
 
-            CounterDAO dao = new CounterDAO();
-            int invoiceId = dao.findInvoiceIdByPid(orderCode);
+            CounterDAO dao = new CounterDAO(); // Tạo instance của DAO để làm việc với dữ liệu (truy vấn database)
+            int invoiceId = dao.findInvoiceIdByPid(orderCode); // Tìm mã hóa đơn (invoiceId) tương ứng với mã đơn hàng (orderCode)
 
             if (invoiceId == -1) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
