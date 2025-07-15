@@ -81,17 +81,59 @@
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     }
 
+    .help-section {
+      background-color: #f8f9fa;
+      padding: 60px 0;
+    }
+
+    .faq-card {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease;
+    }
+
+    .faq-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .contact-card {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease;
+    }
+
+    .contact-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .troubleshoot-card {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease;
+    }
+
+    .troubleshoot-card:hover {
+      transform: translateY(-5px);
+    }
+
     @media (max-width: 991px) {
       .navbar-nav .btn {
         margin-top: 10px;
+      }
+      .help-section {
+        padding: 30px 0;
       }
     }
   </style>
 </head>
 
 <body>
-
-
 
 <!-- Header -->
 <header class="bg-white shadow-md">
@@ -136,7 +178,68 @@
   </div>
 </section>
 
+<!-- Help Section -->
+<section class="help-section">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-10 text-gray-800">Trợ Giúp & Hỗ Trợ</h2>
 
+    <!-- FAQ -->
+    <h3 class="text-2xl font-semibold mb-6 text-gray-700">Câu Hỏi Thường Gặp (FAQ)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+      <div class="faq-card">
+        <h4 class="font-semibold text-gray-700 mb-2">Làm thế nào để đặt lịch hẹn?</h4>
+        <p class="text-gray-600">Bạn có thể đặt lịch hẹn trực tuyến qua trang "Đăng nhập" hoặc gọi hotline 0901 234 567 để được hỗ trợ.</p>
+      </div>
+      <div class="faq-card">
+        <h4 class="font-semibold text-gray-700 mb-2">Làm sao để kiểm tra đơn thuốc?</h4>
+        <p class="text-gray-600">Vào mục "Hồ sơ bệnh nhân" trên dashboard sau khi đăng nhập để xem lịch sử đơn thuốc của bạn.</p>
+      </div>
+      <div class="faq-card">
+        <h4 class="font-semibold text-gray-700 mb-2">Tôi quên mật khẩu, làm sao để khôi phục?</h4>
+        <p class="text-gray-600">Nhấp vào "Quên mật khẩu" trên trang đăng nhập, nhập email của bạn và làm theo hướng dẫn được gửi qua email.</p>
+      </div>
+      <div class="faq-card">
+        <h4 class="font-semibold text-gray-700 mb-2">Làm thế nào để liên hệ dược sĩ?</h4>
+        <p class="text-gray-600">Gửi yêu cầu tư vấn qua form phản hồi hoặc gọi số (012) 1234 5678 trong giờ làm việc.</p>
+      </div>
+    </div>
+
+    <!-- Contact Support -->
+    <h3 class="text-2xl font-semibold mb-6 text-gray-700">Liên Hệ Hỗ Trợ</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div class="contact-card text-center">
+        <i class="fas fa-phone-alt text-blue-600 text-3xl mb-4"></i>
+        <h4 class="font-semibold text-gray-700">Điện thoại</h4>
+        <p class="text-gray-600">(012) 1234 5678</p>
+        <p class="text-gray-600">Hotline: 0901 234 567</p>
+      </div>
+      <div class="contact-card text-center">
+        <i class="fas fa-envelope text-blue-600 text-3xl mb-4"></i>
+        <h4 class="font-semibold text-gray-700">Email</h4>
+        <p class="text-gray-600">phongduoc@bvquocte.vn</p>
+      </div>
+      <div class="contact-card text-center">
+        <i class="fas fa-clock text-blue-600 text-3xl mb-4"></i>
+        <h4 class="font-semibold text-gray-700">Giờ làm việc</h4>
+        <p class="text-gray-600">Thứ 2 - Thứ 7: 7h30 - 17h30</p>
+        <p class="text-gray-600">Chủ nhật: 8h00 - 12h00</p>
+      </div>
+    </div>
+
+    <!-- Troubleshooting Guide -->
+    <h3 class="text-2xl font-semibold mb-6 text-gray-700">Hướng Dẫn Khắc Phục Sự Cố</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+      <div class="troubleshoot-card">
+        <h4 class="font-semibold text-gray-700 mb-2">Không đăng nhập được?</h4>
+        <p class="text-gray-600">Kiểm tra kết nối internet, đảm bảo email và mật khẩu chính xác. Nếu vẫn gặp vấn đề, khôi phục mật khẩu qua email.</p>
+      </div>
+      <div class="troubleshoot-card">
+        <h4 class="font-semibold text-gray-700 mb-2">Dashboard không tải dữ liệu?</h4>
+        <p class="text-gray-600">Làm mới trang hoặc kiểm tra xem bạn đã đăng nhập đúng tài khoản. Liên hệ hỗ trợ nếu lỗi tiếp diễn.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- Footer -->
 <footer class="bg-gray-900 text-white py-12">
@@ -213,9 +316,7 @@
           </div>
         </ul>
       </div>
-
     </div>
-
   </div>
 </footer>
 

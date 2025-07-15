@@ -81,17 +81,59 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
+        .about-section {
+            background-color: #f8f9fa;
+            padding: 60px 0;
+        }
+
+        .mission-vision-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .mission-vision-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .team-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .testimonial-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+        }
+
         @media (max-width: 991px) {
             .navbar-nav .btn {
                 margin-top: 10px;
+            }
+            .about-section {
+                padding: 30px 0;
             }
         }
     </style>
 </head>
 
 <body>
-
-
 
 <!-- Header -->
 <header class="bg-white shadow-md">
@@ -136,7 +178,58 @@
     </div>
 </section>
 
+<!-- About Section -->
+<section class="about-section">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-10 text-gray-800">Về Chúng Tôi</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Introduction -->
+            <div>
+                <h3 class="text-xl font-semibold mb-4 text-gray-700">Giới thiệu về KiviCare Clinic</h3>
+                <p class="text-gray-600 mb-4">KiviCare Clinic được thành lập vào năm 2015 với sứ mệnh mang đến dịch vụ y tế chất lượng cao cho cộng đồng tại TP.HCM. Chúng tôi tự hào là một trong những phòng khám tiên phong trong việc cung cấp dịch vụ dược lâm sàng và quản lý bệnh nhân toàn diện, kết hợp giữa công nghệ hiện đại và đội ngũ y bác sĩ tận tâm.</p>
+                <p class="text-gray-600">Với hơn 10 năm kinh nghiệm, KiviCare đã phục vụ hàng ngàn bệnh nhân, từ tư vấn sử dụng thuốc an toàn đến khám lâm sàng chuyên sâu. Chúng tôi cam kết mang lại sự chăm sóc tốt nhất với môi trường thân thiện và chuyên nghiệp.</p>
+            </div>
+            <!-- Mission & Vision -->
+            <div class="space-y-6">
+                <div class="mission-vision-card">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-700">Sứ mệnh</h3>
+                    <p class="text-gray-600">Cung cấp dịch vụ y tế toàn diện, tập trung vào sức khỏe cộng đồng thông qua việc sử dụng thuốc an toàn, hiệu quả và chăm sóc bệnh nhân cá nhân hóa.</p>
+                </div>
+                <div class="mission-vision-card">
+                    <h3 class="text-xl font-semibold mb-2 text-gray-700">Tầm nhìn</h3>
+                    <p class="text-gray-600">Trở thành phòng khám hàng đầu tại Việt Nam về dược lâm sàng và quản lý bệnh nhân, tích hợp công nghệ tiên tiến để nâng cao chất lượng sống.</p>
+                </div>
+            </div>
+        </div>
 
+        <!-- Facilities & Technology -->
+        <h2 class="text-3xl font-bold text-center mt-16 mb-10 text-gray-800">Cơ Sở Vật Chất & Công Nghệ</h2>
+        <p class="text-gray-600 text-center mb-8 max-w-3xl mx-auto">KiviCare Clinic đầu tư mạnh mẽ vào cơ sở hạ tầng hiện đại và công nghệ tiên tiến, bao gồm hệ thống quản lý bệnh nhân điện tử, phòng khám vô trùng đạt tiêu chuẩn quốc tế, và kho thuốc được kiểm soát nhiệt độ nghiêm ngặt.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="text-gray-600">
+                <h4 class="font-semibold mb-2">Hệ thống quản lý điện tử</h4>
+                <p>Giúp theo dõi hồ sơ bệnh nhân và lịch sử sử dụng thuốc một cách chính xác.</p>
+            </div>
+            <div class="text-gray-600">
+                <h4 class="font-semibold mb-2">Phòng khám vô trùng</h4>
+                <p>Đáp ứng các tiêu chuẩn y tế quốc tế để đảm bảo an toàn cho bệnh nhân.</p>
+            </div>
+        </div>
+
+        <!-- Testimonials -->
+        <h2 class="text-3xl font-bold text-center mt-16 mb-10 text-gray-800">Đánh Giá Từ Khách Hàng</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="testimonial-card">
+                <p class="text-gray-600 italic mb-2">"Dịch vụ rất chuyên nghiệp, đội ngũ y bác sĩ tận tâm, tôi rất hài lòng!"</p>
+                <p class="text-gray-500 text-right font-semibold">- Nguyễn Văn D</p>
+            </div>
+            <div class="testimonial-card">
+                <p class="text-gray-600 italic mb-2">"Thủ tục nhanh chóng, thuốc được tư vấn rất chi tiết."</p>
+                <p class="text-gray-500 text-right font-semibold">- Trần Thị E</p>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Footer -->
 <footer class="bg-gray-900 text-white py-12">
@@ -215,7 +308,6 @@
             </div>
 
         </div>
-
     </div>
 </footer>
 
