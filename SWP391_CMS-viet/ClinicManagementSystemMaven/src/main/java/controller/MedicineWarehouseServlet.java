@@ -37,7 +37,25 @@ public class MedicineWarehouseServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         String pathInfo = req.getPathInfo();
+        String name = req.getParameter("name");
+
         try {
+            // Handle search by name
+            if (name != null && !name.trim().isEmpty()) {
+                try {
+                    List<Medicine> medicines = dao.getMedicineByName(name);
+                    if (medicines != null && !medicines.isEmpty()) {
+                        resp.getWriter().write(gson.toJson(medicines));
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        resp.getWriter().write("{\"error\":\"No warehouses found with name: " + name + "\"}");
+                    }
+                } catch (Exception e) {
+                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    resp.getWriter().write("{\"error\":\"Failed to fetch warehouses by name: " + e.getMessage() + "\"}");
+                }
+                return;
+            }
             if (pathInfo == null || pathInfo.equals("/") || pathInfo.isEmpty()) {
 
                 List<Medicine> medicines = dao.getAllMedicines();

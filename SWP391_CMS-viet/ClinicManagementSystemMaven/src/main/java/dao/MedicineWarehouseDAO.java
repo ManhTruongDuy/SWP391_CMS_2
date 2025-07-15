@@ -1,6 +1,7 @@
 package dao;
 
 import model.Medicine;
+import model.Warehouse;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -70,6 +71,35 @@ public class MedicineWarehouseDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<Medicine> getMedicineByName(String name) {
+        List<Medicine> medicines = new ArrayList<>();
+        String sql = "SELECT * FROM Medicine WHERE name LIKE ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + name.trim() + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Medicine m = new Medicine();
+                    m.setMedicine_id(rs.getInt("medicine_id"));
+                    m.setName(rs.getString("name"));
+                    m.setUnit_id(rs.getInt("unit_id"));
+                    m.setCategory_id(rs.getInt("category_id"));
+                    m.setIngredient(rs.getString("ingredient"));
+                    m.setUsage(rs.getString("usage"));
+                    m.setPreservation(rs.getString("preservation"));
+                    m.setManuDate(rs.getDate("manuDate") != null ? rs.getDate("manuDate").toLocalDate() : null);
+                    m.setExpDate(rs.getDate("expDate") != null ? rs.getDate("expDate").toLocalDate() : null);
+                    m.setQuantity(rs.getInt("quantity"));
+                    m.setPrice(rs.getFloat("price"));
+                    m.setWarehouse_id(rs.getInt("warehouse_id"));
+                    medicines.add(m);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return medicines;
     }
 
     // Thêm mới thuốc

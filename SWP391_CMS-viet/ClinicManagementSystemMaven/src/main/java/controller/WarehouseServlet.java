@@ -35,12 +35,49 @@ public class WarehouseServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         String pathInfo = req.getPathInfo();
+        String name = req.getParameter("name");
+        String location = req.getParameter("location");
+
+        // Handle search by name
+        if (name != null && !name.trim().isEmpty()) {
+            try {
+                List<Warehouse> warehouses = warehouseDAO.getWarehouseByName(name);
+                if (warehouses != null && !warehouses.isEmpty()) {
+                    resp.getWriter().write(gson.toJson(warehouses));
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    resp.getWriter().write("{\"error\":\"No warehouses found with name: " + name + "\"}");
+                }
+            } catch (Exception e) {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.getWriter().write("{\"error\":\"Failed to fetch warehouses by name: " + e.getMessage() + "\"}");
+            }
+            return;
+        }
+        // Handle search by location
+        if (location != null && !location.trim().isEmpty()) {
+            try {
+                List<Warehouse> warehouses = warehouseDAO.getWarehouseByLocation(location);
+                if (warehouses != null && !warehouses.isEmpty()) {
+                    resp.getWriter().write(gson.toJson(warehouses));
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    resp.getWriter().write("{\"error\":\"No warehouses found with location: " + location + "\"}");
+                }
+            } catch (Exception e) {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.getWriter().write("{\"error\":\"Failed to fetch warehouses by location: " + e.getMessage() + "\"}");
+            }
+            return;
+        }
+
         if (pathInfo != null && !pathInfo.equals("/")) {
             String[] pathParts = pathInfo.substring(1).split("/");
             if (pathParts.length == 1) {
                 try {
                     int id = Integer.parseInt(pathParts[0]);
                     Warehouse warehouse = warehouseDAO.getWarehouseById(id);
+
                     if (warehouse != null) {
                         resp.getWriter().write(gson.toJson(warehouse));
                     } else {
@@ -52,14 +89,10 @@ public class WarehouseServlet extends HttpServlet {
                     resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     resp.getWriter().write("{\"error\":\"Invalid ID\"}");
                 }
-            }else if(pathParts.length == 1 && pathParts[0].equals("name")){
-                String name = pathParts[0];
-            }
-            else if (pathParts.length == 2 && pathParts[1].equals("medicines")) {
+            } else if (pathParts.length == 2 && pathParts[1].equals("medicines")) {
                 try {
                     int id = Integer.parseInt(pathParts[0]);
                     List<MedicineWarehouse> medicines = warehouseDAO.getMedicinesByWarehouseId(id);
-                    System.out.println("Medicines fetched for warehouse " + id + ": " + medicines);
                     resp.getWriter().write(gson.toJson(medicines));
                 } catch (NumberFormatException e) {
                     resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
