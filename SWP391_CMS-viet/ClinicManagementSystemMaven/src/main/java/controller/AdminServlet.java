@@ -2,6 +2,7 @@ package controller;
 
 import com.google.gson.Gson;
 import dao.AdminDAO;
+import dao.SysAdminDAO;
 import jakarta.servlet.ServletException;
 
 import jakarta.servlet.annotation.WebServlet;
@@ -33,7 +34,6 @@ public class AdminServlet extends HttpServlet {
 
         try (PrintWriter out = response.getWriter()) {
             switch (action) {
-                case "pharmacists" -> out.print(gson.toJson(dao.getAllPharmacists()));
                 case "medicines"     -> out.print(gson.toJson(dao.getAllMedicines()));
                 case "medicineid"   -> {
                     String idParam = request.getParameter("id");
@@ -55,6 +55,13 @@ public class AdminServlet extends HttpServlet {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         out.print("{\"error\":\"Invalid Medicine ID format\"}");
                     }
+                }
+                case "updatePrice" -> {
+
+
+
+
+
                 }
                 default -> {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

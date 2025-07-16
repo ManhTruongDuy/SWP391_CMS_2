@@ -79,30 +79,16 @@ public class AdminDAO {
         return null;
     }
 
-    // Lấy tất cả tk dược sĩ
-    public List<PharmacistAccount> getAllPharmacists() {
-        List<PharmacistAccount> list = new ArrayList<>();
-        String sql = "SELECT * " +
-                "FROM Pharmacist p JOIN AccountPharmacist ap" +
-                "ON p.account_pharmacist_id = ap.account_pharmacist_id" +
-                "ORDER BY p.pharmacist_id " ;
+    // Cập nhật giá thuốc
+    public Boolean updateMedicinePriceById(int id, float price) {
+        String sql = "UPDATE Medicine SET price=? WHERE medicine_id=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    PharmacistAccount pa = new PharmacistAccount(
-                            rs.getInt("pharmacist_id"),
-                            rs.getString("full_name"),
-                            rs.getString("phone"),
-                            rs.getString("email"),
-                            rs.getString("username"),
-                            rs.getString("password")
-                    );
-                    list.add(pa);
-                }
-            }
+            ps.setFloat(1, price);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return list;
     }
 }
