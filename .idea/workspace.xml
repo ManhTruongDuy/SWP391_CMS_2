@@ -9,30 +9,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1a732c4d-0a4a-4c87-9b47-500c54fb2c88" name="Changes" comment="added admin and system admin functions">
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/AdminDashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/AdminDashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/AdminDashboard.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Doctor.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/DoctorAccount.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/DoctorAccount.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/DoctorAccount.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/LandingPage.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/ManagerAccount.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/ManagerAccount.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/ManagerAccount.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Medicine.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Pharmacist.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/PharmacistAccount.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/PharmacistAccount.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/PharmacistAccount.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Report.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/SysAdminDashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/SysAdminDashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/SysAdminDashboard.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/WEB-INF/classes/controller/AdminServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/WEB-INF/classes/controller/AdminServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/WEB-INF/classes/dao/AdminDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/WEB-INF/classes/dao/AdminDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/view/AdminDashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/view/AdminDashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/view/DoctorAccount.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/view/DoctorAccount.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/view/Medicine.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/view/Medicine.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/view/SysAdminDashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/ClinicManagementSystem-1.0-SNAPSHOT/view/SysAdminDashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/classes/controller/AdminServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/classes/controller/AdminServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/classes/dao/AdminDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/target/classes/dao/AdminDAO.class" afterDir="false" />
+    <list default="true" id="1a732c4d-0a4a-4c87-9b47-500c54fb2c88" name="Changes" comment="changed about and help">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/About.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/About.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Help.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Help.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/LandingPage.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/LandingPage.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Medicine.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Medicine.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -248,7 +230,15 @@
       <workItem from="1752130669177" duration="4540000" />
       <workItem from="1752210519122" duration="7013000" />
       <workItem from="1752250616180" duration="1213000" />
-      <workItem from="1752299181318" duration="1560000" />
+      <workItem from="1752299181318" duration="2757000" />
+      <workItem from="1752316396843" duration="4677000" />
+      <workItem from="1752336191860" duration="4956000" />
+      <workItem from="1752410136246" duration="8669000" />
+      <workItem from="1752492812306" duration="87000" />
+      <workItem from="1752492924159" duration="2456000" />
+      <workItem from="1752540276527" duration="2249000" />
+      <workItem from="1752641770095" duration="375000" />
+      <workItem from="1752643143395" duration="357000" />
     </task>
     <task id="LOCAL-00001" summary="added admin and system admin functions">
       <option name="closed" value="true" />
@@ -290,7 +280,55 @@
       <option name="project" value="LOCAL" />
       <updated>1752218241587</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="added admin and system admin functions">
+      <option name="closed" value="true" />
+      <created>1752306422055</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1752306422055</updated>
+    </task>
+    <task id="LOCAL-00007" summary="more page added">
+      <option name="closed" value="true" />
+      <created>1752306631488</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1752306631488</updated>
+    </task>
+    <task id="LOCAL-00008" summary="implement all views and searches for system admin, starting work on admin">
+      <option name="closed" value="true" />
+      <created>1752422837041</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1752422837041</updated>
+    </task>
+    <task id="LOCAL-00009" summary="add all views for manager">
+      <option name="closed" value="true" />
+      <created>1752502437009</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1752502437009</updated>
+    </task>
+    <task id="LOCAL-00010" summary="fixed page links">
+      <option name="closed" value="true" />
+      <created>1752540502827</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1752540502828</updated>
+    </task>
+    <task id="LOCAL-00011" summary="changed about and help">
+      <option name="closed" value="true" />
+      <created>1752541953860</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1752541953860</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -298,7 +336,12 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added admin and system admin functions" />
-    <option name="LAST_COMMIT_MESSAGE" value="added admin and system admin functions" />
+    <MESSAGE value="more page added" />
+    <MESSAGE value="implement all views and searches for system admin, starting work on admin" />
+    <MESSAGE value="add all views for manager" />
+    <MESSAGE value="fixed page links" />
+    <MESSAGE value="changed about and help" />
+    <option name="LAST_COMMIT_MESSAGE" value="changed about and help" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
