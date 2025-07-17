@@ -1100,40 +1100,8 @@
     async function updateMedicine() {
         const id = document.getElementById('editMedicineId').value;
         let unitId = document.getElementById('editMedicineUnitIdInput').value;
-        if (unitId === 'custom') {
-            const newUnit = prompt('Enter new unit name:');
-            if (newUnit) {
-                try {
-                    unitId = await addNewUnit(newUnit);
-                } catch (error) {
-                    alert(`Failed to add new unit: ${error.message}`);
-                    return;
-                }
-            } else {
-                alert('Unit is required');
-                return;
-            }
-        } else {
-            unitId = parseInt(unitId);
-        }
-
-        let categoryId = document.getElementById('editMedicineCategoryIdInput').value;
-        if (categoryId === 'custom') {
-            const newCategory = prompt('Enter new category name:');
-            if (newCategory) {
-                try {
-                    categoryId = await addNewCategory(newCategory);
-                } catch (error) {
-                    alert(`Failed to add new category: ${error.message}`);
-                    return;
-                }
-            } else {
-                alert('Category is required');
-                return;
-            }
-        } else {
-            categoryId = parseInt(categoryId);
-        }
+        unitId = parseInt(unitId);
+        categoryId = parseInt(categoryId);
 
         const medicine = {
             medicine_id: parseInt(id),
