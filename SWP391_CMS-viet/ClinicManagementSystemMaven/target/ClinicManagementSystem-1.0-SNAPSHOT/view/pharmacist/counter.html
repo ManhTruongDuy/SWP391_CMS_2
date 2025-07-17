@@ -966,7 +966,7 @@
                             <td><strong>${p.id}</strong></td>
                             <td class="medicine-name">${p.name}</td>
                             <td>
-                                 <span class="medicine-category">${p.category?.name || ''}</span>
+                                 <span class="medicine-category">${p.category?.categoryName || ''}</span>
                              </td>
                             <td class="medicine-price">${p.price.toLocaleString()} ₫</td>
                             <td>
@@ -1088,14 +1088,14 @@
                         <i class="fas fa-weight me-2"></i>
                         Đơn vị
                     </div>
-                    <div class="detail-value">${med.unit?.name || 'N/A'}</div>
+                    <div class="detail-value">${med.unit?.unitName || 'N/A'}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">
                         <i class="fas fa-tags me-2"></i>
                         Loại thuốc
                     </div>
-                    <div class="detail-value">${med.category?.name || 'N/A'}</div>
+                    <div class="detail-value">${med.category?.categoryName || 'N/A'}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">
