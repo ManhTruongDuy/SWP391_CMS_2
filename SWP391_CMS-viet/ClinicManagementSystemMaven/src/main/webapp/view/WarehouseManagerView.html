@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient API</title>
+    <title>WarehouseManager API</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,12 +13,12 @@
             font-family: 'Inter', sans-serif;
         }
 
-        #patient-table-body tr:hover {
+        #wmanager-table-body tr:hover {
             background-color: #e0f0ff !important;
             cursor: pointer;
         }
 
-        #patient-table-body tr.selected {
+        #wmanager-table-body tr.selected {
             background-color: #bfdbfe !important;
             font-weight: 500;
         }
@@ -96,17 +96,6 @@
             transform: translateY(-1px);
         }
 
-        .btn-info {
-            background-color: #3b82f6;
-            border-color: #3b82f6;
-        }
-
-        .btn-info:hover {
-            background-color: #2563eb;
-            border-color: #2563eb;
-            transform: translateY(-1px);
-        }
-
         .container {
             max-width: 1200px;
         }
@@ -164,7 +153,6 @@
             background-color: #2563eb;
             transform: translateY(-1px);
         }
-
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -216,7 +204,7 @@
 
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="md:hidden hidden bg-blue-700 p-6 rounded-b-lg shadow-lg">
-        <a href="SysAdminDashboard.html" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Trang chủ</a>
+        <a href="AdminDashboard.html" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Trang chủ</a>
         <a href="#profile" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Hồ sơ</a>
         <a href="#logout" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Đăng xuất</a>
     </div>
@@ -227,14 +215,14 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar w-64 h-screen fixed md:static shadow-xl">
         <div class="p-6">
-            <h2 class="text-xl font-semibold text-blue-800 mb-6 tracking-wide">Kiểm soát tài khoản</h2>
+            <h2 class="text-xl font-semibold text-blue-800 mb-6 tracking-wide">Bảng điều khiển</h2>
             <ul class="space-y-3">
-                <li><a href="PharmacistAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Dược sĩ</a></li>
-                <li><a href="DoctorAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-heart-pulse"></i> Bác sĩ</a></li>
-                <li><a href="ManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person-workspace"></i> Quản lý</a></li>
-                <li><a href="SysAdminAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-gear"></i> Quản trị hệ thống</a></li>
-                <li><a href="PatientAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person"></i> Bệnh nhân</a></li>
-                <li><a href="WarehouseManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Quản lý kho</a></li>
+                <li><a href="Medicine.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Xem thuốc</a></li>
+                <li><a href="PharmacistView.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Thông tin dược sĩ</a></li>
+                <li><a href="DoctorView.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Thông tin bác sĩ</a></li>
+                <li><a href="ManagerView.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Thông tin quản lý</a></li>
+                <li><a href="SysadminView.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Thông tin quản trị hệ thống</a></li>
+                <li><a href="WarehouseManagerView.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Thông tin quản lý nhà kho</a></li>
             </ul>
         </div>
     </aside>
@@ -242,10 +230,10 @@
     <!-- Content Area -->
     <main class="flex-1 p-6 md:ml-64">
         <div class="container mt-5">
-            <h4 class="mb-3">List of Patients</h4>
+            <h4 class="mb-3">Danh sách quản lý kho</h4>
 
             <div class="search-container">
-                <input type="text" id="patient-id-search" placeholder="Nhập ID bệnh nhân" class="form-control">
+                <input type="text" id="wmanager-id-search" placeholder="Nhập ID quản lý kho" class="form-control">
                 <button id="search-btn" class="btn">Tìm kiếm</button>
             </div>
 
@@ -259,10 +247,9 @@
                     <th>Tên người dùng</th>
                     <th>Mật khẩu</th>
                     <th>Trạng thái</th>
-                    <th>Hành động</th>
                 </tr>
                 </thead>
-                <tbody id="patient-table-body">
+                <tbody id="wmanager-table-body">
                 <!-- rows will be dynamically injected here -->
                 </tbody>
             </table>
@@ -307,40 +294,33 @@
 
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
     let selectedRow = null;
+    let allWarehouseManager = []; // Store all manager for filtering
 
-    // Display patients
-    function displayPatients(data) {
-        const tummy = document.getElementById('patient-table-body');
-        console.log('Rendering patients:', data); // Debug
-        tummy.innerHTML = '';
+    // Display pharmacists
+    function displayWarehouseManagers(data) {
+        const tbody = document.getElementById('wmanager-table-body');
+        console.log('Rendering warehouse managers:', data); // Debug
+        tbody.innerHTML = '';
         selectedRow = null;
 
-        const patients = data;
-        if (patients.length === 0) {
-            tummy.innerHTML = '<tr><td colspan="8" class="text-center">Không tìm thấy bệnh nhân</td></tr>';
+        const wManagers = Array.isArray(data) ? data : [data];
+        if (wManagers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Không tìm thấy quản lý kho</td></tr>';
             return;
         }
 
-        patients.forEach((patient, index) => {
+        wManagers.forEach((wManager, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${patient.patient_id ?? 'N/A'}</td>
-                <td>${patient.fullName || 'N/A'}</td>
-                <td>${patient.phone || 'N/A'}</td>
-                <td>${patient.email || 'N/A'}</td>
-                <td>${patient.username || 'N/A'}</td>
-                <td>${patient.password || 'N/A'}</td>
-                <td>${patient.status || 'N/A'}</td>
-                <td>
-                    <button class="btn btn-danger btn-sm delete-btn" data-id="${patient.id}">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                    <button class="btn btn-info btn-sm select-btn" data-id="${patient.id}">
-                        <i class="bi bi-eye"></i> Select
-                    </button>
-                </td>
+                <td>${wManager.Warehouse_manager_id ?? 'N/A'}</td>
+                <td>${wManager.full_name || 'N/A'}</td>
+                <td>${wManager.phone || 'N/A'}</td>
+                <td>${wManager.email || 'N/A'}</td>
+                <td>${wManager.username || 'N/A'}</td>
+                <td>${wManager.password || 'N/A'}</td>
+                <td>${wManager.status || 'N/A'}</td>
             `;
-            tummy.appendChild(row);
+            tbody.appendChild(row);
 
             if (index === 0) {
                 row.classList.add('selected');
@@ -351,54 +331,55 @@
 
     // Display error message
     function displayError(message) {
-        const tbody = document.getElementById('patient-table-body');
+        const tbody = document.getElementById('wmanager-table-body');
         console.error('Error:', message); // Debug
-        tbody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">${message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-danger text-center">${message}</td></tr>`;
     }
 
-    // Fetch all patients
-    async function getAllPatients() {
+    // Fetch all warehouse managers
+    async function getAllWarehouseManagers() {
         try {
-            const response = await fetch(`${baseUrl}/api/system-admin?action=patients`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();  // handle non-JSON error
-                throw new Error(`HTTP error ${response.status}: ${errorText}`);
-            }
-
-            const text = await response.text(); // read response as text first
-            if (!text) {
-                throw new Error("Empty response from server");
-            }
-
-            const data = JSON.parse(text); // now safely parse
-            console.log('Data received:', data);
-            displayPatients(data);
-        } catch (error) {
-            console.error('Fetch error:', error);
-            displayError(error.message);
-        }
-    }
-
-    // Search for patient by ID
-    async function searchPatientById(id) {
-        try {
-            if (!id) {
-                getAllPatients(); // If no ID, show all patients
-                return;
-            }
-
-            const response = await fetch(`${baseUrl}/api/system-admin?action=patientid&id=${id}`, {
+            const response = await fetch(`${baseUrl}/api/system-admin?action=wManager`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`HTTP error ${response.status}: ${errorText}`);
+                throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
+            }
+
+            const text = await response.text();
+            if (!text) {
+                throw new Error("Phản hồi từ máy chủ rỗng");
+            }
+
+            const data = JSON.parse(text);
+            console.log('Data received:', data);
+            allPharmacists = data; // Store all pharmacists
+            displayWarehouseManagers(data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+            displayError(error.message);
+        }
+    }
+
+    // Search for pharmacist by ID
+    async function searchWarehouseManagerById(id) {
+        try {
+            if (!id) {
+                displayPharmacists(allWarehouseManager); // If no ID, show all pharmacists
+                return;
+            }
+
+            const response = await fetch(`${baseUrl}/api/system-admin?action=wManagerid&id=${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
             }
 
             const text = await response.text();
@@ -409,9 +390,9 @@
             const data = JSON.parse(text);
             console.log('Search result:', data);
             if (!data || Object.keys(data).length === 0) {
-                displayError('Không bệnh nhân nào có ID này!');
+                displayError('Không tìm thấy quản lý kho với ID này');
             } else {
-                displayManagers([data]);
+                displayWarehouseManagers([data]);
             }
         } catch (error) {
             console.error('Search error:', error);
@@ -421,22 +402,22 @@
 
     // Search bar event listener
     const searchBtn = document.getElementById('search-btn');
-    const searchInput = document.getElementById('patient-id-search');
+    const searchInput = document.getElementById('wmanager-id-search');
     searchBtn.addEventListener('click', () => {
-        const patientId = searchInput.value.trim();
-        searchPatientById(patientId);
+        const wManagerId = searchInput.value.trim();
+        searchWarehouseManagerById(wManagerId)
     });
 
     // Allow pressing Enter to search
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            const patientId = searchInput.value.trim();
-            searchPatientById(patientId);
+            const wManagerId = searchInput.value.trim();
+            searchWarehouseManagerById(wManagerId)
         }
     });
 
-    // Load patient list on page load
-    getAllPatients();
+    // Load warehouse managers list on page load
+    getAllWarehouseManagers()
 </script>
 </body>
 </html>

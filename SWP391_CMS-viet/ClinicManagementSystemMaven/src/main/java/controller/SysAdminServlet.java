@@ -27,6 +27,7 @@ public class SysAdminServlet extends HttpServlet {
                 case "managers"    -> out.print(gson.toJson(dao.getAllManagers()));
                 case "sys-admins"  -> out.print(gson.toJson(dao.getAllSysAdmins()));
                 case "patients"    -> out.print(gson.toJson(dao.getAllPatients()));
+                case "wManager"    -> out.print(gson.toJson(dao.getAllWarehouseManagers()));
                 case "doctorid"    -> {
                     String idParam = request.getParameter("id");
                     if (idParam == null || idParam.trim().isEmpty()) {
@@ -52,7 +53,7 @@ public class SysAdminServlet extends HttpServlet {
                     String idParam = request.getParameter("id");
                     if (idParam == null || idParam.trim().isEmpty()) {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.print("{\"error\":\"Doctor ID is missing\"}");
+                        out.print("{\"error\":\"Manager ID is missing\"}");
                         return;
                     }
                     try {
@@ -130,6 +131,27 @@ public class SysAdminServlet extends HttpServlet {
                     } catch (NumberFormatException e) {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         out.print("{\"error\":\"Invalid System admin ID format\"}");
+                    }
+                }
+                case "wManagerid"    -> {
+                    String idParam = request.getParameter("id");
+                    if (idParam == null || idParam.trim().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Warehouse manager ID is missing\"}");
+                        return;
+                    }
+                    try {
+                        int wManagerId = Integer.parseInt(idParam);
+                        Object wManager = dao.getSysAdminById(wManagerId);
+                        if (wManager == null) {
+                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                            out.print("{\"error\":\"Warehouse manager not found\"}");
+                        } else {
+                            out.print(gson.toJson(wManager));
+                        }
+                    } catch (NumberFormatException e) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Invalid Warehouse manager ID format\"}");
                     }
                 }
                 default -> {

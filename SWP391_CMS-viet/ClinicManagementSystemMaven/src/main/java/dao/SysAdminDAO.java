@@ -154,6 +154,31 @@ public class SysAdminDAO {
         return list;
     }
 
+    //Lấy tất cả tk quản lí kho
+    public List<WarehouseManagerAccount> getAllWarehouseManagers() {
+        List<WarehouseManagerAccount> list = new ArrayList<>();
+        String sql = "SELECT * FROM Warehouse_manager w JOIN AccountStaff a ON w.account_staff_id = a.account_staff_id ORDER BY w.Warehouse_manager_id " ;
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    WarehouseManagerAccount wa = new WarehouseManagerAccount(
+                            rs.getInt("Warehouse_manager_id"),
+                            rs.getString("full_name"),
+                            rs.getString("phone"),
+                            rs.getString("email"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("status")
+                    );
+                    list.add(wa);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     //Lấy bác sĩ theo id
     public DoctorAccount getDoctorById(int id) {
         String sql = "SELECT * FROM Doctor d JOIN AccountStaff ast ON d.account_staff_id = ast.account_staff_id WHERE d.doctor_id = ?";
@@ -209,7 +234,7 @@ public class SysAdminDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     ManagerAccount ma = new ManagerAccount();
-                        ma.setAdmin_id(rs.getInt("doctor_id"));
+                        ma.setAdmin_id(rs.getInt("admin_id"));
                         ma.setFullName(rs.getString("full_name"));
                         ma.setPhone(rs.getString("phone"));
                         ma.setEmail(rs.getString("email"));
@@ -265,6 +290,31 @@ public class SysAdminDAO {
                         pa.setPassword(rs.getString("password"));
                         pa.setStatus(rs.getString("status"));
                     return pa;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //Lấy tk quản lí kho theo id
+    public WarehouseManagerAccount getWarehouseManagerById(int id) {
+        String sql = "SELECT * FROM Warehouse_manager w JOIN AccountStaff a ON w.account_staff_id = a.account_staff_id WHERE w.Warehouse_manager_id = ? " ;
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    WarehouseManagerAccount wa = new WarehouseManagerAccount(
+                            rs.getInt("Warehouse_manager_id"),
+                            rs.getString("full_name"),
+                            rs.getString("phone"),
+                            rs.getString("email"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("status")
+                    );
+                    return wa;
                 }
             }
         } catch (SQLException e) {

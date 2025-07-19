@@ -78,35 +78,6 @@
       border-bottom: 1px solid #e5e7eb;
     }
 
-    .btn-sm {
-      padding: 8px 12px;
-      font-size: 0.875rem;
-      border-radius: 6px;
-      transition: all 0.2s ease-in-out;
-    }
-
-    .btn-danger {
-      background-color: #ef4444;
-      border-color: #ef4444;
-    }
-
-    .btn-danger:hover {
-      background-color: #dc2626;
-      border-color: #dc2626;
-      transform: translateY(-1px);
-    }
-
-    .btn-info {
-      background-color: #3b82f6;
-      border-color: #3b82f6;
-    }
-
-    .btn-info:hover {
-      background-color: #2563eb;
-      border-color: #2563eb;
-      transform: translateY(-1px);
-    }
-
     .container {
       max-width: 1200px;
     }
@@ -226,13 +197,14 @@
   <!-- Sidebar -->
   <aside id="sidebar" class="sidebar w-64 h-screen fixed md:static shadow-xl">
     <div class="p-6">
-      <h2 class="text-xl font-semibold text-blue-800 mb-6 tracking-wide">Kiểm soát tài khoản</h2>
+      <h2 class="text-xl font-semibold text-blue-800 mb-6 tracking-wide">Bảng điều khiển</h2>
       <ul class="space-y-3">
         <li><a href="Medicine.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Xem thuốc</a></li>
         <li><a href="PharmacistView.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Thông tin dược sĩ</a></li>
         <li><a href="DoctorView.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Thông tin bác sĩ</a></li>
         <li><a href="ManagerView.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Thông tin quản lý</a></li>
         <li><a href="SysadminView.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Thông tin quản trị hệ thống</a></li>
+        <li><a href="WarehouseManagerView.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Thông tin quản lý nhà kho</a></li>
       </ul>
     </div>
   </aside>
@@ -251,13 +223,13 @@
         <thead class="table-primary">
         <tr>
           <th>ID</th>
-          <th>Name</th>
-          <th>Mobile</th>
-          <th>Department</th>
+          <th>Họ và tên</th>
+          <th>Số điện thoại</th>
+          <th>Phòng ban</th>
           <th>Email</th>
-          <th>Username</th>
-          <th>Password</th>
-          <th>Status</th>
+          <th>Tên người dùng</th>
+          <th>Mật khẩu</th>
+          <th>Trạng thái</th>
         </tr>
         </thead>
         <tbody id="manager-table-body">
@@ -315,7 +287,7 @@
 
     const managers = data;
     if (managers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" class="text-center">No managers found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center">Không tìm thấy quản lý</td></tr>';
       return;
     }
 
@@ -344,7 +316,7 @@
   function displayError(message) {
     const tbody = document.getElementById('manager-table-body');
     console.error('Error:', message); // Debug
-    tbody.innerHTML = `<tr><td colspan="9" class="text-danger text-center">${message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">${message}</td></tr>`;
   }
 
   // Fetch all managers
