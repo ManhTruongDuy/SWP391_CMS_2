@@ -50,7 +50,6 @@ public class MedicineDAO {
         return list;
     }
 
-
     // Lấy thuốc theo ID
     public Medicine getMedicineById(int id) {
         String sql = "SELECT medicine_id, name, unit_id, category_id, ingredient, usage, preservation, manuDate, expDate, quantity, price, warehouse_id FROM Medicine WHERE medicine_id=?";
@@ -273,5 +272,4 @@ public class MedicineDAO {
         ps.setFloat(10, medicine.getPrice());
         ps.setInt(11, medicine.getWarehouse_id());
     }
-
 }
