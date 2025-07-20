@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warehouse API Tester</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <style>
         body {
             background-color: whitesmoke;
@@ -15,12 +16,16 @@
             height: auto;
         }
 
-        #warehouse-table-body tr:hover {
+        #warehouse-table-body tr:hover,
+        #medicine-table-body tr:hover,
+        #unit-table-body tr:hover {
             background-color: #e0f0ff !important;
             cursor: pointer;
         }
 
-        #warehouse-table-body tr.selected {
+        #warehouse-table-body tr.selected,
+        #medicine-table-body tr.selected,
+        #unit-table-body tr.selected {
             background-color: #cce5ff !important;
         }
 
@@ -33,17 +38,69 @@
             border-radius: 10px;
         }
 
-        #warehouse-table-body:empty::after,
-        #medicine-table-body:empty::after {
-            content: 'No data available';
-            display: block;
+        table {
             text-align: center;
-            color: #6c757d;
+        }
+
+        .expandable-section {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+
+        .pagination-controls {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .form-select {
+            text-align: center;
+        }
+
+        .expiry-green {
+            color: green;
+            font-weight: bold;
+        }
+
+        .expiry-yellow {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .expiry-red {
+            color: red;
+            font-weight: bold;
+        }
+
+        .sort-icon {
+            margin-left: 5px;
+        }
+
+        .sortable {
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 <div class="container-fluid mt-3">
+    <div id="loading" class="text-center" style="display: none;">
+        <div class="spinner-border" role="status"></div>
+    </div>
+    <div id="expiryAlert" class="alert alert-danger alert-dismissible fade show" role="alert" style="display: none; position: fixed; top: 10px; right: 10px; z-index: 1050;">
+        <strong>Warning!</strong> Some medicines are expired or will expire soon.
+        <ul id="expiredMedicinesList"></ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm p-3 mb-4 bg-white rounded">
@@ -56,11 +113,25 @@
                         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addWarehouseModal">
                             <i class="bi bi-plus"></i> Add Warehouse
                         </button>
+                        <button class="btn btn-info" onclick="getAllMedicines()">
+                            <i class="bi bi-capsule"></i> Fetch All Medicines
+                        </button>
+                        <button class="btn btn-warning" onclick="getAllUnits()">
+                            <i class="bi bi-box"></i> Fetch All Units
+                        </button>
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUnitModal">
+                            <i class="bi bi-plus"></i> Add Unit
+                        </button>
                     </div>
                     <div class="col-md-6">
                         <div class="input-group">
-                            <input type="number" id="warehouseId" class="form-control" placeholder="Enter Warehouse ID" min="1">
-                            <button class="btn btn-outline-primary" onclick="getWarehouseById()">
+                            <select id="warehouseSearchType" class="form-select" style="max-width: 150px;">
+                                <option value="id">ID</option>
+                                <option value="name">Name</option>
+                                <option value="location">Location</option>
+                            </select>
+                            <input id="warehouseSearchInput" class="form-control" placeholder="Enter search value" type="text">
+                            <button class="btn btn-outline-primary" onclick="searchWarehouse()">
                                 <i class="bi bi-search"></i> Fetch Warehouse
                             </button>
                         </div>
@@ -69,19 +140,136 @@
                 <table class="table table-bordered table-striped">
                     <thead class="table-primary">
                     <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Location</th>
-                        <th>Actions</th>
+                        <th scope="col" class="sortable" onclick="sortTable('warehouse', 'id')">
+                            ID <span class="sort-icon" id="warehouse-id-sort"></span>
+                        </th>
+                        <th scope="col" class="sortable" onclick="sortTable('warehouse', 'name')">
+                            Name <span class="sort-icon" id="warehouse-name-sort"></span>
+                        </th>
+                        <th scope="col">Location</th>
+                        <th scope="col">Actions</th>
                     </tr>
                     </thead>
                     <tbody id="warehouse-table-body"></tbody>
                 </table>
+                <div class="pagination-controls">
+                    <button class="btn btn-secondary btn-sm me-2" onclick="changeWarehousePage('prev')" id="prevWarehousePageBtn" disabled>
+                        <i class="bi bi-arrow-left"></i>
+                    </button>
+                    <span id="currentWarehousePage">Page 1</span>
+                    <button class="btn btn-secondary ms-2" onclick="changeWarehousePage('next')" id="nextWarehousePageBtn">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div id="unit-section" class="expandable-section">
+                    <h6>Units</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#addUnitModal">
+                                <i class="bi bi-plus"></i> Add Unit
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <select id="unitSearchType" class="form-select" style="max-width: 150px;">
+                                    <option value="id">ID</option>
+                                    <option value="name">Name</option>
+                                </select>
+                                <input id="unitSearchInput" class="form-control" placeholder="Enter search value" type="text">
+                                <button class="btn btn-outline-primary" onclick="searchUnit()">
+                                    <i class="bi bi-search"></i> Fetch Unit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="sortable" onclick="sortTable('unit', 'id')">
+                                ID <span class="sort-icon" id="unit-id-sort"></span>
+                            </th>
+                            <th scope="col" class="sortable" onclick="sortTable('unit', 'name')">
+                                Name <span class="sort-icon" id="unit-name-sort"></span>
+                            </th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="unit-table-body"></tbody>
+                    </table>
+                    <div class="pagination-controls">
+                        <button class="btn btn-secondary btn-sm me-2" onclick="changeUnitPage('prev')" id="prevUnitPageBtn" disabled>
+                            <i class="bi bi-arrow-left"></i>
+                        </button>
+                        <span id="currentUnitPage">Page 1</span>
+                        <button class="btn btn-secondary ms-2" onclick="changeUnitPage('next')" id="nextUnitPageBtn">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="medicine-section" class="expandable-section">
+                    <h6>Medicines</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#addMedicineModal">
+                                <i class="bi bi-plus"></i> Add Medicine
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <select id="medicineSearchType" class="form-select" style="max-width: 150px;">
+                                    <option value="id">ID</option>
+                                    <option value="name">Name</option>
+                                </select>
+                                <input id="medicineSearchInput" class="form-control" placeholder="Enter search value" type="text">
+                                <button class="btn btn-outline-primary" onclick="searchMedicine()">
+                                    <i class="bi bi-search"></i> Fetch Medicine
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="sortable" onclick="sortTable('medicine', 'id')">
+                                ID <span class="sort-icon" id="medicine-id-sort"></span>
+                            </th>
+                            <th scope="col" class="sortable" onclick="sortTable('medicine', 'name')">
+                                Name <span class="sort-icon" id="medicine-name-sort"></span>
+                            </th>
+                            <th scope="col">Warehouse</th>
+                            <th scope="col">Unit</th>
+                            <th scope="col" class="sortable" onclick="sortTable('medicine', 'quantity')">
+                                Quantity <span class="sort-icon" id="medicine-quantity-sort"></span>
+                            </th>
+                            <th scope="col">Manufacture Date</th>
+                            <th scope="col">Expiry Date</th>
+                            <th scope="col">Expiry Status</th>
+                            <th scope="col" class="sortable" onclick="sortTable('medicine', 'price')">
+                                Price <span class="sort-icon" id="medicine-price-sort"></span>
+                            </th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="medicine-table-body"></tbody>
+                    </table>
+                    <div class="pagination-controls">
+                        <button class="btn btn-secondary btn-sm me-2" onclick="changeMedicinePage('prev')" id="prevMedicinePageBtn" disabled>
+                            Jimmy Carter
+                            <i class="bi bi-arrow-left"></i>
+                        </button>
+                        <span id="currentMedicinePage">Page 1</span>
+                        <button class="btn btn-secondary ms-2" onclick="changeMedicinePage('next')" id="nextMedicinePageBtn">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal để thêm kho -->
+    <!-- Modal to add warehouse -->
     <div class="modal fade" id="addWarehouseModal" tabindex="-1" aria-labelledby="addWarehouseModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -106,7 +294,7 @@
         </div>
     </div>
 
-    <!-- Modal để sửa kho -->
+    <!-- Modal to edit warehouse -->
     <div class="modal fade" id="editWarehouseModal" tabindex="-1" aria-labelledby="editWarehouseModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -132,28 +320,171 @@
         </div>
     </div>
 
-    <!-- Modal để hiển thị thuốc trong kho -->
-    <div class="modal fade" id="medicineModal" tabindex="-1" aria-labelledby="medicineModalLabel" aria-hidden="true">
+    <!-- Modal to add unit -->
+    <div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="medicineModalLabel">Medicines in Warehouse</h5>
+                    <h5 class="modal-title" id="addUnitModalLabel">Add New Unit</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Quantity</th>
-                            <th>Manufacture date</th>
-                            <th>Expire date</th>
-                            <th>Price</th>
-                        </tr>
-                        </thead>
-                        <tbody id="medicine-table-body"></tbody>
-                    </table>
+                    <form id="addUnitForm">
+                        <div class="mb-3">
+                            <label for="unitNameInput" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="unitNameInput" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal to edit unit -->
+    <div class="modal fade" id="editUnitModal" tabindex="-1" aria-labelledby="editUnitModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUnitModalLabel">Edit Unit</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUnitForm">
+                        <input type="hidden" id="editUnitId">
+                        <div class="mb-3">
+                            <label for="editUnitNameInput" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="editUnitNameInput" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal to add medicine -->
+    <div class="modal fade" id="addMedicineModal" tabindex="-1" aria-labelledby="addMedicineModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMedicineModalLabel">Add New Medicine</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addMedicineForm">
+                        <div class="mb-3">
+                            <label for="medicineNameInput" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="medicineNameInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicineUnitIdInput" class="form-label">Unit</label>
+                            <select class="form-control" id="medicineUnitIdInput" required>
+                                <option value="">Select Unit</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicineCategoryIdInput" class="form-label">Category</label>
+                            <select class="form'select" id="medicineCategoryIdInput" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicineIngredientInput" class="form-label">Ingredient</label>
+                            <input type="text" class="form-control" id="medicineIngredientInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicineUsageInput" class="form-label">Usage</label>
+                            <input type="text" class="form-control" id="medicineUsageInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicinePreservationInput" class="form-label">Preservation</label>
+                            <input type="text" class="form-control" id="medicinePreservationInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicineManuDateInput" class="form-label">Manufacture Date</label>
+                            <input type="date" class="form-control" id="medicineManuDateInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicineExpDateInput" class="form-label">Expiry Date</label>
+                            <input type="date" class="form-control" id="medicineExpDateInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicineQuantityInput" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="medicineQuantityInput" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicinePriceInput" class="form-label">Price</label>
+                            <input type="number" class="form-control" id="medicinePriceInput" min="0" step="0.01" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal to edit medicine -->
+    <div class="modal fade" id="editMedicineModal" tabindex="-1" aria-labelledby="editMedicineModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editMedicineModalLabel">Edit Medicine</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editMedicineForm">
+                        <input type="hidden" id="editMedicineId">
+                        <div class="mb-3">
+                            <label for="editMedicineNameInput" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="editMedicineNameInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedicineUnitIdInput" class="form-label">Unit</label>
+                            <select class="form-control" id="editMedicineUnitIdInput" required>
+                                <option value="">Select Unit</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedicineCategoryIdInput" class="form-label">Category</label>
+                            <select class="form-control" id="editMedicineCategoryIdInput" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedicineIngredientInput" class="form-label">Ingredient</label>
+                            <input type="text" class="form-control" id="editMedicineIngredientInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedicineUsageInput" class="form-label">Usage</label>
+                            <input type="text" class="form-control" id="editMedicineUsageInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedicinePreservationInput" class="form-label">Preservation</label>
+                            <input type="text" class="form-control" id="editMedicinePreservationInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedicineManuDateInput" class="form-label">Manufacture Date</label>
+                            <input type="date" class="form-control" id="editMedicineManuDateInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedicineExpDateInput" class="form-label">Expiry Date</label>
+                            <input type="date" class="form-control" id="editMedicineExpDateInput" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedicineQuantityInput" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="editMedicineQuantityInput" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedicinePriceInput" class="form-label">Price</label>
+                            <input type="number" class="form-control" id="editMedicinePriceInput" min="0" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMedicineWarehouseIdInput" class="form-label">Warehouse ID</label>
+                            <input type="number" class="form-control" id="editMedicineWarehouseIdInput" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -162,27 +493,508 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
     let selectedRow = null;
+    let selectedWarehouseId = null;
+    let selectedUnitId = null;
+    let currentWarehousePage = 0;
+    let currentMedicinePage = 0;
+    let currentUnitPage = 0;
+    const itemsPerPage = 5;
+    let allWarehouses = [];
+    let allMedicines = [];
+    let allUnits = [];
+    let warehouses = [];
+    let units = [];
+    let categories = [];
+    let sortStates = {
+        warehouse: { column: 'id', direction: 'asc' },
+        medicine: { column: 'id', direction: 'asc' },
+        unit: { column: 'id', direction: 'asc' }
+    };
 
-    // Hiển thị danh sách kho
-    function displayWarehouses(data) {
-        const tbody = document.getElementById('warehouse-table-body');
-        console.log('Rendering warehouses:', data); // Debug
+    // Check expiry dates and show alert
+    async function checkExpiringMedicines() {
+        try {
+            const response = await fetch(`${baseUrl}/api/MedicineWarehouse`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            const medicines = await response.json();
+            const expiringMedicines = medicines.filter(medicine => {
+                const expDate = new Date(medicine.expDate);
+                const today = new Date();
+                const daysDiff = (expDate - today) / (1000 * 60 * 60 * 24);
+                return daysDiff <= 7;
+            });
+
+            if (expiringMedicines.length > 0) {
+                const list = document.getElementById('expiredMedicinesList');
+                list.innerHTML = '';
+                expiringMedicines.forEach(medicine => {
+                    const daysDiff = Math.round((new Date(medicine.expDate) - new Date()) / (1000 * 60 * 60 * 24));
+                    const status = daysDiff < 0 ? 'Expired' : `Expires in ${daysDiff} days`;
+                    list.innerHTML += `<li>${medicine.name}: ${status}</li>`;
+                });
+                document.getElementById('expiryAlert').style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Check expiry error:', error);
+        }
+    }
+
+    // Get expiry status class
+    function getExpiryStatusClass(expDate) {
+        const today = new Date();
+        const expiry = new Date(expDate);
+        const daysDiff = (expiry - today) / (1000 * 60 * 60 * 24);
+        if (daysDiff <= 7) return 'expiry-red';
+        if (daysDiff <= 30) return 'expiry-yellow';
+        return 'expiry-green';
+    }
+
+    // Get unit name by ID
+    function getUnitName(unitId) {
+        const unit = units.find(u => u.idUnit === unitId);
+        return unit ? unit.unitName : 'N/A';
+    }
+
+    // Fetch units
+    async function getAllUnits() {
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/units`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                throw new Error(await response.text() || `HTTP error ${response.status}`);
+            }
+            units = await response.json();
+            allUnits = Array.isArray(units) ? units : [units];
+            populateUnitDropdowns();
+            displayUnits(allUnits, 0);
+        } catch (error) {
+            console.error('Fetch units error:', error);
+            alert('Failed to load units. Please try again or contact support.');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Fetch unit by ID
+    async function getUnitById(id) {
+        if (!id || isNaN(id) || id <= 0) {
+            document.getElementById('unit-table-body').innerHTML = '<tr><td colspan="3" class="text-danger text-center">Please enter a valid positive number ID</td></tr>';
+            return;
+        }
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/units/${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+            const data = await response.json();
+            allUnits = Array.isArray(data) ? data : [data];
+            displayUnits(allUnits, 0);
+        } catch (error) {
+            console.error('Fetch unit error:', error);
+            document.getElementById('unit-table-body').innerHTML = `<tr><td colspan="3" class="text-danger text-center">${error.message}</td></tr>`;
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Fetch unit by name
+    async function getUnitByName(name) {
+        if (!name.trim()) {
+            document.getElementById('unit-table-body').innerHTML = '<tr><td colspan="3" class="text-danger text-center">Please enter a valid unit name</td></tr>';
+            return;
+        }
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/units?name=${encodeURIComponent(name)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+            const data = await response.json();
+            allUnits = Array.isArray(data) ? data : [data];
+            displayUnits(allUnits, 0);
+        } catch (error) {
+            console.error('Fetch unit error:', error);
+            document.getElementById('unit-table-body').innerHTML = `<tr><td colspan="3" class="text-danger text-center">${error.message}</td></tr>`;
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Search unit
+    function searchUnit() {
+        const searchType = document.getElementById('unitSearchType').value;
+        const searchValue = document.getElementById('unitSearchInput').value;
+
+        if (searchType === 'id') {
+            getUnitById(searchValue);
+        } else if (searchType === 'name') {
+            getUnitByName(searchValue);
+        }
+    }
+
+    // Display units with pagination
+    function displayUnits(data, page = 0) {
+        const tbody = document.getElementById('unit-table-body');
         tbody.innerHTML = '';
-        selectedRow = null;
+        selectedUnitId = null;
 
-        const warehouses = Array.isArray(data) ? data : [data];
-        if (warehouses.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center">No warehouses found</td></tr>';
+        allUnits = Array.isArray(data) ? data : [data];
+        if (allUnits.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center">No units found AZ found</td></tr>';
+            updateUnitPaginationControls(0);
             return;
         }
 
-        warehouses.forEach((warehouse, index) => {
+        const start = page * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedUnits = allUnits.slice(start, end);
+
+        paginatedUnits.forEach(unit => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${warehouse.id|| 'N/A'}</td>
+                <td>${unit.idUnit || 'N/A'}</td>
+                <td>${unit.unitName || 'N/A'}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm edit-unit-btn" data-id="${unit.idUnit}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm delete-unit-btn" data-id="${unit.idUnit}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+
+            row.querySelector('.edit-unit-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                editUnit(unit.idUnit);
+            });
+            row.querySelector('.delete-unit-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteUnit(unit.idUnit);
+            });
+        });
+
+        updateUnitPaginationControls(page);
+    }
+
+    // Update unit pagination controls
+    function updateUnitPaginationControls(page) {
+        currentUnitPage = page;
+        const totalPages = Math.ceil(allUnits.length / itemsPerPage);
+        document.getElementById('currentUnitPage').textContent = `Page ${page + 1} of ${totalPages}`;
+        document.getElementById('prevUnitPageBtn').disabled = page === 0;
+        document.getElementById('nextUnitPageBtn').disabled = page >= totalPages - 1;
+    }
+
+    // Change unit page
+    function changeUnitPage(direction) {
+        if (direction === 'prev' && currentUnitPage > 0) {
+            displayUnits(allUnits, currentUnitPage - 1);
+        } else if (direction === 'next' && currentUnitPage < Math.ceil(allUnits.length / itemsPerPage) - 1) {
+            displayUnits(allUnits, currentUnitPage + 1);
+        }
+    }
+
+    // Add new unit
+    async function addUnit() {
+        const name = document.getElementById('unitNameInput').value;
+
+        try {
+            validateUnitInput(name);
+            document.getElementById('loading').style.display = 'block';
+
+            const response = await fetch(`${baseUrl}/api/units`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ unitName: name })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+
+            const addedUnit = await response.json();
+            alert(`Unit added successfully with ID: ${addedUnit.idUnit}`);
+            $('#addUnitModal').modal('hide');
+            document.getElementById('addUnitForm').reset();
+            getAllUnits();
+        } catch (error) {
+            console.error('Add unit error:', error);
+            alert(`Failed to add unit: ${error.message}`);
+            $('#addUnitModal').modal('hide');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Edit unit
+    async function editUnit(id) {
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/units/${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+            const unit = await response.json();
+            document.getElementById('editUnitId').value = id;
+            document.getElementById('editUnitNameInput').value = unit.unitName || '';
+            $('#editUnitModal').modal('show');
+        } catch (error) {
+            console.error('Edit unit fetch error:', error);
+            alert('Failed to fetch unit for editing: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Update unit
+    async function updateUnit() {
+        const id = document.getElementById('editUnitId').value;
+        const name = document.getElementById('editUnitNameInput').value;
+
+        try {
+            validateUnitInput(name);
+            document.getElementById('loading').style.display = 'block';
+
+            const response = await fetch(`${baseUrl}/api/units/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idUnit: parseInt(id), unitName: name })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+
+            alert('Unit updated successfully');
+            $('#editUnitModal').modal('hide');
+            getAllUnits();
+        } catch (error) {
+            console.error('Update unit error:', error);
+            alert('Failed to update unit: ' + error.message);
+            $('#editUnitModal').modal('hide');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Delete unit
+    async function deleteUnit(id) {
+        if (!confirm('Are you sure you want to delete this unit?')) return;
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/units/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+            alert('Unit deleted successfully');
+            getAllUnits();
+        } catch (error) {
+            console.error('Delete unit error:', error);
+            alert('Failed to delete unit: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Validate unit input
+    function validateUnitInput(name) {
+        const nameRegex = /^[a-zA-Z0-9\s]{1,50}$/;
+        if (!nameRegex.test(name)) {
+            throw new Error('Unit name must be 1-50 alphanumeric characters');
+        }
+    }
+
+    // Sort table
+    function sortTable(tableType, column) {
+        let data;
+        if (tableType === 'warehouse') {
+            data = [...allWarehouses];
+        } else if (tableType === 'medicine') {
+            data = [...allMedicines];
+        } else if (tableType === 'unit') {
+            data = [...allUnits];
+        }
+
+        const sortState = sortStates[tableType];
+        if (sortState.column === column) {
+            sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortState.column = column;
+            sortState.direction = 'asc';
+        }
+
+        data.sort((a, b) => {
+            let valA, valB;
+            if (tableType === 'warehouse') {
+                valA = column === 'id' ? a.id : a.name.toLowerCase();
+                valB = column === 'id' ? b.id : b.name.toLowerCase();
+            } else if (tableType === 'medicine') {
+                if (column === 'id') {
+                    valA = a.medicine_id;
+                    valB = b.medicine_id;
+                } else if (column === 'quantity') {
+                    valA = a.quantity;
+                    valB = b.quantity;
+                } else if (column === 'price') {
+                    valA = a.price;
+                    valB = b.price;
+                } else {
+                    valA = a.name.toLowerCase();
+                    valB = b.name.toLowerCase();
+                }
+            } else if (tableType === 'unit') {
+                valA = column === 'id' ? a.idUnit : a.unitName.toLowerCase();
+                valB = column === 'id' ? b.idUnit : b.unitName.toLowerCase();
+            }
+
+            if (sortState.direction === 'asc') {
+                return valA > valB ? 1 : -1;
+            } else {
+                return valA < valB ? 1 : -1;
+            }
+        });
+
+        // Update sort icons
+        document.querySelectorAll(`#${tableType}-id-sort, #${tableType}-name-sort, #${tableType}-quantity-sort, #${tableType}-price-sort`).forEach(icon => {
+            icon.innerHTML = '';
+        });
+        const sortIcon = document.getElementById(`${tableType}-${column}-sort`);
+        sortIcon.innerHTML = sortState.direction === 'asc' ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>';
+
+        // Redisplay sorted data
+        if (tableType === 'warehouse') {
+            displayWarehouses(data, currentWarehousePage);
+        } else if (tableType === 'medicine') {
+            displayMedicines(data, currentMedicinePage);
+        } else if (tableType === 'unit') {
+            displayUnits(data, currentUnitPage);
+        }
+    }
+
+    // Fetch categories
+    async function getAllCategories() {
+        try {
+            const response = await fetch(`${baseUrl}/api/categories`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                throw new Error(await response.text() || `HTTP error ${response.status}`);
+            }
+            categories = await response.json();
+            populateCategoryDropdowns();
+        } catch (error) {
+            console.error('Fetch categories error:', error);
+            alert('Failed to load categories. Please try again or contact support.');
+        }
+    }
+
+    // Populate unit dropdowns
+    function populateUnitDropdowns() {
+        const unitDropdowns = [document.getElementById('medicineUnitIdInput'),
+            document.getElementById('editMedicineUnitIdInput')];
+        unitDropdowns.forEach(dropdown => {
+            dropdown.innerHTML = '<option value="">Select Unit</option>';
+            units.forEach(unit => {
+                dropdown.innerHTML += `<option value="${unit.idUnit}">${unit.unitName}</option>`;
+            });
+        });
+    }
+
+    // Populate category dropdowns
+    function populateCategoryDropdowns() {
+        const categoryDropdowns = [document.getElementById('medicineCategoryIdInput'),
+            document.getElementById('editMedicineCategoryIdInput')];
+        categoryDropdowns.forEach(dropdown => {
+            dropdown.innerHTML = '<option value="">Select Category</option>';
+            categories.forEach(category => {
+                dropdown.innerHTML += `<option value="${category.category_id}">${category.categoryName}</option>`;
+            });
+        });
+    }
+
+    // Add new category
+    async function addNewCategory(categoryName) {
+        try {
+            const response = await fetch(`${baseUrl}/api/categories`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ categoryName })
+            });
+            if (!response.ok) {
+                throw new Error(await response.text() || `HTTP error ${response.status}`);
+            }
+            const newCategory = await response.json();
+            categories.push(newCategory);
+            populateCategoryDropdowns();
+            return newCategory.category_id;
+        } catch (error) {
+            console.error('Add category error:', error);
+            throw error;
+        }
+    }
+
+    // Get warehouse name by ID
+    function getWarehouseName(warehouseId) {
+        const warehouse = warehouses.find(w => w.id === warehouseId);
+        return warehouse ? warehouse.name : 'N/A';
+    }
+
+    // Display warehouses with pagination
+    function displayWarehouses(data, page = 0) {
+        const tbody = document.getElementById('warehouse-table-body');
+        tbody.innerHTML = '';
+        selectedRow = null;
+        selectedWarehouseId = null;
+
+        allWarehouses = Array.isArray(data) ? data : [data];
+        if (allWarehouses.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center">No warehouses found</td></tr>';
+            document.getElementById('medicine-table-body').innerHTML = '';
+            document.getElementById('medicine-section').style.display = 'none';
+            updateWarehousePaginationControls(0);
+            return;
+        }
+
+        const start = page * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedWarehouses = allWarehouses.slice(start, end);
+
+        paginatedWarehouses.forEach((warehouse, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${warehouse.id || 'N/A'}</td>
                 <td>${warehouse.name || 'N/A'}</td>
                 <td>${warehouse.location || 'N/A'}</td>
                 <td>
@@ -192,7 +1004,7 @@
                     <button class="btn btn-danger btn-sm delete-btn" data-id="${warehouse.id}">
                         <i class="bi bi-trash"></i>
                     </button>
-                    <button class="btn btn-info btn-sm select-btn" data-id="${warehouse.id}">
+                    <button class="btn btn-info btn-sm select-btn" data-id="${warehouse.id}" hidden>
                         <i class="bi bi-eye"></i> Select
                     </button>
                 </td>
@@ -202,11 +1014,12 @@
                 if (selectedRow) selectedRow.classList.remove('selected');
                 row.classList.add('selected');
                 selectedRow = row;
+                selectedWarehouseId = warehouse.id;
+                showMedicines(warehouse.id);
             });
 
             tbody.appendChild(row);
 
-            // Thêm sự kiện cho các nút
             row.querySelector('.edit-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
                 editWarehouse(warehouse.id);
@@ -217,222 +1030,723 @@
             });
             row.querySelector('.select-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
+                if (selectedRow) selectedRow.classList.remove('selected');
+                row.classList.add('selected');
+                selectedRow = row;
+                selectedWarehouseId = warehouse.id;
                 showMedicines(warehouse.id);
             });
 
-            if (index === 0) {
+            if (index === 0 && page === 0) {
                 row.classList.add('selected');
                 selectedRow = row;
+                selectedWarehouseId = warehouse.id;
+                showMedicines(warehouse.id);
             }
         });
+
+        updateWarehousePaginationControls(page);
     }
 
-    // Hiển thị thông báo lỗi
+    // Update warehouse pagination controls
+    function updateWarehousePaginationControls(page) {
+        currentWarehousePage = page;
+        const totalPages = Math.ceil(allWarehouses.length / itemsPerPage);
+        document.getElementById('currentWarehousePage').textContent = `Page ${page + 1} of ${totalPages}`;
+        document.getElementById('prevWarehousePageBtn').disabled = page === 0;
+        document.getElementById('nextWarehousePageBtn').disabled = page >= totalPages - 1;
+    }
+
+    // Change warehouse page
+    function changeWarehousePage(direction) {
+        if (direction === 'prev' && currentWarehousePage > 0) {
+            displayWarehouses(allWarehouses, currentWarehousePage - 1);
+        } else if (direction === 'next' && currentWarehousePage < Math.ceil(allWarehouses.length / itemsPerPage) - 1) {
+            displayWarehouses(allWarehouses, currentWarehousePage + 1);
+        }
+    }
+
+    // Display medicines with pagination
+    function displayMedicines(data, page = 0) {
+        const tbody = document.getElementById('medicine-table-body');
+        tbody.innerHTML = '';
+
+        allMedicines = Array.isArray(data) ? data : [data];
+        if (allMedicines.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" class="text-center">No medicines found</td></tr>';
+            document.getElementById('medicine-section').style.display = 'block';
+            updateMedicinePaginationControls(page);
+            return;
+        }
+
+        const start = page * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedMedicines = allMedicines.slice(start, end);
+
+        paginatedMedicines.forEach((medicine) => {
+            const row = document.createElement('tr');
+            const expiryStatusClass = getExpiryStatusClass(medicine.expDate);
+            row.innerHTML = `
+                <td>${medicine.medicine_id || 'N/A'}</td>
+                <td>${medicine.name || 'N/A'}</td>
+                <td>${getWarehouseName(medicine.warehouse_id)}</td>
+                <td>${getUnitName(medicine.unit_id)}</td>
+                <td>${medicine.quantity || 'N/A'}</td>
+                <td>${medicine.manuDate || 'N/A'}</td>
+                <td>${medicine.expDate || 'N/A'}</td>
+                <td class="${expiryStatusClass}">${expiryStatusClass.replace('expiry-', '').charAt(0).toUpperCase() + expiryStatusClass.slice(8)}</td>
+                <td>${medicine.price?.toFixed(2) || 'N/A'}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm edit-medicine-btn" data-id="${medicine.medicine_id}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm delete-medicine-btn" data-id="${medicine.medicine_id}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+
+            row.querySelector('.edit-medicine-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                editMedicine(medicine.medicine_id);
+            });
+            row.querySelector('.delete-medicine-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteMedicine(medicine.medicine_id);
+            });
+        });
+
+        document.getElementById('medicine-section').style.display = 'block';
+        updateMedicinePaginationControls(page);
+    }
+
+    // Update medicine pagination controls
+    function updateMedicinePaginationControls(page) {
+        currentMedicinePage = page;
+        const totalPages = Math.ceil(allMedicines.length / itemsPerPage);
+        document.getElementById('currentMedicinePage').textContent = `Page ${page + 1} of ${totalPages}`;
+        document.getElementById('prevMedicinePageBtn').disabled = page === 0;
+        document.getElementById('nextMedicinePageBtn').disabled = page >= totalPages - 1;
+    }
+
+    // Change medicine page
+    function changeMedicinePage(direction) {
+        if (direction === 'prev' && currentMedicinePage > 0) {
+            displayMedicines(allMedicines, currentMedicinePage - 1);
+        } else if (direction === 'next' && currentMedicinePage < Math.ceil(allMedicines.length / itemsPerPage) - 1) {
+            displayMedicines(allMedicines, currentMedicinePage + 1);
+        }
+    }
+
+    // Display error
     function displayError(message) {
         const tbody = document.getElementById('warehouse-table-body');
-        console.error('Error:', message); // Debug
         tbody.innerHTML = `<tr><td colspan="4" class="text-danger text-center">${message}</td></tr>`;
     }
 
-    // Lấy tất cả kho
+    // Get all warehouses
     async function getAllWarehouses() {
+        document.getElementById('loading').style.display = 'block';
         try {
             const response = await fetch(`${baseUrl}/api/warehouse`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `HTTP error ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
             }
             const data = await response.json();
-            console.log('Data received:', data); // Debug
-            displayWarehouses(data);
+            warehouses = Array.isArray(data) ? data : [data];
+            displayWarehouses(data, 0);
+            getAllMedicines();
         } catch (error) {
             console.error('Fetch error:', error);
             displayError(error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
         }
     }
 
-    // Lấy kho theo ID
-    async function getWarehouseById() {
-        const id = document.getElementById('warehouseId').value;
+    // Get warehouse by ID
+    async function getWarehouseById(id) {
         if (!id || isNaN(id) || id <= 0) {
             displayError('Please enter a valid positive number ID');
             return;
         }
+        document.getElementById('loading').style.display = 'block';
         try {
-            const url = `${baseUrl}/api/warehouse/${id}`;
-            console.log('Fetching:', url);
-            const response = await fetch(url, {
+            const response = await fetch(`${baseUrl}/api/warehouse/${id}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `HTTP error ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
             }
             const data = await response.json();
-            console.log('Response data:', data);
-            displayWarehouses(data);
+            warehouses = Array.isArray(data) ? data : [data];
+            displayWarehouses(data, 0);
         } catch (error) {
             console.error('Fetch error:', error);
             displayError(error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
         }
     }
 
-    // Thêm kho
-    async function addWarehouse() {
-        const name = document.getElementById('warehouseNameInput').value;
-        const location = document.getElementById('warehouseLocationInput').value;
-
-        if (!name || !location) {
-            alert('All fields are required');
+    // Get warehouse by name
+    async function getWarehouseByName(name) {
+        if (!name.trim()) {
+            displayError('Please enter a valid warehouse name');
             return;
         }
-
-        const warehouse = { name, location }; // Không cần ID
+        document.getElementById('loading').style.display = 'block';
         try {
-            const response = await fetch(`${baseUrl}/api/warehouse`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(warehouse)
+            const response = await fetch(`${baseUrl}/api/warehouse?name=${encodeURIComponent(name)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
             });
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `HTTP error ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
             }
-            const addedWarehouse = await response.json();
-            alert('Warehouse added successfully with ID: ' + addedWarehouse.id);
-            $('#addWarehouseModal').modal('hide');
-            getAllWarehouses();
+            const data = await response.json();
+            warehouses = Array.isArray(data) ? data : [data];
+            displayWarehouses(data, 0);
         } catch (error) {
-            console.error('Add error:', error);
-            alert('Failed to add warehouse: ' + error.message);
+            console.error('Fetch error:', error);
+            displayError(error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
         }
     }
 
-    // Sửa kho
-    async function editWarehouse(id) {
-        try {
-            const warehouse = await (await fetch(`${baseUrl}/api/warehouse/${id}`)).json();
-            document.getElementById('editWarehouseId').value = id;
-            document.getElementById('editWarehouseNameInput').value = warehouse.name;
-            document.getElementById('editWarehouseLocationInput').value = warehouse.location;
-            $('#editWarehouseModal').modal('show'); // Sử dụng jQuery
-        } catch (error) {
-            console.error('Edit fetch error:', error);
-            displayError('Failed to fetch warehouse for editing');
+    // Get warehouse by location
+    async function getWarehouseByLocation(location) {
+        if (!location.trim()) {
+            displayError('Please enter a valid location');
+            return;
         }
-    }
-
-    async function updateWarehouse() {
-        const id = document.getElementById('editWarehouseId').value;
-        const name = document.getElementById('editWarehouseNameInput').value;
-        const location = document.getElementById('editWarehouseLocationInput').value;
-
-        const warehouse = { id: parseInt(id), name, location };
+        document.getElementById('loading').style.display = 'block';
         try {
-            const response = await fetch(`${baseUrl}/api/warehouse/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(warehouse)
+            const response = await fetch(`${baseUrl}/api/warehouse?location=${encodeURIComponent(location)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
             });
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `HTTP error ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
             }
-            alert('Warehouse updated successfully');
-            $('#editWarehouseModal').modal('hide'); // Sử dụng jQuery
-            getAllWarehouses();
+            const data = await response.json();
+            warehouses = Array.isArray(data) ? data : [data];
+            displayWarehouses(data, 0);
         } catch (error) {
-            console.error('Update error:', error);
-            alert('Failed to update warehouse: ' + error.message);
+            console.error('Fetch error:', error);
+            displayError(error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
         }
     }
 
-    // Xóa kho
-    async function deleteWarehouse(id) {
-        if (confirm('Are you sure you want to delete this warehouse?')) {
-            try {
-                const response = await fetch(`${baseUrl}/api/warehouse/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error || `HTTP error ${response.status}`);
-                }
-                alert('Warehouse deleted successfully');
-                getAllWarehouses();
-            } catch (error) {
-                console.error('Delete error:', error);
-                alert('Failed to delete warehouse: ' + error.message);
+    // Get medicine by ID
+    async function getMedicineById(id) {
+        if (!id || isNaN(id) || id <= 0) {
+            document.getElementById('medicine-table-body').innerHTML = '<tr><td colspan="10" class="text-danger text-center">Please enter a valid positive number ID</td></tr>';
+            return;
+        }
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/MedicineWarehouse/${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
             }
+            const data = await response.json();
+            displayMedicines(data, 0);
+        } catch (error) {
+            console.error('Fetch medicine error:', error);
+            document.getElementById('medicine-table-body').innerHTML = `<tr><td colspan="10" class="text-danger text-center">${error.message}</td></tr>`;
+        } finally {
+            document.getElementById('loading').style.display = 'none';
         }
     }
 
-    // Hiển thị thuốc trong kho
+    // Get medicine by name
+    async function getMedicineByName(name) {
+        if (!name.trim()) {
+            document.getElementById('medicine-table-body').innerHTML = '<tr><td colspan="10" class="text-danger text-center">Please enter a valid medicine name</td></tr>';
+            return;
+        }
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/MedicineWarehouse?name=${encodeURIComponent(name)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+            const data = await response.json();
+            displayMedicines(data, 0);
+        } catch (error) {
+            console.error('Fetch medicine error:', error);
+            document.getElementById('medicine-table-body').innerHTML = `<tr><td colspan="10" class="text-danger text-center">${error.message}</td></tr>`;
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Search warehouse
+    function searchWarehouse() {
+        const searchType = document.getElementById('warehouseSearchType').value;
+        const searchValue = document.getElementById('warehouseSearchInput').value;
+
+        if (searchType === 'id') {
+            getWarehouseById(searchValue);
+        } else if (searchType === 'name') {
+            getWarehouseByName(searchValue);
+        } else if (searchType === 'location') {
+            getWarehouseByLocation(searchValue);
+        }
+    }
+
+    // Search medicine
+    function searchMedicine() {
+        const searchType = document.getElementById('medicineSearchType').value;
+        const searchValue = document.getElementById('medicineSearchInput').value;
+
+        if (searchType === 'id') {
+            getMedicineById(searchValue);
+        } else if (searchType === 'name') {
+            getMedicineByName(searchValue);
+        }
+    }
+
+    // Show medicines in a warehouse
     async function showMedicines(id) {
+        document.getElementById('loading').style.display = 'block';
         try {
             const response = await fetch(`${baseUrl}/api/warehouse/${id}/medicines`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `HTTP error ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
             }
-            const MedicineWarehouse = await response.json();
-            console.log('Medicines data:', MedicineWarehouse);
-            displayMedicines(MedicineWarehouse);
-            $('#medicineModal').modal('show'); // Sử dụng jQuery
+            const medicines = await response.json();
+            console.log('Medicines data:', medicines);
+            displayMedicines(medicines, 0);
         } catch (error) {
             console.error('Fetch medicines error:', error);
             alert('Failed to fetch medicines: ' + error.message);
+            document.getElementById('medicine-table-body').innerHTML = '<tr><td colspan="10" class="text-center">No medicines found</td></tr>';
+            document.getElementById('medicine-section').style.display = 'block';
+        } finally {
+            document.getElementById('loading').style.display = 'none';
         }
     }
 
-    // Hiển thị danh sách thuốc
-    function displayMedicines(data) {
-        const tbody = document.getElementById('medicine-table-body');
-        console.log('Rendering medicines:', data); // Debug
-        tbody.innerHTML = '';
+    // Get all medicines
+    async function getAllMedicines() {
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/MedicineWarehouse`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+            const data = await response.json();
+            allMedicines = Array.isArray(data) ? data : [data];
+            displayMedicines(allMedicines, 0);
+        } catch (error) {
+            console.error('Fetch medicines error:', error);
+            alert('Failed to fetch medicines: ' + error.message);
+            document.getElementById('medicine-table-body').innerHTML = '<tr><td colspan="10" class="text-center">No medicines found</td></tr>';
+            document.getElementById('medicine-section').style.display = 'block';
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
 
-        const MedicineWarehouse = Array.isArray(data) ? data : [data];
-        if (MedicineWarehouse.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No medicines found</td></tr>';
+    // Add warehouse
+    async function addWarehouse() {
+        const name = document.getElementById('warehouseNameInput').value;
+        const location = document.getElementById('warehouseLocationInput').value;
+
+        try {
+            validateWarehouseInput(name, location);
+            document.getElementById('loading').style.display = 'block';
+
+            const response = await fetch(`${baseUrl}/api/warehouse`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, location })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+
+            const addedWarehouse = await response.json();
+            alert(`Warehouse added successfully with ID: ${addedWarehouse.id}`);
+            $('#addWarehouseModal').modal('hide');
+            getAllWarehouses();
+        } catch (error) {
+            console.error('Add error:', error);
+            alert(`Failed to add warehouse: ${error.message}`);
+            $('#addWarehouseModal').modal('hide');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Edit warehouse
+    async function editWarehouse(id) {
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/warehouse/${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+            const warehouse = await response.json();
+            document.getElementById('editWarehouseId').value = id;
+            document.getElementById('editWarehouseNameInput').value = warehouse.name || '';
+            document.getElementById('editWarehouseLocationInput').value = warehouse.location || '';
+            $('#editWarehouseModal').modal('show');
+        } catch (error) {
+            console.error('Edit fetch error:', error);
+            alert('Failed to fetch warehouse for editing: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Update warehouse
+    async function updateWarehouse() {
+        const id = document.getElementById('editWarehouseId').value;
+        const name = document.getElementById('editWarehouseNameInput').value;
+        const location = document.getElementById('editWarehouseLocationInput').value;
+
+        try {
+            validateWarehouseInput(name, location);
+            document.getElementById('loading').style.display = 'block';
+
+            const response = await fetch(`${baseUrl}/api/warehouse/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: parseInt(id), name, location })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+
+            alert('Warehouse updated successfully');
+            $('#editWarehouseModal').modal('hide');
+            getAllWarehouses();
+        } catch (error) {
+            console.error('Update error:', error);
+            alert('Failed to update warehouse: ' + error.message);
+            $('#editWarehouseModal').modal('hide');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Delete warehouse
+    async function deleteWarehouse(id) {
+        if (!confirm('Are you sure you want to delete this warehouse?')) return;
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/warehouse/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+            alert('Warehouse deleted successfully');
+            getAllWarehouses();
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('Failed to delete warehouse: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Validate warehouse input
+    function validateWarehouseInput(name, location) {
+        const nameRegex = /^[a-zA-Z0-9\s]{1,50}$/;
+        const locationRegex = /^[a-zA-Z0-9\s,]{1,100}$/;
+        if (!nameRegex.test(name)) {
+            throw new Error('Name must be 1-50 alphanumeric characters');
+        }
+        if (!locationRegex.test(location)) {
+            throw new Error('Location must be 1-100 alphanumeric characters or commas');
+        }
+    }
+
+    // Add medicine
+    async function addMedicine() {
+        if (!selectedWarehouseId) {
+            alert('Please select a warehouse first');
+            $('#addMedicineModal').modal('hide');
             return;
         }
 
-        MedicineWarehouse.forEach((MedicineWarehouse, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${MedicineWarehouse.medicine_id || 'N/A'}</td>
-                <td>${MedicineWarehouse.name || 'N/A'}</td>
-                <td>${MedicineWarehouse.quantity || 'N/A'}</td>
-                <td>${MedicineWarehouse.manuDate || 'N/A'}</td>
-                <td>${MedicineWarehouse.expDate || 'N/A'}</td>
-                <td>${MedicineWarehouse.price.toFixed(2) || 'N/A'}</td>
-            `;
-            tbody.appendChild(row);
-        });
+        const medicine = {
+            name: document.getElementById('medicineNameInput').value,
+            unit_id: parseInt(document.getElementById('medicineUnitIdInput').value),
+            category_id: parseInt(document.getElementById('medicineCategoryIdInput').value),
+            ingredient: document.getElementById('medicineIngredientInput').value,
+            usage: document.getElementById('medicineUsageInput').value,
+            preservation: document.getElementById('medicinePreservationInput').value,
+            manuDate: document.getElementById('medicineManuDateInput').value,
+            expDate: document.getElementById('medicineExpDateInput').value,
+            quantity: parseInt(document.getElementById('medicineQuantityInput').value),
+            price: parseFloat(document.getElementById('medicinePriceInput').value),
+            warehouse_id: selectedWarehouseId
+        };
+
+        try {
+            validateMedicineInput(medicine);
+            document.getElementById('loading').style.display = 'block';
+
+            console.log('Sending medicine:', medicine);
+            const response = await fetch(`${baseUrl}/api/MedicineWarehouse/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(medicine)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+
+            const addedMedicine = await response.json();
+            alert(`Thêm thành công ${addedMedicine.name}`);
+            $('#addMedicineModal').modal('hide');
+            document.getElementById('addMedicineForm').reset();
+            if (selectedWarehouseId) showMedicines(selectedWarehouseId);
+            else getAllMedicines();
+        } catch (error) {
+            console.error('Add medicine error:', error);
+            alert(`Failed to add medicine: ${error.message}`);
+            $('#addMedicineModal').modal('hide');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
     }
 
-    // Sự kiện cho form thêm kho
+    // Edit medicine
+    async function editMedicine(id) {
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/MedicineWarehouse/${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+            const medicine = await response.json();
+            document.getElementById('editMedicineId').value = id;
+            document.getElementById('editMedicineNameInput').value = medicine.name;
+            document.getElementById('editMedicineUnitIdInput').value = medicine.unit_id;
+            document.getElementById('editMedicineCategoryIdInput').value = medicine.category_id;
+            document.getElementById('editMedicineIngredientInput').value = medicine.ingredient;
+            document.getElementById('editMedicineUsageInput').value = medicine.usage;
+            document.getElementById('editMedicinePreservationInput').value = medicine.preservation;
+            document.getElementById('editMedicineManuDateInput').value = medicine.manuDate;
+            document.getElementById('editMedicineExpDateInput').value = medicine.expDate;
+            document.getElementById('editMedicineQuantityInput').value = medicine.quantity;
+            document.getElementById('editMedicinePriceInput').value = medicine.price;
+            document.getElementById('editMedicineWarehouseIdInput').value = medicine.warehouse_id;
+            $('#editMedicineModal').modal('show');
+        } catch (error) {
+            console.error('Edit medicine fetch error:', error);
+            alert('Failed to fetch medicine for editing: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Update medicine
+    async function updateMedicine() {
+        const id = document.getElementById('editMedicineId').value;
+        let unitId = document.getElementById('editMedicineUnitIdInput').value;
+        let categoryId = document.getElementById('editMedicineCategoryIdInput').value;
+        unitId = parseInt(unitId);
+        categoryId = parseInt(categoryId);
+
+        const medicine = {
+            medicine_id: parseInt(id),
+            name: document.getElementById('editMedicineNameInput').value,
+            unit_id: unitId,
+            category_id: categoryId,
+            ingredient: document.getElementById('editMedicineIngredientInput').value,
+            usage: document.getElementById('editMedicineUsageInput').value,
+            preservation: document.getElementById('editMedicinePreservationInput').value,
+            manuDate: document.getElementById('editMedicineManuDateInput').value,
+            expDate: document.getElementById('editMedicineExpDateInput').value,
+            quantity: parseInt(document.getElementById('editMedicineQuantityInput').value),
+            price: parseFloat(document.getElementById('editMedicinePriceInput').value),
+            warehouse_id: parseInt(document.getElementById('editMedicineWarehouseIdInput').value)
+        };
+
+        try {
+            validateMedicineInput(medicine);
+            document.getElementById('loading').style.display = 'block';
+
+            console.log('Medicine payload:', JSON.stringify(medicine, null, 2));
+
+            const response = await fetch(`${baseUrl}/api/MedicineWarehouse/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(medicine)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+
+            alert('Medicine updated successfully');
+            $('#editMedicineModal').modal('hide');
+            if (selectedWarehouseId) showMedicines(selectedWarehouseId);
+            else getAllMedicines();
+        } catch (error) {
+            console.error('Update medicine error:', error);
+            alert('Failed to update medicine: ' + error.message);
+            $('#editMedicineModal').modal('hide');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Delete medicine
+    async function deleteMedicine(id) {
+        if (!confirm('Are you sure you want to delete this medicine?')) return;
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/MedicineWarehouse/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error ${response.status}`);
+            }
+            alert('Medicine deleted successfully');
+            if (selectedWarehouseId) showMedicines(selectedWarehouseId);
+            else getAllMedicines();
+        } catch (error) {
+            console.error('Delete medicine error:', error);
+            alert('Failed to delete medicine: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+/á
+    // Validate medicine input
+    function validateMedicineInput(medicine) {
+    const nameRegex = /^[a-zA-Z0-9\s]{1,50}$/;
+    const textRegex = /^[a-zA-Z0-9\s,]{1,200}$/;
+    if (!nameRegex.test(medicine.name)) {
+        throw new Error('Name must be 1-50 alphanumeric characters');
+    }
+    if (!Number.isInteger(medicine.unit_id) || medicine.unit_id <= 0) {
+        throw new Error('Unit must be selected');
+    }
+    if (!Number.isInteger(medicine.category_id) || medicine.category_id <= 0) {
+        throw new Error('Category must be selected');
+    }
+    if (!textRegex.test(medicine.ingredient)) {
+        throw new Error('Ingredient must be 1-200 alphanumeric characters or commas');
+    }
+    if (!textRegex.test(medicine.usage)) {
+        throw new Error('Usage must be 1-200 alphanumeric characters or commas');
+    }
+    if (!textRegex.test(medicine.preservation)) {
+        throw new Error('Preservation must be 1-200 alphanumeric characters or commas');
+    }
+    if (!medicine.manuDate || isNaN(Date.parse(medicine.manuDate))) {
+        throw new Error('Invalid manufacture date');
+    }
+    if (!medicine.expDate || isNaN(Date.parse(medicine.expDate))) {
+        throw new Error('Invalid expiry date');
+    }
+    if (!Number.isInteger(medicine.quantity) || medicine.quantity < 0) {
+        throw new Error('Quantity must be a non-negative integer');
+    }
+    if (isNaN(medicine.price) || medicine.price < 0) {
+        throw new Error('Price must be a non-negative number');
+    }
+    if (!Number.isInteger(medicine.warehouse_id) || medicine.warehouse_id <= 0) {
+        throw new Error('Warehouse ID must be a positive integer');
+    }
+    }
+
+    // Event listeners
     document.getElementById('addWarehouseForm').addEventListener('submit', (e) => {
         e.preventDefault();
         addWarehouse();
     });
 
-    // Sự kiện cho form sửa kho
     document.getElementById('editWarehouseForm').addEventListener('submit', (e) => {
         e.preventDefault();
         updateWarehouse();
     });
 
-    // Tải danh sách kho khi trang được tải
-    getAllWarehouses();
+    document.getElementById('addUnitForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        addUnit();
+    });
+
+    document.getElementById('editUnitForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        updateUnit();
+    });
+
+    document.getElementById('addMedicineForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        addMedicine();
+    });
+
+    document.getElementById('editMedicineForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        updateMedicine();
+    });
+
+    // Initialize on page load
+    async function init() {
+        await getAllUnits();
+        await getAllCategories();
+        await getAllWarehouses();
+        await checkExpiringMedicines();
+    }
+
+    init();
 </script>
 </body>
 </html>
