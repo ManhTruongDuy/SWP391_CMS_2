@@ -20,6 +20,8 @@ public class AccountPharmacistDAO extends DBContext {
         );
     }
 
+
+
     /* ---------------- GET ALL ---------------- */
     public List<AccountPharmacist> getAllAccount() {
         List<AccountPharmacist> listAccount = new ArrayList<>();
