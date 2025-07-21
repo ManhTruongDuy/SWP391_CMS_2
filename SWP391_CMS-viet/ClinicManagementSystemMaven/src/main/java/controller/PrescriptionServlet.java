@@ -25,7 +25,6 @@ public class PrescriptionServlet extends HttpServlet {
 
         PrescriptionDAO dao = new PrescriptionDAO();
 
-        // Nếu có tham số id -> trả về chi tiết
         String idParam = req.getParameter("id");
         if (idParam != null) {
             try {
@@ -60,7 +59,22 @@ public class PrescriptionServlet extends HttpServlet {
             return;
         }
 
-        List<Prescription> prescriptions = dao.getAllPrescriptions(page, pageSize);
+        String status = req.getParameter("status");
+        String startDateStr = req.getParameter("startDate");
+        String endDateStr = req.getParameter("endDate");
+
+        java.sql.Date startDate = null;
+        java.sql.Date endDate = null;
+        try {
+            if (startDateStr != null) startDate = java.sql.Date.valueOf(startDateStr);
+            if (endDateStr != null) endDate = java.sql.Date.valueOf(endDateStr);
+        } catch (IllegalArgumentException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"error\":\"Invalid date format. Use yyyy-MM-dd\"}");
+            return;
+        }
+
+        List<Prescription> prescriptions = dao.getAllPrescriptions(page, pageSize, status, startDate, endDate);
         int totalItems = dao.getTotalPrescriptions();
         int totalPages = (int) Math.ceil((double) totalItems / pageSize);
 

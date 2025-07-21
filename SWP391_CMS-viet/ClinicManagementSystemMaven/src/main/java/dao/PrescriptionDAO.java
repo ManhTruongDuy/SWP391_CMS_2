@@ -5,6 +5,7 @@ import model.MedicineRecord;
 import model.Patient;
 import model.Prescription;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,21 +13,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PrescriptionDAO extends DBContext{
-    public List<Prescription> getAllPrescriptions(int page, int pageSize) {
+    public List<Prescription> getAllPrescriptions(int page, int pageSize, String status, Date startDate, Date endDate) {
         List<Prescription> prescriptions = new ArrayList<>();
-        String sql = "SELECT pre.prescription_id, pre.prescription_date, pre.status, " +
-                "pat.full_name AS patientName, doc.full_name AS doctorName " +
-                "FROM Prescription pre " +
-                "JOIN MedicineRecords mr ON pre.medicineRecord_id = mr.medicineRecord_id " +
-                "JOIN Patient pat ON pat.patient_id = mr.patient_id " +
-                "JOIN Doctor doc ON doc.doctor_id = pre.doctor_id " +
-                "ORDER BY pre.prescription_date DESC " +
-                "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT pre.prescription_id, pre.prescription_date, pre.status, " +
+                        "pat.full_name AS patientName, doc.full_name AS doctorName " +
+                        "FROM Prescription pre " +
+                        "JOIN MedicineRecords mr ON pre.medicineRecord_id = mr.medicineRecord_id " +
+                        "JOIN Patient pat ON pat.patient_id = mr.patient_id " +
+                        "JOIN Doctor doc ON doc.doctor_id = pre.doctor_id " +
+                        "WHERE 1=1 "
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (status != null && !status.isEmpty()) {
+            sql.append("AND pre.status = ? ");
+            params.add(status);
+        }
+
+        if (startDate != null) {
+            sql.append("AND pre.prescription_date >= ? ");
+            params.add(startDate);
+        }
+
+        if (endDate != null) {
+            sql.append("AND pre.prescription_date <= ? ");
+            params.add(endDate);
+        }
+
+        sql.append("ORDER BY pre.prescription_date DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
         try {
-            PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setInt(1, (page - 1) * pageSize); // OFFSET
-            stm.setInt(2, pageSize);
+            PreparedStatement stm = connection.prepareStatement(sql.toString());
+
+            int index = 1;
+            for (Object param : params) {
+                if (param instanceof Date) {
+                    stm.setDate(index++, new java.sql.Date(((Date) param).getTime()));
+                } else {
+                    stm.setString(index++, param.toString());
+                }
+            }
+
+            stm.setInt(index++, (page - 1) * pageSize);
+            stm.setInt(index, pageSize);
+
             ResultSet rs = stm.executeQuery();
+            System.out.println("SQL = " + sql);
             while (rs.next()) {
                 Prescription pre = new Prescription();
                 pre.setId(rs.getInt("prescription_id"));
@@ -49,8 +84,10 @@ public class PrescriptionDAO extends DBContext{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
         return prescriptions;
     }
+
     public int getTotalPrescriptions() {
         String sql = "SELECT COUNT(*) AS total FROM Prescription";
         try {

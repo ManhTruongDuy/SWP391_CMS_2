@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử phát thuốc - Hệ thống quản lý bệnh viện</title>
+    <link href="/view/assets/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="/view/assets/css/custom.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c5aa0;
+            --secondary-color: #17a2b8;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-bg: #f8f9fa;
+            --dark-bg: #343a40;
+            --white: #ffffff;
+            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+            --border-radius: 10px;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Layout Container */
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Left Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--dark-bg) 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-brand {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-brand .brand-text {
+            display: none;
+        }
+
+        .sidebar-brand:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .brand-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: -15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            display: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 0;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+
+        .sidebar.collapsed .nav-link .nav-text {
+            display: none;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar.collapsed .nav-link:hover {
+            transform: none;
+        }
+
+        .nav-link.active {
+            color: white;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+            border-right: 3px solid white;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: white;
+        }
+
+        .nav-icon {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-text {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-footer {
+            position: relative;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .user-info {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .user-details {
+            display: none;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.1rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .logout-btn {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: #ff6b6b;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .sidebar.collapsed .logout-btn .logout-text {
+            display: none;
+        }
+
+        .logout-btn:hover {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        /* Right Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            background: var(--light-bg);
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .search-section {
+            padding: 2rem;
+            background: var(--light-bg);
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .search-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: none;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            color: white;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            color: white;
+        }
+
+        .table-section {
+            padding: 2rem;
+        }
+
+        .table-container {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.875rem;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(44, 90, 160, 0.05);
+            transform: scale(1.01);
+        }
+
+        .medicine-badge {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .quantity-badge {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #fd7e14 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .patient-name {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .date-text {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .footer-section {
+            padding: 2rem;
+            background: var(--light-bg);
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-back:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-cards {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: var(--white);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .icon-primary { color: var(--primary-color); }
+        .icon-success { color: var(--success-color); }
+        .icon-warning { color: var(--warning-color); }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: var(--sidebar-collapsed-width);
+            }
+
+            .main-content {
+                margin-left: var(--sidebar-collapsed-width);
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .stats-cards {
+                flex-direction: column;
+            }
+
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+
+            .sidebar-nav .nav-section-title,
+            .sidebar .nav-text,
+            .sidebar .brand-text,
+            .sidebar .user-details,
+            .sidebar .logout-text {
+                display: none;
+            }
+
+            .sidebar .nav-link {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+
+            .sidebar .user-info {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="layout-container">
+    <!-- Left Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-chevron-left" id="toggleIcon"></i>
+        </button>
+
+        <div class="sidebar-header">
+            <a href="dashboard-pharmacist.html" class="sidebar-brand">
+                <div class="brand-icon">
+                    <i class="fas fa-hospital"></i>
+                </div>
+                <span class="brand-text">MediCare System</span>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Chính</div>
+                <div class="nav-item">
+                    <a href="dashboard-pharmacist.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        <span class="nav-text">Chức năng</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Quản lý</div>
+                <div class="nav-item">
+                    <a href="prescription.html" class="nav-link">
+                        <i class="fas fa-file-prescription nav-icon"></i>
+                        <span class="nav-text">Đơn thuốc</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="counter.html" class="nav-link">
+                        <i class="fas fa-cash-register nav-icon"></i>
+                        <span class="nav-text">Quầy thuốc</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="alternative-medicine.html" class="nav-link">
+                        <i class="fas fa-exchange-alt nav-icon"></i>
+                        <span class="nav-text">Thuốc thay thế</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="patients.html" class="nav-link">
+                        <i class="fas fa-user-injured nav-icon"></i>
+                        <span class="nav-text">Bệnh nhân</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="medicines.html" class="nav-link">
+                        <i class="fas fa-pills nav-icon"></i>
+                        <span class="nav-text">Thuốc</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="inventory.html" class="nav-link">
+                        <i class="fas fa-boxes nav-icon"></i>
+                        <span class="nav-text">Kho thuốc</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Báo cáo</div>
+                <div class="nav-item">
+                    <a href="statistic-pharmacist.html" class="nav-link">
+                        <i class="fas fa-chart-bar nav-icon"></i>
+                        <span class="nav-text">Thống kê</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="history-pharmacist.html" class="nav-link active">
+                        <i class="fas fa-chart-line nav-icon"></i>
+                        <span class="nav-text">Lịch sử & Tra cứu</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Hệ thống</div>
+                <div class="nav-item">
+                    <a href="settings.html" class="nav-link">
+                        <i class="fas fa-cog nav-icon"></i>
+                        <span class="nav-text">Cài đặt</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="users.html" class="nav-link">
+                        <i class="fas fa-users nav-icon"></i>
+                        <span class="nav-text">Người dùng</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">DT</div>
+                <div class="user-details">
+                    <div class="user-name">Dược sĩ Thảo</div>
+                    <div class="user-role">Quầy thuốc</div>
+                </div>
+            </div>
+            <a href="login.html" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="logout-text">Đăng xuất</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Right Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="header-content">
+                <h1 class="page-title">
+                    <i class="fas fa-pills me-3"></i>
+                    Lịch sử phát thuốc
+                </h1>
+                <p class="page-subtitle">Theo dõi và quản lý lịch sử cấp phát thuốc cho bệnh nhân</p>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-card">
+                <form class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                        <label for="patient" class="form-label fw-bold">
+                            <i class="fas fa-user-injured me-2"></i>
+                            Tìm kiếm bệnh nhân
+                        </label>
+                        <input type="text" class="form-control" id="patient" name="patient"
+                               placeholder="Nhập tên hoặc mã bệnh nhân...">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-search w-100">
+                            <i class="fas fa-search me-2"></i>
+                            Xem lịch sử
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="search-section pt-0">
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon icon-primary">
+                        <i class="fas fa-user-injured"></i>
+                    </div>
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Bệnh nhân</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-success">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <div class="stat-number">35</div>
+                    <div class="stat-label">Lượt phát thuốc</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-warning">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Ngày gần đây</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-section">
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle text-center">
+                        <thead class="table-light">
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên bệnh nhân</th>
+                            <th>Tên bác sĩ</th>
+                            <th>Ngày phát</th>
+                            <th>Số tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody id="invoiceTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="mt-3 text-muted">Đang tải dữ liệu...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state d-none" id="emptyState">
+                <i class="fas fa-search"></i>
+                <h4>Không tìm thấy dữ liệu</h4>
+                <p>Vui lòng thử lại với từ khóa khác hoặc kiểm tra lại thông tin tìm kiếm.</p>
+            </div>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer-section">
+            <a href="dashboard-pharmacist.html" class="btn-back">
+                <i class="fas fa-arrow-left me-2"></i>
+                Quay lại Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+
+<script src="/view/assets/js/core/bootstrap.bundle.min.js"></script>
+<script>
+    const baseUrl = window.location.origin + '/ClinicManagementSystem_war';
+
+    fetch(`${baseUrl}/api/historyPay`)
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('invoiceTableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6">Không có đơn nào!</td></tr>`;
+                return;
+            }
+
+            data.forEach((invoice, index) => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                      <td>${index + 1}</td>
+                      <td><i class="fas fa-user-circle text-primary me-2"></i>${invoice.patientName || 'N/A'}</td>
+                      <td><i class="fas fa-user-circle text-primary me-2"></i>${invoice.phaName || 'N/A'}</td>
+                      <td><i class="fas fa-calendar-alt me-2"></i>${formatDate(invoice.issueDate)}</td>
+                      <td><i class="fas fa-coins me-2"></i>${formatCurrency(invoice.totalAmount)}</td>
+                      <td>
+                        <span class="badge bg-${invoice.status === 'paid' ? 'success' : 'secondary'}">
+                          ${invoice.status === 'paid' ? 'Đã thanh toán' : invoice.status}
+                        </span>
+                      </td>
+                      <td>
+                        <a href="invoice-detail.html?invoiceId=${invoice.invoiceId}" class="btn btn-outline-primary btn-sm">
+                          <i class="fas fa-eye"></i>
+                        </a>
+                          <button class="btn btn-outline-success btn-sm print-btn"
+                              data-id="${invoice.invoiceId}"
+                              data-patient="${invoice.patientName}"
+                              data-pharmacist="${invoice.phaName}"
+                              data-date="${formatDate(invoice.issueDate)}"
+                              data-total="${formatCurrency(invoice.totalAmount)}">
+                              <i class="fas fa-print"></i>
+                            </button>
+                      </td>
+                    `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(err => {
+            console.error("❌ Lỗi khi load lịch sử:", err);
+            document.getElementById('invoiceTableBody').innerHTML =
+                `<tr><td colspan="6">Lỗi khi tải dữ liệu!</td></tr>`;
+        });
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '---';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('vi-VN');
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(amount || 0);
+    }
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+
+        if (sidebar.classList.contains('collapsed')) {
+            toggleIcon.classList.remove('fa-chevron-left');
+            toggleIcon.classList.add('fa-chevron-right');
+        } else {
+            toggleIcon.classList.remove('fa-chevron-right');
+            toggleIcon.classList.add('fa-chevron-left');
+        }
+    }
+
+    // Enhanced form functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const tableContainer = document.querySelector('.table-container');
+        const emptyState = document.getElementById('emptyState');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Show loading state
+            tableContainer.style.display = 'none';
+            loadingSpinner.style.display = 'block';
+            emptyState.classList.add('d-none');
+
+            // Simulate API call
+            setTimeout(() => {
+                loadingSpinner.style.display = 'none';
+                tableContainer.style.display = 'block';
+
+                // Add animation to table rows
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach((row, index) => {
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        row.style.transition = 'all 0.3s ease';
+                        row.style.opacity = '1';
+                        row.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }, 1500);
+        });
+
+        // Add smooth scrolling for better UX
+        const searchButton = document.querySelector('.btn-search');
+        searchButton.addEventListener('click', function() {
+            setTimeout(() => {
+                document.querySelector('.table-section').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }, 100);
+        });
+    });
+    document.addEventListener("click", function (e) {
+        const btn = e.target.closest(".print-btn");
+        if (!btn) return;
+
+        const invoiceId = btn.getAttribute("data-id");
+        const patientName = btn.getAttribute("data-patient");
+        const pharmacistName = btn.getAttribute("data-pharmacist");
+        const issueDate = btn.getAttribute("data-date");
+        const totalAmount = btn.getAttribute("data-total");
+
+        // Debug
+        console.log("Clicked invoiceId:", invoiceId);
+
+        fetch(`/ClinicManagementSystem_war/api/historyPayDetail?id=${invoiceId}`)
+            .then(res => res.json())
+            .then(items => {
+                const exportData = {
+                    data : {
+                        doctor: { fullName: pharmacistName },
+                        id: invoiceId,
+                        medicineRecord: { patient: { fullName: patientName } },
+                        prescriptionDate: (() => {
+                            const parts = issueDate.split("/");
+                            const dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                            return dateObj;
+                        })(),
+                        totalAmount: totalAmount
+
+                    },
+                    items: items,
+                };
+
+                localStorage.setItem("printPrescription", JSON.stringify(exportData));
+                console.log(exportData);
+                console.log("id" + invoiceId);
+
+                window.location.href = "print-prescription.html";
+            })
+            .catch(err => {
+                console.error("Lỗi fetch:", err);
+                alert("Không thể lấy dữ liệu hóa đơn để in.");
+            });
+    });
+</script>
+
+</body>
+</html>
