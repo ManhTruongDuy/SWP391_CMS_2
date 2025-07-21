@@ -1,54 +1,48 @@
 package dao;
-//aa
+
 import model.Medicine;
-//123
+import model.Warehouse;
+
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.math.BigDecimal;
 
-public class MedicineDAO {
+public class MedicineWarehouseDAO {
     private final Connection conn;
 
-    public MedicineDAO() {
+    public MedicineWarehouseDAO() {
         this.conn = DBContext.getInstance().getConnection();
     }
 
     // Lấy tất cả thuốc
-    public List<Medicine> getAllMedicines(int limit, int offset) {
+    public List<Medicine> getAllMedicines() {
         List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT medicine_id, name, unit_id, category_id, ingredient, usage, preservation, manuDate, expDate, quantity, price, warehouse_id " +
-                "FROM Medicine " +
-                "ORDER BY medicine_id " +
-                "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, offset);
-            ps.setInt(2, limit);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Medicine m = new Medicine(
-                            rs.getInt("medicine_id"),
-                            rs.getString("name"),
-                            rs.getInt("unit_id"),
-                            rs.getInt("category_id"),
-                            rs.getString("ingredient"),
-                            rs.getString("usage"),
-                            rs.getString("preservation"),
-                            rs.getDate("manuDate") != null ? rs.getDate("manuDate").toLocalDate() : null,
-                            rs.getDate("expDate") != null ? rs.getDate("expDate").toLocalDate() : null,
-                            rs.getInt("quantity"),
-                            rs.getFloat("price"),
-                            rs.getInt("warehouse_id")
-                    );
-                    list.add(m);
-                }
+        String sql = "SELECT * FROM Medicine";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Medicine m = new Medicine();
+                m.setMedicine_id(rs.getInt("medicine_id"));
+                m.setName(rs.getString("name"));
+                m.setUnit_id(rs.getInt("unit_id"));
+                m.setCategory_id(rs.getInt("category_id"));
+                m.setIngredient(rs.getString("ingredient"));
+                m.setUsage(rs.getString("usage"));
+                m.setPreservation(rs.getString("preservation"));
+                m.setManuDate(rs.getDate("manuDate") != null ? rs.getDate("manuDate").toLocalDate() : null);
+                m.setExpDate(rs.getDate("expDate") != null ? rs.getDate("expDate").toLocalDate() : null);
+                m.setQuantity(rs.getInt("quantity"));
+                m.setPrice(rs.getFloat("price"));
+                m.setWarehouse_id(rs.getInt("warehouse_id"));
+                list.add(m);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return list;
     }
+
+
 
     // Lấy thuốc theo ID
     public Medicine getMedicineById(int id) {
@@ -77,6 +71,35 @@ public class MedicineDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<Medicine> getMedicineByName(String name) {
+        List<Medicine> medicines = new ArrayList<>();
+        String sql = "SELECT * FROM Medicine WHERE name LIKE ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + name.trim() + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Medicine m = new Medicine();
+                    m.setMedicine_id(rs.getInt("medicine_id"));
+                    m.setName(rs.getString("name"));
+                    m.setUnit_id(rs.getInt("unit_id"));
+                    m.setCategory_id(rs.getInt("category_id"));
+                    m.setIngredient(rs.getString("ingredient"));
+                    m.setUsage(rs.getString("usage"));
+                    m.setPreservation(rs.getString("preservation"));
+                    m.setManuDate(rs.getDate("manuDate") != null ? rs.getDate("manuDate").toLocalDate() : null);
+                    m.setExpDate(rs.getDate("expDate") != null ? rs.getDate("expDate").toLocalDate() : null);
+                    m.setQuantity(rs.getInt("quantity"));
+                    m.setPrice(rs.getFloat("price"));
+                    m.setWarehouse_id(rs.getInt("warehouse_id"));
+                    medicines.add(m);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return medicines;
     }
 
     // Thêm mới thuốc
@@ -179,97 +202,8 @@ public class MedicineDAO {
         return false;
     }
 
-    public List<Medicine> searchMedicines(String keyword, Integer categoryId, int limit, int offset) {
-        List<Medicine> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT medicine_id, name, unit_id, category_id, ingredient, usage, preservation, manuDate, expDate, quantity, price, warehouse_id FROM Medicine WHERE 1=1");
-        List<Object> params = new ArrayList<>();
 
-        // Thêm điều kiện filter nếu có keyword
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND name LIKE ?");
-            params.add("%" + keyword.trim() + "%");
-        }
-        // Thêm điều kiện filter nếu có categoryId
-        if (categoryId != null) {
-            sql.append(" AND category_id = ?");
-            params.add(categoryId);
-        }
-        // Thêm phân trang (nếu muốn)
-        sql.append(" ORDER BY medicine_id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
-        params.add(offset);
-        params.add(limit);
 
-        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Medicine m = new Medicine(
-                            rs.getInt("medicine_id"),
-                            rs.getString("name"),
-                            rs.getInt("unit_id"),
-                            rs.getInt("category_id"),
-                            rs.getString("ingredient"),
-                            rs.getString("usage"),
-                            rs.getString("preservation"),
-                            rs.getDate("manuDate") != null ? rs.getDate("manuDate").toLocalDate() : null,
-                            rs.getDate("expDate") != null ? rs.getDate("expDate").toLocalDate() : null,
-                            rs.getInt("quantity"),
-                            rs.getFloat("price"),
-                            rs.getInt("warehouse_id")
-                    );
-                    list.add(m);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-    public List<Medicine> getExpiredMedicines() {
-        List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT * FROM medicines WHERE expDate < CURDATE()";
-        try (PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Medicine medicine = extractMedicineFromResultSet(rs);
-                list.add(medicine);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
 
-    private Medicine extractMedicineFromResultSet(ResultSet rs) throws SQLException {
-        Medicine medicine = new Medicine();
-        medicine.setMedicine_id(rs.getInt("medicine_id"));
-        medicine.setName(rs.getString("name"));
-        medicine.setUnit_id(rs.getInt("unit_id"));
-        medicine.setCategory_id(rs.getInt("category_id"));
-        medicine.setIngredient(rs.getString("ingredient"));
-        medicine.setUsage(rs.getString("usage"));
-        medicine.setPreservation(rs.getString("preservation"));
-        medicine.setManuDate(rs.getDate("manuDate").toLocalDate());
-        medicine.setExpDate(rs.getDate("expDate").toLocalDate());
-        medicine.setQuantity(rs.getInt("quantity"));
-        medicine.setPrice(rs.getFloat("price"));
-        medicine.setWarehouse_id(rs.getInt("warehouse_id"));
-        return medicine;
-    }
 
-    private void setMedicineParameters(PreparedStatement ps, Medicine medicine) throws SQLException {
-        ps.setString(1, medicine.getName());
-        ps.setInt(2, medicine.getUnit_id());
-        ps.setInt(3, medicine.getCategory_id());
-        ps.setString(4, medicine.getIngredient());
-        ps.setString(5, medicine.getUsage());
-        ps.setString(6, medicine.getPreservation());
-        ps.setDate(7, Date.valueOf(medicine.getManuDate()));
-        ps.setDate(8, Date.valueOf(medicine.getExpDate()));
-        ps.setInt(9, medicine.getQuantity());
-        ps.setFloat(10, medicine.getPrice());
-        ps.setInt(11, medicine.getWarehouse_id());
-    }
 }
