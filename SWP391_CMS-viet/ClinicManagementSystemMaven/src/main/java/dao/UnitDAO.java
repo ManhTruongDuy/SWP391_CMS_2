@@ -29,6 +29,24 @@ public class UnitDAO {
         return list;
     }
 
+    public Unit getUnitById(int id) {
+        Unit unit = null;
+        String sql = "SELECT * FROM Unit WHERE unit_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    unit = new Unit();
+                    unit.setIdUnit(rs.getInt("unit_id"));
+                    unit.setUnitName(rs.getString("unitName"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return unit;
+    }
+
     public List<Unit> getUnitsByName(String name) {
         List<Unit> list = new ArrayList<>();
         String sql = "SELECT unit_id, unitName FROM Unit WHERE unitName LIKE ?";
@@ -61,6 +79,29 @@ public class UnitDAO {
                 }
                 return true;
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean updateUnit(Unit unit) {
+        String sql = "UPDATE Unit SET unitName = ? WHERE unit_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, unit.getUnitName());
+            ps.setInt(2, unit.getIdUnit());
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean deleteUnit(int id) {
+        String sql = "DELETE FROM Unit WHERE unit_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }

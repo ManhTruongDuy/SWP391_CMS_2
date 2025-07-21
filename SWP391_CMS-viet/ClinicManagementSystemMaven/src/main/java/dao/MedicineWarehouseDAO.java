@@ -203,37 +203,6 @@ public class MedicineWarehouseDAO {
     }
 
 
-    public List<Medicine> getExpiredMedicines() {
-        List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT * FROM medicines WHERE expDate < CURDATE()";
-        try (PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Medicine medicine = extractMedicineFromResultSet(rs);
-                list.add(medicine);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    private Medicine extractMedicineFromResultSet(ResultSet rs) throws SQLException {
-        Medicine medicine = new Medicine();
-        medicine.setMedicine_id(rs.getInt("medicine_id"));
-        medicine.setName(rs.getString("name"));
-        medicine.setUnit_id(rs.getInt("unit_id"));
-        medicine.setCategory_id(rs.getInt("category_id"));
-        medicine.setIngredient(rs.getString("ingredient"));
-        medicine.setUsage(rs.getString("usage"));
-        medicine.setPreservation(rs.getString("preservation"));
-        medicine.setManuDate(rs.getDate("manuDate").toLocalDate());
-        medicine.setExpDate(rs.getDate("expDate").toLocalDate());
-        medicine.setQuantity(rs.getInt("quantity"));
-        medicine.setPrice(rs.getFloat("price"));
-        medicine.setWarehouse_id(rs.getInt("warehouse_id"));
-        return medicine;
-    }
 
 
 

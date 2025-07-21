@@ -24,9 +24,29 @@ public class CategoryDAO {
                 list.add(category);
             }
         } catch (SQLException e) {
+            System.out.println("Error fetching all categories: " + e.getMessage());
             e.printStackTrace();
         }
         return list;
+    }
+
+    public Category getCategoryById(int id) {
+        Category category = null;
+        String sql = "SELECT category_id, categoryName FROM Category WHERE category_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    category = new Category();
+                    category.setCategory_id(rs.getInt("category_id"));
+                    category.setCategoryName(rs.getString("categoryName"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching category by id: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return category;
     }
 
     public boolean addCategory(Category category) {
@@ -43,6 +63,34 @@ public class CategoryDAO {
                 return true;
             }
         } catch (SQLException e) {
+            System.out.println("Error adding category: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateCategory(Category category) {
+        String sql = "UPDATE Category SET categoryName = ? WHERE category_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, category.getCategoryName());
+            ps.setInt(2, category.getCategory_id());
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating category: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteCategory(int id) {
+        String sql = "DELETE FROM Category WHERE category_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            System.out.println("Error deleting category: " + e.getMessage());
             e.printStackTrace();
         }
         return false;

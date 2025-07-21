@@ -135,7 +135,7 @@ public class WarehouseDAO {
 
     public List<MedicineWarehouse> getMedicinesByWarehouseId(int warehouseId) {
         List<MedicineWarehouse> list = new ArrayList<>();
-        String sql = "SELECT medicine_id, name, quantity,manuDate, expDate, price FROM Medicine WHERE warehouse_id = ?";
+        String sql = "SELECT medicine_id, name, quantity,unit_id,manuDate, expDate, price FROM Medicine WHERE warehouse_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, warehouseId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -144,6 +144,7 @@ public class WarehouseDAO {
                     medicine.setMedicine_id(rs.getInt("medicine_id"));
                     medicine.setName(rs.getString("name"));
                     medicine.setQuantity(rs.getInt("quantity"));
+                    medicine.setUnit(rs.getString("unit_id"));
                     medicine.setManuDate(rs.getDate("manuDate").toLocalDate());
                     medicine.setExpDate(rs.getDate("expDate").toLocalDate());
                     medicine.setPrice(rs.getFloat("price"));

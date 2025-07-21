@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet("/api/categories")
+@WebServlet("/api/categories/*")
 public class CategoryServlet extends HttpServlet {
     private final CategoryDAO categoryDAO = new CategoryDAO();
     private final Gson gson = new Gson();
@@ -21,7 +21,7 @@ public class CategoryServlet extends HttpServlet {
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setHeader("Access-Control-Allow-Origin", "*");
-        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
@@ -30,38 +30,123 @@ public class CategoryServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
-        try {
-            List<Category> categories = categoryDAO.getAllCategories();
-            resp.getWriter().write(gson.toJson(categories));
+        String pathInfo = req.getPathInfo();
+        try (PrintWriter out = resp.getWriter()) {
+            if (pathInfo == null || pathInfo.equals("/")) {
+                List<Category> categories = categoryDAO.getAllCategories();
+                out.write(gson.toJson(categories));
+            } else {
+                try {
+                    int id = Integer.parseInt(pathInfo.substring(1));
+                    Category category = categoryDAO.getCategoryById(id);
+                    if (category != null) {
+                        out.write(gson.toJson(category));
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        out.write("{\"error\":\"Category not found\"}");
+                    }
+                } catch (NumberFormatException e) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.write("{\"error\":\"Invalid ID\"}");
+                }
+            }
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("{\"error\":\"Failed to fetch categories\"}");
+            resp.getWriter().write("{\"error\":\"Failed to fetch categories: " + e.getMessage() + "\"}");
+            e.printStackTrace();
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
-        PrintWriter out = resp.getWriter();
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader reader = req.getReader()) {
-            String line;
-            while ((line = reader.readLine()) != null) sb.append(line);
-        }
-        try {
+        try (PrintWriter out = resp.getWriter()) {
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader reader = req.getReader()) {
+                String line;
+                while ((line = reader.readLine()) != null) sb.append(line);
+            }
             Category category = gson.fromJson(sb.toString(), Category.class);
-            boolean ok = categoryDAO.addCategory(category);
-            if (ok) {
-                resp.setStatus(HttpServletResponse.SC_CREATED);
-                out.print(gson.toJson(category));
+            if (category != null && category.getCategoryName() != null && !category.getCategoryName().trim().isEmpty()) {
+                if (categoryDAO.addCategory(category)) {
+                    resp.setStatus(HttpServletResponse.SC_CREATED);
+                    out.print(gson.toJson(category));
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"error\":\"Insert failed\"}");
+                }
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print("{\"error\":\"Insert failed\"}");
+                out.print("{\"error\":\"Category name is required\"}");
             }
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("{\"error\":\"Invalid body or data: " + e.getMessage() + "\"}");
+            resp.getWriter().write("{\"error\":\"Invalid body or data: " + e.getMessage() + "\"}");
+            e.printStackTrace();
         }
-        out.flush();
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+        String pathInfo = req.getPathInfo();
+        try (PrintWriter out = resp.getWriter()) {
+            if (pathInfo == null || !pathInfo.matches("/\\d+")) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"error\":\"Invalid or missing ID\"}");
+                return;
+            }
+            int id = Integer.parseInt(pathInfo.substring(1));
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader reader = req.getReader()) {
+                String line;
+                while ((line = reader.readLine()) != null) sb.append(line);
+            }
+            Category category = gson.fromJson(sb.toString(), Category.class);
+            if (category != null && category.getCategoryName() != null && !category.getCategoryName().trim().isEmpty()) {
+                category.setCategory_id(id); // Gán ID từ path
+                if (categoryDAO.updateCategory(category)) {
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    out.write(gson.toJson(category));
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    out.write("{\"error\":\"Update failed\"}");
+                }
+            } else {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"error\":\"Category name is required\"}");
+            }
+        } catch (Exception e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"error\":\"Invalid body or data: " + e.getMessage() + "\"}");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+        String pathInfo = req.getPathInfo();
+        try (PrintWriter out = resp.getWriter()) {
+            if (pathInfo == null || !pathInfo.matches("/\\d+")) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.write("{\"error\":\"Invalid or missing ID\"}");
+                return;
+            }
+            int id = Integer.parseInt(pathInfo.substring(1));
+            if (categoryDAO.deleteCategory(id)) {
+                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                out.write("{\"error\":\"Delete failed\"}");
+            }
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"error\":\"Invalid ID\"}");
+        } catch (Exception e) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("{\"error\":\"Failed to delete category: " + e.getMessage() + "\"}");
+            e.printStackTrace();
+        }
     }
 }
