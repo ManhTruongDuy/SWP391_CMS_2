@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.MedicineCounter;
 import model.MedicineOrderRequest;
 import model.Prescription;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @WebServlet("/api/medicineCounter")
 public class MedicineCounterServlet extends HttpServlet {
@@ -85,26 +87,31 @@ public class MedicineCounterServlet extends HttpServlet {
             CounterDAO dao = new CounterDAO();
             Prescription pre = preDAO.getPrescriptionById(Integer.parseInt(order.getPrescriptionId()));
             if(pre != null) {
+                long timestamp = System.currentTimeMillis();
+                int random = new Random().nextInt(900) + 100;
+                Long orderCode = Long.parseLong(timestamp + "" + random);
                 int pending = dao.insertInvoice(pre.getMedicineRecord().getPatient().getId(), pre.getId(),
                         order.getItems().stream()
                                 .filter(i -> i.getQuantity() > 0 && i.getPrice() != null)
                                 .map(i -> i.getPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
                                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                                 .doubleValue(),
-                        "pending");
+                        "pending",orderCode);
                 int pid = dao.insertPrescriptionInvoice(pending, Integer.parseInt(order.getPrescriptionId()));
                 dao.insertMedicines(pid, order.getItems());
+
+                resp.setStatus(HttpServletResponse.SC_OK);
+                JSONObject responseJson = new JSONObject();
+                responseJson.put("message", "Lưu đơn thuốc thành công.");
+                responseJson.put("orderCode", orderCode);
+                resp.getWriter().write(responseJson.toString());
             }
             else{
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 resp.getWriter().write("{\"error\": \"Khong tim thay prescription.\"}");
-
             }
-
-
             // Trả phản hồi thành công
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().write("{\"message\": \"Lưu đơn thuốc thành công.\"}");
+
 
         } catch (Exception e) {
             e.printStackTrace();

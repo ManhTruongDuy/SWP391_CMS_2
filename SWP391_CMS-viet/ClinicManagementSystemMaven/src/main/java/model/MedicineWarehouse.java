@@ -6,6 +6,7 @@ public class MedicineWarehouse {
     public int medicine_id;
     public String name;
     public int quantity;
+    public String unit;
     public LocalDate manuDate;
     public LocalDate expDate;
     public float price;
@@ -14,14 +15,23 @@ public class MedicineWarehouse {
     public MedicineWarehouse() {
     }
 
-    public MedicineWarehouse(int medicine_id, String name, int quantity, LocalDate manuDate, LocalDate expDate, float price, int warehouse_id) {
+    public MedicineWarehouse(int medicine_id, String name, int quantity, String unit, LocalDate manuDate, LocalDate expDate, float price, int warehouse_id) {
         this.medicine_id = medicine_id;
         this.name = name;
         this.quantity = quantity;
+        this.unit = unit;
         this.manuDate = manuDate;
         this.expDate = expDate;
         this.price = price;
         this.warehouse_id = warehouse_id;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public int getMedicine_id() {

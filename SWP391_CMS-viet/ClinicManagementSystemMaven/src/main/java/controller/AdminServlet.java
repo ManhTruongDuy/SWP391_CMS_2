@@ -1,0 +1,76 @@
+package controller;
+
+import com.google.gson.Gson;
+import dao.AdminDAO;
+import dao.SysAdminDAO;
+import jakarta.servlet.ServletException;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+@WebServlet("/api/admin")
+public class AdminServlet extends HttpServlet {
+    private final AdminDAO dao = new AdminDAO();
+    private final Gson gson = new Gson();
+
+    //Handles CORS preflight requests
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String action = request.getParameter("action");
+
+        try (PrintWriter out = response.getWriter()) {
+            switch (action) {
+                case "medicines"     -> out.print(gson.toJson(dao.getAllMedicines()));
+                case "medicineid"   -> {
+                    String idParam = request.getParameter("id");
+                    if (idParam == null || idParam.trim().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Medicine ID is missing\"}");
+                        return;
+                    }
+                    try {
+                        int medicineId = Integer.parseInt(idParam);
+                        Object medicine = dao.getMedicineById(medicineId);
+                        if (medicine == null) {
+                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                            out.print("{\"error\":\"Medicine not found\"}");
+                        } else {
+                            out.print(gson.toJson(medicine));
+                        }
+                    } catch (NumberFormatException e) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Invalid Medicine ID format\"}");
+                    }
+                }
+                case "updatePrice" -> {
+
+
+
+
+
+                }
+                default -> {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"error\":\"Unknown or missing action\"}");
+                }
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Server error: " + e.getMessage() + "\"}");
+        }
+    }
+}

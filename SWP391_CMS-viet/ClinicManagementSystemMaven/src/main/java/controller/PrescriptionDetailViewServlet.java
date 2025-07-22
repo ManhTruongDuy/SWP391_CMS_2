@@ -31,6 +31,8 @@ public class PrescriptionDetailViewServlet extends HttpServlet {
         String sort = req.getParameter("sort"); // "asc" hoặc "desc"
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
+
+        // Gọi DAO để tìm danh sách chi tiết đơn thuốc theo các tiêu chí tìm kiếm
         List<PrescriptionDetailView> list = dao.searchPrescriptionDetails(presId, patientName, sort);
         resp.getWriter().write(gson.toJson(list));
     }

@@ -38,64 +38,88 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-
-
         if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            String err = "Email and Password cannot be empty";
-            request.setAttribute("err", err);
+            request.setAttribute("err", "Email and Password cannot be empty");
             request.getRequestDispatcher("/view/accountpharmacist/Login.jsp").forward(request, response);
             return;
         }
-        //check pharmacist
-        AccountPharmacistDAO dao = new AccountPharmacistDAO();
-        AccountPharmacist pharmacist = dao.getAccountByEmailAndPassword(email, password);
 
+        HttpSession session = request.getSession();
+
+        // Check Pharmacist
+        AccountPharmacistDAO pharmacistDao = new AccountPharmacistDAO();
+        AccountPharmacist pharmacist = pharmacistDao.getAccountByEmailAndPassword(email, password);
         if (pharmacist != null) {
-            if(!pharmacist.getStatus().equalsIgnoreCase("Enable")){
-            request.setAttribute("err", "Your account is locked.");
-            request.getRequestDispatcher("/view/accountpharmacist/Login.jsp").forward(request, response);
-            return;
+            if (!"Enable".equalsIgnoreCase(pharmacist.getStatus())) {
+                request.setAttribute("err", "Your account is locked.");
+                request.getRequestDispatcher("/view/accountpharmacist/Login.jsp").forward(request, response);
+                return;
             }
-            HttpSession session = request.getSession();
+
             session.setAttribute("account", pharmacist);
-            response.sendRedirect("home");
+            session.setAttribute("userType", "pharmacist");
+            session.setAttribute("role", "Pharmacist");
+            response.sendRedirect(request.getContextPath() + "view/pharmacist/dashboard-pharmacist.html"); // Gợi ý: nên có trang riêng
             return;
         }
 
-        //check staff
+        // Check Staff
         AccountStaffDAO staffDao = new AccountStaffDAO();
         AccountStaff staff = staffDao.getAccountByEmailAndPassword(email, password);
-
         if (staff != null) {
-            if (!staff.getStatus().equalsIgnoreCase("Enable")) {
+            if (!"Enable".equalsIgnoreCase(staff.getStatus())) {
+
                 request.setAttribute("err", "Your account is locked.");
                 request.getRequestDispatcher("/view/accountpharmacist/Login.jsp").forward(request, response);
                 return;
             }
-            HttpSession session = request.getSession();
+
+
             session.setAttribute("account", staff);
-            response.sendRedirect("home");
+            session.setAttribute("userType", "staff");
+            session.setAttribute("role", staff.getRole());
+
+            switch (staff.getRole()) {
+                case "Doctor":
+                    response.sendRedirect(request.getContextPath() + "/view/doctor/home.jsp");
+                    break;
+                case "AdminSys":
+                    response.sendRedirect(request.getContextPath() + "/view/SysAdminDashboard.html");
+                    break;
+                case "AdminBusiness":
+                    response.sendRedirect(request.getContextPath() + "/view/AdminDashboard.html");
+                    break;
+                default:
+                    request.setAttribute("err", "Invalid staff role.");
+                    request.getRequestDispatcher("/view/accountpharmacist/Login.jsp").forward(request, response);
+                    break;
+            }
             return;
         }
 
-        //check patient
+        // Check Patient
         AccountPatientDAO patientDao = new AccountPatientDAO();
         AccountPatient patient = patientDao.getAccountByEmailAndPassword(email, password);
-
         if (patient != null) {
-            if (!patient.getStatus().equalsIgnoreCase("Enable")) {
+            if (!"Enable".equalsIgnoreCase(patient.getStatus())) {
+
                 request.setAttribute("err", "Your account is locked.");
                 request.getRequestDispatcher("/view/accountpharmacist/Login.jsp").forward(request, response);
                 return;
             }
-            HttpSession session = request.getSession();
+
+
             session.setAttribute("account", patient);
+            session.setAttribute("userType", "patient");
+            session.setAttribute("role", "Patient");
+
             response.sendRedirect("home");
             return;
         }
 
-        String err = "Email or Password is incorrect";
-        request.setAttribute("err", err);
+        // If all fail
+        request.setAttribute("err", "Email or Password is incorrect");
         request.getRequestDispatcher("/view/accountpharmacist/Login.jsp").forward(request, response);
     }
+
 }
