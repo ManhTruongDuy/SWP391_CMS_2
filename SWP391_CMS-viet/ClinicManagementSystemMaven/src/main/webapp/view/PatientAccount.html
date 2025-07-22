@@ -309,17 +309,18 @@
 
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
     let selectedRow = null;
+    let allPatients = [];
 
     // Display patients
     function displayPatients(data) {
-        const tummy = document.getElementById('patient-table-body');
+        const tbody = document.getElementById('patient-table-body');
         console.log('Rendering patients:', data); // Debug
-        tummy.innerHTML = '';
+        tbody.innerHTML = '';
         selectedRow = null;
 
-        const patients = data;
+        const patients = Array.isArray(data) ? data : [data];
         if (patients.length === 0) {
-            tummy.innerHTML = '<tr><td colspan="8" class="text-center">Không tìm thấy bệnh nhân</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">Không tìm thấy bệnh nhân</td></tr>';
             return;
         }
 
@@ -342,7 +343,7 @@
                     </button>
                 </td>
             `;
-            tummy.appendChild(row);
+            tbody.appendChild(row);
 
             if (index === 0) {
                 row.classList.add('selected');
@@ -373,11 +374,12 @@
 
             const text = await response.text(); // read response as text first
             if (!text) {
-                throw new Error("Empty response from server");
+                throw new Error("Phản hồi từ máy chủ rỗng");
             }
 
             const data = JSON.parse(text); // now safely parse
             console.log('Data received:', data);
+            allPatients = data;
             displayPatients(data);
         } catch (error) {
             console.error('Fetch error:', error);
@@ -389,7 +391,7 @@
     async function searchPatientById(id) {
         try {
             if (!id) {
-                getAllPatients(); // If no ID, show all patients
+                displayPatients(allPatients) // If no ID, show all patients
                 return;
             }
 
@@ -413,7 +415,7 @@
             if (!data || Object.keys(data).length === 0) {
                 displayError('Không bệnh nhân nào có ID này!');
             } else {
-                displayManagers([data]);
+                displayPatients([data]);
             }
         } catch (error) {
             console.error('Search error:', error);
