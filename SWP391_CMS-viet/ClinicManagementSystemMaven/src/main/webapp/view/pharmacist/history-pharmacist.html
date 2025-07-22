@@ -385,6 +385,23 @@
             color: white;
         }
 
+        .btn-clear {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            color: white;
+        }
+
+        .btn-clear:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            color: white;
+        }
+
         .table-section {
             padding: 2rem;
         }
@@ -540,6 +557,13 @@
             opacity: 0.5;
         }
 
+        .search-highlight {
+            background-color: #fff3cd;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
@@ -629,24 +653,7 @@
                         <span class="nav-text">Thuốc thay thế</span>
                     </a>
                 </div>
-                <div class="nav-item">
-                    <a href="patients.html" class="nav-link">
-                        <i class="fas fa-user-injured nav-icon"></i>
-                        <span class="nav-text">Bệnh nhân</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="medicines.html" class="nav-link">
-                        <i class="fas fa-pills nav-icon"></i>
-                        <span class="nav-text">Thuốc</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="inventory.html" class="nav-link">
-                        <i class="fas fa-boxes nav-icon"></i>
-                        <span class="nav-text">Kho thuốc</span>
-                    </a>
-                </div>
+
             </div>
 
             <div class="nav-section">
@@ -665,21 +672,7 @@
                 </div>
             </div>
 
-            <div class="nav-section">
-                <div class="nav-section-title">Hệ thống</div>
-                <div class="nav-item">
-                    <a href="settings.html" class="nav-link">
-                        <i class="fas fa-cog nav-icon"></i>
-                        <span class="nav-text">Cài đặt</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="users.html" class="nav-link">
-                        <i class="fas fa-users nav-icon"></i>
-                        <span class="nav-text">Người dùng</span>
-                    </a>
-                </div>
-            </div>
+
         </nav>
 
         <div class="sidebar-footer">
@@ -713,8 +706,8 @@
         <!-- Search Section -->
         <div class="search-section">
             <div class="search-card">
-                <form class="row g-3 align-items-end">
-                    <div class="col-md-8">
+                <form class="row g-3 align-items-end" id="searchForm">
+                    <div class="col-md-6">
                         <label for="patient" class="form-label fw-bold">
                             <i class="fas fa-user-injured me-2"></i>
                             Tìm kiếm bệnh nhân
@@ -722,10 +715,16 @@
                         <input type="text" class="form-control" id="patient" name="patient"
                                placeholder="Nhập tên hoặc mã bệnh nhân...">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <button type="submit" class="btn btn-search w-100">
                             <i class="fas fa-search me-2"></i>
-                            Xem lịch sử
+                            Tìm kiếm
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-clear w-100" id="clearBtn">
+                            <i class="fas fa-times me-2"></i>
+                            Xóa bộ lọc
                         </button>
                     </div>
                 </form>
@@ -739,22 +738,22 @@
                     <div class="stat-icon icon-primary">
                         <i class="fas fa-user-injured"></i>
                     </div>
-                    <div class="stat-number">3</div>
-                    <div class="stat-label">Bệnh nhân</div>
+                    <div class="stat-number" id="patientCount">0</div>
+                    <div class="stat-label">Bệnh nhân đã mua thuốc</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon icon-success">
                         <i class="fas fa-pills"></i>
                     </div>
-                    <div class="stat-number">35</div>
-                    <div class="stat-label">Lượt phát thuốc</div>
+                    <div class="stat-number" id="prescriptionCount">0</div>
+                    <div class="stat-label">Đơn thuốc đã bán</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon icon-warning">
                         <i class="fas fa-calendar-day"></i>
                     </div>
-                    <div class="stat-number">7</div>
-                    <div class="stat-label">Ngày gần đây</div>
+                    <div class="stat-number" id="recentDays">0</div>
+                    <div class="stat-label">Ngày bán gần đây</div>
                 </div>
             </div>
         </div>
@@ -806,72 +805,211 @@
         </div>
     </div>
 </div>
-<!-- Modal -->
 
 <script src="/view/assets/js/core/bootstrap.bundle.min.js"></script>
 <script>
-    const baseUrl = window.location.origin + '/ClinicManagementSystem_war';
+    const baseUrl = window.location.origin + '/ClinicManagementSystem_war_exploded';
+    let allInvoices = []; // Lưu trữ tất cả dữ liệu để tìm kiếm
+    let filteredInvoices = []; // Dữ liệu đã lọc
+    let currentSearchTerm = ''; // Từ khóa tìm kiếm hiện tại
 
-    fetch(`${baseUrl}/api/historyPay`)
-        .then(res => res.json())
-        .then(data => {
-            const tbody = document.getElementById('invoiceTableBody');
-            tbody.innerHTML = '';
+    // Load dữ liệu ban đầu
+    function loadInitialData() {
+        showLoading(true);
 
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6">Không có đơn nào!</td></tr>`;
-                return;
-            }
-
-            data.forEach((invoice, index) => {
-                const row = document.createElement('tr');
-
-                row.innerHTML = `
-                      <td>${index + 1}</td>
-                      <td><i class="fas fa-user-circle text-primary me-2"></i>${invoice.patientName || 'N/A'}</td>
-                      <td><i class="fas fa-user-circle text-primary me-2"></i>${invoice.phaName || 'N/A'}</td>
-                      <td><i class="fas fa-calendar-alt me-2"></i>${formatDate(invoice.issueDate)}</td>
-                      <td><i class="fas fa-coins me-2"></i>${formatCurrency(invoice.totalAmount)}</td>
-                      <td>
-                        <span class="badge bg-${invoice.status === 'paid' ? 'success' : 'secondary'}">
-                          ${invoice.status === 'paid' ? 'Đã thanh toán' : invoice.status}
-                        </span>
-                      </td>
-                      <td>
-                        <a href="invoice-detail.html?invoiceId=${invoice.invoiceId}" class="btn btn-outline-primary btn-sm">
-                          <i class="fas fa-eye"></i>
-                        </a>
-                          <button class="btn btn-outline-success btn-sm print-btn"
-                              data-id="${invoice.invoiceId}"
-                              data-patient="${invoice.patientName}"
-                              data-pharmacist="${invoice.phaName}"
-                              data-date="${formatDate(invoice.issueDate)}"
-                              data-total="${formatCurrency(invoice.totalAmount)}">
-                              <i class="fas fa-print"></i>
-                            </button>
-                      </td>
-                    `;
-                tbody.appendChild(row);
+        fetch(`${baseUrl}/api/historyPay`)
+            .then(res => res.json())
+            .then(data => {
+                allInvoices = data;
+                filteredInvoices = data;
+                updateStatistics(data);
+                renderTable(data);
+                showLoading(false);
+            })
+            .catch(err => {
+                console.error("❌ Lỗi khi load lịch sử:", err);
+                showError("Lỗi khi tải dữ liệu!");
+                showLoading(false);
             });
-        })
-        .catch(err => {
-            console.error("❌ Lỗi khi load lịch sử:", err);
-            document.getElementById('invoiceTableBody').innerHTML =
-                `<tr><td colspan="6">Lỗi khi tải dữ liệu!</td></tr>`;
+    }
+
+    // Cập nhật thống kê
+    function updateStatistics(data) {
+        // Đếm số bệnh nhân duy nhất
+        const uniquePatients = new Set(data.map(invoice => invoice.patientName)).size;
+        document.getElementById('patientCount').textContent = uniquePatients;
+
+        // Đếm tổng số đơn thuốc
+        document.getElementById('prescriptionCount').textContent = data.length;
+
+        // Tính số ngày gần đây có bán thuốc
+        const recentDays = calculateRecentDays(data);
+        document.getElementById('recentDays').textContent = recentDays;
+    }
+
+    // Tính số ngày gần đây có hoạt động bán thuốc
+    function calculateRecentDays(data) {
+        if (data.length === 0) return 0;
+
+        const today = new Date();
+        const uniqueDates = new Set();
+
+        data.forEach(invoice => {
+            if (invoice.issueDate) {
+                const issueDate = new Date(invoice.issueDate);
+                const daysDiff = Math.floor((today - issueDate) / (1000 * 60 * 60 * 24));
+
+                // Chỉ tính những ngày trong vòng 30 ngày gần đây
+                if (daysDiff <= 30) {
+                    const dateStr = issueDate.toDateString();
+                    uniqueDates.add(dateStr);
+                }
+            }
         });
 
+        return uniqueDates.size;
+    }
+
+    // Render bảng dữ liệu
+    function renderTable(data) {
+        const tbody = document.getElementById('invoiceTableBody');
+        tbody.innerHTML = '';
+
+        if (data.length === 0) {
+            showEmptyState(true);
+            return;
+        }
+
+        showEmptyState(false);
+
+        data.forEach((invoice, index) => {
+            const row = document.createElement('tr');
+
+            // Highlight search term nếu có
+            const patientName = highlightSearchTerm(invoice.patientName || 'N/A', currentSearchTerm);
+            const doctorName = highlightSearchTerm(invoice.phaName || 'N/A', currentSearchTerm);
+
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td><i class="fas fa-user-circle text-primary me-2"></i>${patientName}</td>
+                <td><i class="fas fa-user-circle text-primary me-2"></i>${doctorName}</td>
+                <td><i class="fas fa-calendar-alt me-2"></i>${formatDate(invoice.issueDate)}</td>
+                <td><i class="fas fa-coins me-2"></i>${formatCurrency(invoice.totalAmount)}</td>
+                <td>
+                    <span class="badge bg-${invoice.status === 'paid' ? 'success' : 'secondary'}">
+                        ${invoice.status === 'paid' ? 'Đã thanh toán' : invoice.status}
+                    </span>
+                </td>
+                <td>
+                    <a href="invoice-detail.html?invoiceId=${invoice.invoiceId}" class="btn btn-outline-primary btn-sm me-1">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <button class="btn btn-outline-success btn-sm print-btn"
+                        data-id="${invoice.invoiceId}"
+                        data-patient="${invoice.patientName}"
+                        data-pharmacist="${invoice.phaName}"
+                        data-date="${formatDate(invoice.issueDate)}"
+                        data-total="${formatCurrency(invoice.totalAmount)}">
+                        <i class="fas fa-print"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Add animation to table rows
+        const rows = document.querySelectorAll('tbody tr');
+        rows.forEach((row, index) => {
+            row.style.opacity = '0';
+            row.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '1';
+                row.style.transform = 'translateY(0)';
+            }, index * 50);
+        });
+    }
+
+    // Highlight từ khóa tìm kiếm
+    function highlightSearchTerm(text, searchTerm) {
+        if (!searchTerm || !text) return text;
+
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+        return text.replace(regex, '<span class="search-highlight">$1</span>');
+    }
+
+    // Tìm kiếm dữ liệu
+    function searchInvoices(searchTerm) {
+        if (!searchTerm.trim()) {
+            filteredInvoices = allInvoices;
+            currentSearchTerm = '';
+        } else {
+            currentSearchTerm = searchTerm.trim();
+            filteredInvoices = allInvoices.filter(invoice => {
+                const patientName = (invoice.patientName || '').toLowerCase();
+                const doctorName = (invoice.phaName || '').toLowerCase();
+                const searchLower = searchTerm.toLowerCase();
+
+                return patientName.includes(searchLower) ||
+                    doctorName.includes(searchLower) ||
+                    invoice.invoiceId.toString().includes(searchLower);
+            });
+        }
+
+        updateStatistics(filteredInvoices);
+        renderTable(filteredInvoices);
+    }
+
+    // Hiển thị/ẩn loading
+    function showLoading(show) {
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const tableContainer = document.querySelector('.table-container');
+
+        if (show) {
+            loadingSpinner.style.display = 'block';
+            tableContainer.style.display = 'none';
+        } else {
+            loadingSpinner.style.display = 'none';
+            tableContainer.style.display = 'block';
+        }
+    }
+
+    // Hiển thị/ẩn empty state
+    function showEmptyState(show) {
+        const emptyState = document.getElementById('emptyState');
+        const tableContainer = document.querySelector('.table-container');
+
+        if (show) {
+            emptyState.classList.remove('d-none');
+            tableContainer.style.display = 'none';
+        } else {
+            emptyState.classList.add('d-none');
+            tableContainer.style.display = 'block';
+        }
+    }
+
+    // Hiển thị lỗi
+    function showError(message) {
+        const tbody = document.getElementById('invoiceTableBody');
+        tbody.innerHTML = `<tr><td colspan="7" class="text-danger">${message}</td></tr>`;
+    }
+
+    // Format ngày tháng
     function formatDate(dateStr) {
         if (!dateStr) return '---';
         const date = new Date(dateStr);
         return date.toLocaleDateString('vi-VN');
     }
 
+    // Format tiền tệ
     function formatCurrency(amount) {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
             currency: 'VND'
         }).format(amount || 0);
     }
+
+    // Toggle sidebar
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
@@ -889,94 +1027,86 @@
         }
     }
 
-    // Enhanced form functionality
+    // Event listeners
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const tableContainer = document.querySelector('.table-container');
-        const emptyState = document.getElementById('emptyState');
+        // Load dữ liệu ban đầu
+        loadInitialData();
 
-        form.addEventListener('submit', function(e) {
+        // Xử lý form tìm kiếm
+        const searchForm = document.getElementById('searchForm');
+        const patientInput = document.getElementById('patient');
+        const clearBtn = document.getElementById('clearBtn');
+
+        searchForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            const searchTerm = patientInput.value.trim();
+            searchInvoices(searchTerm);
 
-            // Show loading state
-            tableContainer.style.display = 'none';
-            loadingSpinner.style.display = 'block';
-            emptyState.classList.add('d-none');
-
-            // Simulate API call
-            setTimeout(() => {
-                loadingSpinner.style.display = 'none';
-                tableContainer.style.display = 'block';
-
-                // Add animation to table rows
-                const rows = document.querySelectorAll('tbody tr');
-                rows.forEach((row, index) => {
-                    row.style.opacity = '0';
-                    row.style.transform = 'translateY(20px)';
-                    setTimeout(() => {
-                        row.style.transition = 'all 0.3s ease';
-                        row.style.opacity = '1';
-                        row.style.transform = 'translateY(0)';
-                    }, index * 100);
-                });
-            }, 1500);
-        });
-
-        // Add smooth scrolling for better UX
-        const searchButton = document.querySelector('.btn-search');
-        searchButton.addEventListener('click', function() {
+            // Scroll to table
             setTimeout(() => {
                 document.querySelector('.table-section').scrollIntoView({
                     behavior: 'smooth'
                 });
             }, 100);
         });
-    });
-    document.addEventListener("click", function (e) {
-        const btn = e.target.closest(".print-btn");
-        if (!btn) return;
 
-        const invoiceId = btn.getAttribute("data-id");
-        const patientName = btn.getAttribute("data-patient");
-        const pharmacistName = btn.getAttribute("data-pharmacist");
-        const issueDate = btn.getAttribute("data-date");
-        const totalAmount = btn.getAttribute("data-total");
+        // Tìm kiếm realtime khi gõ
+        patientInput.addEventListener('input', function() {
+            const searchTerm = this.value.trim();
+            if (searchTerm.length >= 2 || searchTerm.length === 0) {
+                searchInvoices(searchTerm);
+            }
+        });
 
-        // Debug
-        console.log("Clicked invoiceId:", invoiceId);
+        // Xóa bộ lọc
+        clearBtn.addEventListener('click', function() {
+            patientInput.value = '';
+            searchInvoices('');
+        });
 
-        fetch(`/ClinicManagementSystem_war/api/historyPayDetail?id=${invoiceId}`)
-            .then(res => res.json())
-            .then(items => {
-                const exportData = {
-                    data : {
-                        doctor: { fullName: pharmacistName },
-                        id: invoiceId,
-                        medicineRecord: { patient: { fullName: patientName } },
-                        prescriptionDate: (() => {
-                            const parts = issueDate.split("/");
-                            const dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
-                            return dateObj;
-                        })(),
-                        totalAmount: totalAmount
+        // Xử lý nút in
+        document.addEventListener("click", function (e) {
+            const btn = e.target.closest(".print-btn");
+            if (!btn) return;
 
-                    },
-                    items: items,
-                };
+            const invoiceId = btn.getAttribute("data-id");
+            const patientName = btn.getAttribute("data-patient");
+            const pharmacistName = btn.getAttribute("data-pharmacist");
+            const issueDate = btn.getAttribute("data-date");
+            const totalAmount = btn.getAttribute("data-total");
 
-                localStorage.setItem("printPrescription", JSON.stringify(exportData));
-                console.log(exportData);
-                console.log("id" + invoiceId);
+            console.log("Clicked invoiceId:", invoiceId);
 
-                window.location.href = "print-prescription.html";
-            })
-            .catch(err => {
-                console.error("Lỗi fetch:", err);
-                alert("Không thể lấy dữ liệu hóa đơn để in.");
-            });
+            fetch(`${baseUrl}/api/historyPayDetail?id=${invoiceId}`)
+                .then(res => res.json())
+                .then(items => {
+                    const exportData = {
+                        data: {
+                            doctor: { fullName: pharmacistName },
+                            id: invoiceId,
+                            medicineRecord: { patient: { fullName: patientName } },
+                            prescriptionDate: (() => {
+                                const parts = issueDate.split("/");
+                                const dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                                return dateObj;
+                            })(),
+                            totalAmount: totalAmount
+                        },
+                        items: items,
+                    };
+
+                    localStorage.setItem("printPrescription", JSON.stringify(exportData));
+                    console.log(exportData);
+                    window.location.href = "print-prescription.html";
+                })
+                .catch(err => {
+                    console.error("Lỗi fetch:", err);
+                    alert("Không thể lấy dữ liệu hóa đơn để in.");
+                });
+        });
     });
 </script>
 
 </body>
 </html>
+
