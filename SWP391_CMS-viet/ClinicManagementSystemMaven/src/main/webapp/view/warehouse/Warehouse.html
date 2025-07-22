@@ -115,26 +115,26 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm p-3 mb-4 bg-white rounded">
-                <h5 class="mb-3">Warehouse API Tester</h5>
+                <h5 class="mb-3">Công cụ kiểm tra API Kho</h5>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <button class="btn btn-primary" onclick="getAllWarehouses()">
-                            <i class="bi bi-list"></i> Fetch All Warehouses
+                            <i class="bi bi-list"></i> Lấy tất cả Kho
                         </button>
                         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addWarehouseModal">
-                            <i class="bi bi-plus"></i> Add Warehouse
+                            <i class="bi bi-plus"></i> Thêm Kho
                         </button>
                     </div>
                     <div class="col-md-6">
                         <div class="input-group">
                             <select id="warehouseSearchType" class="form-select" style="max-width: 150px;">
                                 <option value="id">ID</option>
-                                <option value="name">Name</option>
-                                <option value="location">Location</option>
+                                <option value="name">Tên</option>
+                                <option value="location">Địa điểm</option>
                             </select>
-                            <input id="warehouseSearchInput" class="form-control" placeholder="Enter search value" type="text" onkeypress="if(event.key === 'Enter') searchWarehouse()">
+                            <input id="warehouseSearchInput" class="form-control" placeholder="Nhập giá trị tìm kiếm" type="text" onkeypress="if(event.key === 'Enter') searchWarehouse()">
                             <button class="btn btn-outline-primary" onclick="searchWarehouse()">
-                                <i class="bi bi-search"></i> Fetch Warehouse
+                                <i class="bi bi-search"></i> Tìm Kho
                             </button>
                         </div>
                     </div>
@@ -146,10 +146,10 @@
                             ID <span class="sort-icon" id="warehouse-id-sort"></span>
                         </th>
                         <th scope="col" class="sortable" onclick="sortTable('warehouse', 'name')">
-                            Name <span class="sort-icon" id="warehouse-name-sort"></span>
+                            Tên <span class="sort-icon" id="warehouse-name-sort"></span>
                         </th>
-                        <th scope="col">Location</th>
-                        <th scope="col">Actions</th>
+                        <th scope="col">Địa điểm</th>
+                        <th scope="col">Hành động</th>
                     </tr>
                     </thead>
                     <tbody id="warehouse-table-body"></tbody>
@@ -158,32 +158,32 @@
                     <button class="btn btn-secondary btn-sm me-2" onclick="changeWarehousePage('prev')" id="prevWarehousePageBtn" disabled>
                         <i class="bi bi-arrow-left"></i>
                     </button>
-                    <span id="currentWarehousePage">Page 1</span>
+                    <span id="currentWarehousePage">Trang 1</span>
                     <button class="btn btn-secondary btn-sm ms-2" onclick="changeWarehousePage('next')" id="nextWarehousePageBtn">
                         <i class="bi bi-arrow-right"></i>
                     </button>
                 </div>
 
                 <div id="medicine-section" class="expandable-section">
-                    <h6>Medicines</h6>
+                    <h6>Thuốc</h6>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <button class="btn btn-info" onclick="getAllMedicines()">
-                                <i class="bi bi-capsule"></i> Fetch All Medicines
+                                <i class="bi bi-capsule"></i> Lấy tất cả Thuốc
                             </button>
                             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMedicineModal">
-                                <i class="bi bi-plus"></i> Add Medicine
+                                <i class="bi bi-plus"></i> Thêm Thuốc
                             </button>
                         </div>
                         <div class="col-md-6">
                             <div class="input-group">
                                 <select id="medicineSearchType" class="form-select" style="max-width: 150px;">
                                     <option value="id">ID</option>
-                                    <option value="name">Name</option>
+                                    <option value="name">Tên</option>
                                 </select>
-                                <input id="medicineSearchInput" class="form-control" placeholder="Enter search value" type="text" onkeypress="if(event.key === 'Enter') searchWarehouse()">
+                                <input id="medicineSearchInput" class="form-control" placeholder="Nhập giá trị tìm kiếm" type="text" onkeypress="if(event.key === 'Enter') searchWarehouse()">
                                 <button class="btn btn-outline-primary" onclick="searchMedicine()">
-                                    <i class="bi bi-search"></i> Fetch Medicine
+                                    <i class="bi bi-search"></i> Tìm Thuốc
                                 </button>
                             </div>
                         </div>
@@ -195,20 +195,20 @@
                                 ID <span class="sort-icon" id="medicine-id-sort"></span>
                             </th>
                             <th scope="col" class="sortable" onclick="sortTable('medicine', 'name')">
-                                Name <span class="sort-icon" id="medicine-name-sort"></span>
+                                Tên <span class="sort-icon" id="medicine-name-sort"></span>
                             </th>
-                            <th scope="col">Warehouse</th>
+                            <th scope="col">Kho</th>
                             <th scope="col" class="sortable" onclick="sortTable('medicine', 'quantity')">
-                                Quantity <span class="sort-icon" id="medicine-quantity-sort"></span>
+                                Số lượng <span class="sort-icon" id="medicine-quantity-sort"></span>
                             </th>
-                            <th scope="col">Unit</th>
-                            <th scope="col">Manufacture Date</th>
-                            <th scope="col">Expiry Date</th>
-                            <th scope="col">Expiry Status</th>
+                            <th scope="col">Đơn vị</th>
+                            <th scope="col">Ngày sản xuất</th>
+                            <th scope="col">Ngày hết hạn</th>
+                            <th scope="col">Tình trạng hết hạn</th>
                             <th scope="col" class="sortable" onclick="sortTable('medicine', 'price')">
-                                Price <span class="sort-icon" id="medicine-price-sort"></span>
+                                Giá <span class="sort-icon" id="medicine-price-sort"></span>
                             </th>
-                            <th scope="col">Actions</th>
+                            <th scope="col">Hành động</th>
                         </tr>
                         </thead>
                         <tbody id="medicine-table-body"></tbody>
@@ -217,7 +217,7 @@
                         <button class="btn btn-secondary btn-sm me-2" onclick="changeMedicinePage('prev')" id="prevMedicinePageBtn" disabled>
                             <i class="bi bi-arrow-left"></i>
                         </button>
-                        <span id="currentMedicinePage">Page 1</span>
+                        <span id="currentMedicinePage">Trang 1</span>
                         <button class="btn btn-secondary btn-sm ms-2" onclick="changeMedicinePage('next')" id="nextMedicinePageBtn">
                             <i class="bi bi-arrow-right"></i>
                         </button>
@@ -227,187 +227,180 @@
         </div>
     </div>
 
-    <!-- Modal to add warehouse -->
     <div class="modal fade" id="addWarehouseModal" tabindex="-1" aria-labelledby="addWarehouseModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addWarehouseModalLabel">Add New Warehouse</h5>
+                    <h5 class="modal-title" id="addWarehouseModalLabel">Thêm Kho mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addWarehouseForm">
                         <div class="mb-3">
-                            <label for="warehouseNameInput" class="form-label">Name</label>
+                            <label for="warehouseNameInput" class="form-label">Tên</label>
                             <input type="text" class="form-control" id="warehouseNameInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="warehouseLocationInput" class="form-label">Location</label>
+                            <label for="warehouseLocationInput" class="form-label">Địa điểm</label>
                             <input type="text" class="form-control" id="warehouseLocationInput" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal to edit warehouse -->
     <div class="modal fade" id="editWarehouseModal" tabindex="-1" aria-labelledby="editWarehouseModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editWarehouseModalLabel">Edit Warehouse</h5>
+                    <h5 class="modal-title" id="editWarehouseModalLabel">Chỉnh sửa Kho</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editWarehouseForm">
                         <input type="hidden" id="editWarehouseId">
                         <div class="mb-3">
-                            <label for="editWarehouseNameInput" class="form-label">Name</label>
+                            <label for="editWarehouseNameInput" class="form-label">Tên</label>
                             <input type="text" class="form-control" id="editWarehouseNameInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editWarehouseLocationInput" class="form-label">Location</label>
+                            <label for="editWarehouseLocationInput" class="form-label">Địa điểm</label>
                             <input type="text" class="form-control" id="editWarehouseLocationInput" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-
-
-    <!-- Modal to add medicine -->
     <div class="modal fade" id="addMedicineModal" tabindex="-1" aria-labelledby="addMedicineModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addMedicineModalLabel">Add New Medicine</h5>
+                    <h5 class="modal-title" id="addMedicineModalLabel">Thêm Thuốc mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addMedicineForm">
                         <div class="mb-3">
-                            <label for="medicineNameInput" class="form-label">Name</label>
+                            <label for="medicineNameInput" class="form-label">Tên</label>
                             <input type="text" class="form-control" id="medicineNameInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="medicineUnitIdInput" class="form-label">Unit</label>
+                            <label for="medicineUnitIdInput" class="form-label">Đơn vị</label>
                             <select class="form-control" id="medicineUnitIdInput" required>
-                                <option value="">Select Unit</option>
+                                <option value="">Chọn Đơn vị</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="medicineCategoryIdInput" class="form-label">Category</label>
+                            <label for="medicineCategoryIdInput" class="form-label">Danh mục</label>
                             <select class="form-control" id="medicineCategoryIdInput" required>
-                                <option value="">Select Category</option>
+                                <option value="">Chọn Danh mục</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="medicineIngredientInput" class="form-label">Ingredient</label>
+                            <label for="medicineIngredientInput" class="form-label">Thành phần</label>
                             <input type="text" class="form-control" id="medicineIngredientInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="medicineUsageInput" class="form-label">Usage</label>
+                            <label for="medicineUsageInput" class="form-label">Cách dùng</label>
                             <input type="text" class="form-control" id="medicineUsageInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="medicinePreservationInput" class="form-label">Preservation</label>
+                            <label for="medicinePreservationInput" class="form-label">Bảo quản</label>
                             <input type="text" class="form-control" id="medicinePreservationInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="medicineManuDateInput" class="form-label">Manufacture Date</label>
+                            <label for="medicineManuDateInput" class="form-label">Ngày sản xuất</label>
                             <input type="date" class="form-control" id="medicineManuDateInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="medicineExpDateInput" class="form-label">Expiry Date</label>
+                            <label for="medicineExpDateInput" class="form-label">Ngày hết hạn</label>
                             <input type="date" class="form-control" id="medicineExpDateInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="medicineQuantityInput" class="form-label">Quantity</label>
+                            <label for="medicineQuantityInput" class="form-label">Số lượng</label>
                             <input type="number" class="form-control" id="medicineQuantityInput" min="0" required>
                         </div>
                         <div class="mb-3">
-                            <label for="medicinePriceInput" class="form-label">Price</label>
+                            <label for="medicinePriceInput" class="form-label">Giá</label>
                             <input type="number" class="form-control" id="medicinePriceInput" min="0" step="0.01" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal to edit medicine -->
     <div class="modal fade" id="editMedicineModal" tabindex="-1" aria-labelledby="editMedicineModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editMedicineModalLabel">Edit Medicine</h5>
+                    <h5 class="modal-title" id="editMedicineModalLabel">Chỉnh sửa Thuốc</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editMedicineForm">
                         <input type="hidden" id="editMedicineId">
                         <div class="mb-3">
-                            <label for="editMedicineNameInput" class="form-label">Name</label>
+                            <label for="editMedicineNameInput" class="form-label">Tên</label>
                             <input type="text" class="form-control" id="editMedicineNameInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editMedicineUnitIdInput" class="form-label">Unit</label>
+                            <label for="editMedicineUnitIdInput" class="form-label">Đơn vị</label>
                             <select class="form-control" id="editMedicineUnitIdInput" required>
-                                <option value="">Select Unit</option>
+                                <option value="">Chọn Đơn vị</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="editMedicineCategoryIdInput" class="form-label">Category</label>
+                            <label for="editMedicineCategoryIdInput" class="form-label">Danh mục</label>
                             <select class="form-control" id="editMedicineCategoryIdInput" required>
-                                <option value="">Select Category</option>
+                                <option value="">Chọn Danh mục</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="editMedicineIngredientInput" class="form-label">Ingredient</label>
+                            <label for="editMedicineIngredientInput" class="form-label">Thành phần</label>
                             <input type="text" class="form-control" id="editMedicineIngredientInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editMedicineUsageInput" class="form-label">Usage</label>
+                            <label for="editMedicineUsageInput" class="form-label">Cách dùng</label>
                             <input type="text" class="form-control" id="editMedicineUsageInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editMedicinePreservationInput" class="form-label">Preservation</label>
+                            <label for="editMedicinePreservationInput" class="form-label">Bảo quản</label>
                             <input type="text" class="form-control" id="editMedicinePreservationInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editMedicineManuDateInput" class="form-label">Manufacture Date</label>
+                            <label for="editMedicineManuDateInput" class="form-label">Ngày sản xuất</label>
                             <input type="date" class="form-control" id="editMedicineManuDateInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editMedicineExpDateInput" class="form-label">Expiry Date</label>
+                            <label for="editMedicineExpDateInput" class="form-label">Ngày hết hạn</label>
                             <input type="date" class="form-control" id="editMedicineExpDateInput" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editMedicineQuantityInput" class="form-label">Quantity</label>
+                            <label for="editMedicineQuantityInput" class="form-label">Số lượng</label>
                             <input type="number" class="form-control" id="editMedicineQuantityInput" min="0" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editMedicinePriceInput" class="form-label">Price</label>
+                            <label for="editMedicinePriceInput" class="form-label">Giá</label>
                             <input type="number" class="form-control" id="editMedicinePriceInput" min="0" step="0.01" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editMedicineWarehouseIdInput" class="form-label">Warehouse ID</label>
+                            <label for="editMedicineWarehouseIdInput" class="form-label">ID Kho</label>
                             <input type="number" class="form-control" id="editMedicineWarehouseIdInput" min="1" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
