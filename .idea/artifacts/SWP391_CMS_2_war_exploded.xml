@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="SWP391_CMS_2:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/SWP391_CMS_2_war_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="SWP391_CMS_2" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="SWP391_CMS_2/web/Web" />
+    </root>
+  </artifact>
+</component>

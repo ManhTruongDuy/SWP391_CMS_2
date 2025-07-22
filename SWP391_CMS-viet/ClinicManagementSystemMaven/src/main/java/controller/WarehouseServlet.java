@@ -1,68 +1,149 @@
 package controller;
-
+//aa
 import com.google.gson.Gson;
-
+import com.google.gson.GsonBuilder;
+import dao.WarehouseDAO;
+import model.MedicineWarehouse;
+import model.Warehouse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
-import model.Medicine;
-import dao.WarehouseDAO;
-
-
-import java.io.BufferedReader;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
-@WebServlet("/api/medicine")
+@WebServlet("/api/warehouse/*")
 public class WarehouseServlet extends HttpServlet {
-    private WarehouseDAO dao = new WarehouseDAO();
-    private Gson gson = new Gson();
+    private final WarehouseDAO warehouseDAO = new WarehouseDAO();
+    Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+            .create();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        String action = req.getParameter("action");
-        String keyword = req.getParameter("q");
-        int page = parseInt(req.getParameter("page"), 1);
-        int limit = parseInt(req.getParameter("limit"), 10);
-        int offset = (page - 1) * limit;
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    }
 
-        List<Medicine> data;
-        if ("search".equalsIgnoreCase(action) && keyword != null) {
-            data = dao.searchMedicines(keyword, limit, offset);
-        } else if ("expired".equalsIgnoreCase(action)) {
-            data = dao.getExpiredMedicines();
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null && !pathInfo.equals("/")) {
+            String[] pathParts = pathInfo.substring(1).split("/");
+            if (pathParts.length == 1) {
+                try {
+                    int id = Integer.parseInt(pathParts[0]);
+                    Warehouse warehouse = warehouseDAO.getWarehouseById(id);
+                    if (warehouse != null) {
+                        resp.getWriter().write(gson.toJson(warehouse));
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        resp.getWriter().write("{\"error\":\"Warehouse not found\"}");
+                    }
+                } catch (NumberFormatException e) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().write("{\"error\":\"Invalid ID\"}");
+                }
+            } else if (pathParts.length == 2 && pathParts[1].equals("medicines")) {
+                try {
+                    int id = Integer.parseInt(pathParts[0]);
+                    List<MedicineWarehouse> medicines = warehouseDAO.getMedicinesByWarehouseId(id);
+                    System.out.println("Medicines fetched for warehouse " + id + ": " + medicines);
+                    resp.getWriter().write(gson.toJson(medicines));
+                } catch (NumberFormatException e) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().write("{\"error\":\"Invalid ID\"}");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    resp.getWriter().write("{\"error\":\"Failed to fetch medicines: " + e.getMessage() + "\"}");
+                }
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.getWriter().write("{\"error\":\"Invalid endpoint\"}");
+            }
         } else {
-            data = dao.listMedicines(limit, offset);
+            try {
+                resp.getWriter().write(gson.toJson(warehouseDAO.getAllWarehouses()));
+            } catch (Exception e) {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.getWriter().write("{\"error\":\"Failed to fetch warehouses\"}");
+            }
         }
-        String json = gson.toJson(data);
-        resp.getWriter().write(json);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader reader = req.getReader()) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-        }
-        try {
-            Medicine med = gson.fromJson(sb.toString(), Medicine.class);
-            boolean success = dao.addMedicine(med);
-            resp.getWriter().write("{\"success\": " + success + "}");
-        } catch (Exception e) {
-            resp.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
+        Warehouse warehouse = gson.fromJson(req.getReader(), Warehouse.class);
+        Warehouse addedWarehouse = warehouseDAO.addWarehouse(warehouse);
+        if (addedWarehouse != null) {
+            resp.getWriter().write(gson.toJson(addedWarehouse));
+        } else {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write("{\"error\":\"Failed to add warehouse\"}");
         }
     }
 
-    private int parseInt(String val, int defaultVal) {
-        try {
-            return Integer.parseInt(val);
-        } catch (Exception e) {
-            return defaultVal;
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null && !pathInfo.equals("/")) {
+            try {
+                int id = Integer.parseInt(pathInfo.substring(1));
+                Warehouse warehouse = gson.fromJson(req.getReader(), Warehouse.class);
+                warehouse.setId(id);
+                if (warehouseDAO.updateWarehouse(warehouse)) {
+                    resp.getWriter().write(gson.toJson(warehouse));
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    resp.getWriter().write("{\"error\":\"Warehouse not found\"}");
+                }
+            } catch (NumberFormatException e) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().write("{\"error\":\"Invalid ID\"}");
+            }
+        } else {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"error\":\"ID required for update\"}");
         }
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null && !pathInfo.equals("/")) {
+            try {
+                int id = Integer.parseInt(pathInfo.substring(1));
+                if (warehouseDAO.deleteWarehouse(id)) {
+                    resp.getWriter().write("{\"message\":\"Warehouse deleted\"}");
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    resp.getWriter().write("{\"error\":\"Warehouse not found\"}");
+                }
+            } catch (NumberFormatException e) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().write("{\"error\":\"Invalid ID\"}");
+            }
+        } else {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write("{\"error\":\"ID required for deletion\"}");
+        }
+    }
+
+    @Override
+    public void init() throws ServletException {
+        System.out.println("WarehouseServlet initialized successfully");
+    }
+
+
 }

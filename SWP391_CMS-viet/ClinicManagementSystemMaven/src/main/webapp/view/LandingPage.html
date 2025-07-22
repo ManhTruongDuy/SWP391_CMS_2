@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KiviCare Clinic And Patient Management Dashboard</title>
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="./assets/images/favicon.ico" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Styles -->
+  <style>
+    .navbar {
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .navbar-brand img {
+      height: 40px;
+    }
+
+    .navbar-nav .nav-link {
+      color: #333;
+      margin: 0 10px;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link.active {
+      color: #007bff;
+    }
+
+    .navbar-nav .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: #007bff;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover::after,
+    .navbar-nav .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .btn-custom {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .hero-image {
+      background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .specialist-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 991px) {
+      .navbar-nav .btn {
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+
+
+<!-- Header -->
+<header class="bg-white shadow-md">
+  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+    <a class="navbar-brand" href="LandingPage.html">
+      <img src="./assets/images/logo.png" class="img-fluid" alt="logo">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <nav class="hidden md:flex space-x-6">
+      <a href="About.html" class="text-gray-700 hover:text-blue-600 transition py-2">Giới thiệu</a>
+      <a href="Help.html" class="text-gray-700 hover:text-blue-600 transition py-2">Trợ giúp</a>
+      <a href="accountpharmacist/Login.jsp" class="btn btn-primary btn-custom">Đăng nhập</a>
+      <a href="register.html" class="btn btn-outline-primary btn-custom ms-2">Đăng ký</a>
+    </nav>
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+    <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+      <a href="About.html" class="text-gray-700 hover:text-blue-600 transition py-2">Giới thiệu</a>
+      <a href="Help.html" class="text-gray-700 hover:text-blue-600 transition py-2">Trợ giúp</a>
+      <a href="accountpharmacist/Login.jsp" class="btn btn-primary btn-custom">Đăng nhập</a>
+      <a href="register.html" class="btn btn-outline-primary btn-custom ms-2">Đăng ký</a>
+    </div>
+  </div>
+</header>
+
+<!-- Hero Section -->
+<section class="hero-image text-white py-20 md:py-32">
+  <div class="container text-center px-4">
+    <h1 class="text-4xl md:text-5xl font-bold mb-6">Dịch vụ cung cấp thuốc và khám lâm sàng chất lượng cao</h1>
+    <p class="text-xl mb-8 max-w-2xl mx-auto">Cung cấp thuốc và tư vấn sử dụng thuốc an toàn, hiệu quả cho bệnh nhân</p>
+    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+      <a href="#contact" class="btn btn-light btn-lg rounded-pill text-primary border">Liên hệ ngay</a>
+    </div>
+  </div>
+</section>
+
+<!-- Specialist Section -->
+<div class="container my-5">
+  <h3 class="mb-4 fw-bold">Dịch vụ nổi bật</h3>
+  <div class="row text-center">
+    <!-- Card 1 -->
+    <div class="col-md-3 mb-4">
+      <div class="card specialist-card h-100">
+        <div class="card-body">
+          <div class="mb-3">
+            <i class="fas fa-virus fa-2x text-primary"></i>
+          </div>
+          <h5 class="card-title">Xét nghiệm Covid-19 </h5>
+          <p class="card-text">Xét nghiệm Covid nhanh chóng, an toàn và tiện lợi, đảm bảo độ chính xác cao.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Card 2 -->
+    <div class="col-md-3 mb-4">
+      <div class="card specialist-card h-100">
+        <div class="card-body">
+          <div class="mb-3">
+            <i class="fas fa-lungs fa-2x text-primary"></i>
+          </div>
+          <h5 class="card-title">Khám tim phổi</h5>
+          <p class="card-text">Dịch vụ khám tim phổi chất lượng cao với nhiều ưu đãi cho người già và trẻ nhỏ.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Card 3 -->
+    <div class="col-md-3 mb-4">
+      <div class="card specialist-card h-100">
+        <div class="card-body">
+          <div class="mb-3">
+            <i class="fas fa-capsules fa-2x text-primary"></i>
+          </div>
+          <h5 class="card-title">Thực phẩm chức năng</h5>
+          <p class="card-text">Cung cấp các thực phẩm chức năng nhập khẩu chất lượng cao để năng cao sức khỏe của bạn.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Card 4 -->
+    <div class="col-md-3 mb-4">
+      <div class="card specialist-card h-100">
+        <div class="card-body">
+          <div class="mb-3">
+            <i class="fas fa-brain fa-2x text-primary"></i>
+          </div>
+          <h5 class="card-title">Tư vấn tâm lý</h5>
+          <p class="card-text">Chăm sóc sức khỏe tâm lý của bạn với các chuyên gia hàng đầu Vệt Nam.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Medicines Section -->
+<section id="medicines" class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-gray-800 mb-4">Thuốc thường dùng</h2>
+      <div class="w-20 h-1 bg-blue-600 mx-auto"></div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Medicine Card 1 -->
+      <div class="medicine-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 transition duration-300">
+        <div class="relative">
+          <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1130&q=80" alt="Thuốc kháng sinh" class="w-full h-48 object-cover">
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold text-xl mb-2 text-gray-800">Amoxicillin 500mg</h3>
+          <p class="text-gray-600 mb-3">Kháng sinh điều trị nhiễm khuẩn</p>
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-blue-600">45.000đ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medicine Card 2 -->
+      <div class="medicine-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 transition duration-300">
+        <div class="relative">
+          <img src="./assets/images/landing_med2.jpg" alt="Thuốc giảm đau" class="w-full h-48 object-cover">
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold text-xl mb-2 text-gray-800">Paracetamol 500mg</h3>
+          <p class="text-gray-600 mb-3">Hạ sốt, giảm đau thông thường</p>
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-blue-600">15.000đ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medicine Card 3 -->
+      <div class="medicine-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 transition duration-300">
+        <div class="relative">
+          <img src="./assets/images/landing_med3.jfif" alt="Thuốc kháng viêm" class="w-full h-48 object-cover">
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold text-xl mb-2 text-gray-800">Ibuprofen 400mg</h3>
+          <p class="text-gray-600 mb-3">Kháng viêm, giảm đau không steroid</p>
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-blue-600">35.000đ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="py-16 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="flex flex-col lg:flex-row items-center">
+      <div class="lg:w-1/2 mb-10 lg:mb-0 lg:pr-10">
+        <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Phòng Dược" class="rounded-lg shadow-lg w-full">
+      </div>
+
+      <div class="lg:w-1/2">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Về phòng khám chúng tôi</h2>
+        <p class="text-gray-600 mb-4">Phòng khám tư nhân KiviCare là đơn vị cung cấp dịch vụ dược lâm sàng chất lượng cao, đáp ứng nhu cầu điều trị của bệnh nhân với tiêu chuẩn quốc tế.</p>
+        <p class="text-gray-600 mb-6">Chúng tôi cam kết cung cấp thuốc đảm bảo chất lượng, nguồn gốc rõ ràng và hướng dẫn sử dụng thuốc an toàn, hiệu quả cho người bệnh.</p>
+
+        <div class="space-y-4">
+          <div class="flex items-start">
+            <div class="bg-blue-100 p-2 rounded-full mr-4">
+              <i class="fas fa-check-circle text-blue-600"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-800">Đội ngũ dược sĩ chuyên môn cao</h4>
+              <p class="text-gray-600">100% dược sĩ có trình độ đại học trở lên, nhiều kinh nghiệm lâm sàng</p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <div class="bg-blue-100 p-2 rounded-full mr-4">
+              <i class="fas fa-check-circle text-blue-600"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-800">Hệ thống quản lý thuốc hiện đại</h4>
+              <p class="text-gray-600">Ứng dụng công nghệ thông tin trong quản lý, kiểm soát chất lượng thuốc</p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <div class="bg-blue-100 p-2 rounded-full mr-4">
+              <i class="fas fa-check-circle text-blue-600"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-800">Dịch vụ tận tâm</h4>
+              <p class="text-gray-600">Luôn sẵn sàng hỗ trợ và giải đáp mọi thắc mắc về thuốc cho bệnh nhân</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Map Section -->
+<div class="h-96 w-full">
+  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.123456789012!2d106.12345678901234!3d10.123456789012345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDA3JzI0LjQiTiAxMDbCsDA3JzI0LjQiRQ!5e0!3m2!1svi!2s!4v1234567890123!5m2!1svi!2s" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-12">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <div class="flex items-center space-x-2 mb-4">
+          <i class="fas fa-pills text-blue-400 text-2xl"></i>
+          <h3 class="text-xl font-bold">PHÒNG DƯỢC</h3>
+        </div>
+        <p class="text-gray-400">Cung cấp dịch vụ dược lâm sàng chất lượng cao, đáp ứng nhu cầu điều trị của bệnh nhân với tiêu chuẩn quốc tế.</p>
+      </div>
+
+      <div>
+        <h4 class="text-lg font-semibold mb-4">Liên kết nhanh</h4>
+        <ul class="space-y-2">
+          <div class="flex items-center space-x-2 mb-4">
+            <a href="About.html" class="text-gray-400 hover:text-white transition py-2">Giới thiệu</a>
+          </div>
+          <div class="flex items-center space-x-2 mb-4">
+            <a href="#services" class="text-gray-400 hover:text-white transition py-2">Dịch vụ</a>
+          </div>
+          <div class="flex items-center space-x-2 mb-4">
+            <a href="Help.html" class="text-gray-400 hover:text-white transition py-2">Trợ giúp</a>
+          </div>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-lg font-semibold mb-4">Thông tin liên hệ</h4>
+        <ul class="space-y-2">
+          <div class="space-y-5">
+            <div class="flex items-start">
+              <div class="bg-blue-100 p-3 rounded-full mr-4">
+                <i class="fas fa-map-marker-alt text-blue-600"></i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-200">Địa chỉ</h4>
+                <p class="text-gray-400">Tầng 1, Tòa nhà A, Bệnh viện Đa khoa Quốc tế, 123 Đường ABC, Quận XYZ, TP.HCM</p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <div class="bg-blue-100 p-3 rounded-full mr-4">
+                <i class="fas fa-phone-alt text-blue-600"></i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-200">Điện thoại</h4>
+                <p class="text-gray-400">(012) 1234 5678</p>
+                <p class="text-gray-400">Hotline: 0901 234 567</p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <div class="bg-blue-100 p-3 rounded-full mr-4">
+                <i class="fas fa-envelope text-blue-600"></i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-200">Email</h4>
+                <p class="text-gray-400">phongduoc@bvquocte.vn</p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <div class="bg-blue-100 p-3 rounded-full mr-4">
+                <i class="fas fa-clock text-blue-600"></i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-200">Giờ làm việc</h4>
+                <p class="text-gray-400">Thứ 2 - Thứ 7: 7h30 - 17h30</p>
+                <p class="text-gray-400">Chủ nhật: 8h00 - 12h00</p>
+              </div>
+            </div>
+          </div>
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+  // Mobile menu toggle
+  document.getElementById('mobile-menu-button').addEventListener('click', function() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
+  });
+
+  // FAB toggle
+  document.getElementById('fab-main').addEventListener('click', function() {
+    const options = document.getElementById('fab-options');
+    options.classList.toggle('hidden');
+  });
+
+  // Smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth'
+        });
+
+        // Close mobile menu if open
+        if (!document.getElementById('mobile-menu').classList.contains('hidden')) {
+          document.getElementById('mobile-menu').classList.add('hidden');
+        }
+      }
+    });
+  });
+</script>
+
+</body>
+
+</html>

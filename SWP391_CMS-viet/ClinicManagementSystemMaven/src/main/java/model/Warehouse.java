@@ -1,5 +1,5 @@
 package model;
-
+//asd
 public class Warehouse {
     private int id;
     private String name;
