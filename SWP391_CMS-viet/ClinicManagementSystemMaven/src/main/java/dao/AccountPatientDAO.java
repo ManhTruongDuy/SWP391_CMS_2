@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccountPatientDAO extends DBContext {
-
     /* ---------------- GET ALL ---------------- */
     public List<AccountPatient> getAllAccount() {
         List<AccountPatient> listAccount = new ArrayList<>();

@@ -1,122 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ArtifactsWorkspaceSettings">
-    <artifacts-to-build>
-      <artifact name="ClinicManagementSystem:war exploded" />
-    </artifacts-to-build>
-  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1a732c4d-0a4a-4c87-9b47-500c54fb2c88" name="Changes" comment="changed about and help">
+    <list default="true" id="4361ac0e-71eb-4ece-b677-6e80dd541e6b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/About.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/About.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Help.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Help.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/LandingPage.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/LandingPage.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Medicine.html" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/Medicine.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/ClinicManagementSystemMaven.iml" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/ClinicManagementSystemMaven.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SWP391_CMS_2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS_2.iml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Jsp File" />
-        <option value="Class" />
-        <option value="HTML File" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="manh" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
     &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;WallOfFloof&quot;
+    &quot;assignee&quot;: &quot;ManhTruongDuy&quot;
   }
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/ManhTruongDuy/SWP391_CMS_2.git&quot;,
-    &quot;accountId&quot;: &quot;ff022fc0-c8ef-4468-bf5f-a99391d3ee32&quot;
+    &quot;accountId&quot;: &quot;f7d8ddd9-39f5-4b20-8068-f0b811122028&quot;
   }
 }</component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
-  <component name="LogFilters">
-    <option name="FILTER_ERRORS" value="false" />
-    <option name="FILTER_WARNINGS" value="false" />
-    <option name="FILTER_INFO" value="true" />
-    <option name="FILTER_DEBUG" value="true" />
-    <option name="CUSTOM_FILTER" />
-  </component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 7
+  &quot;associatedIndex&quot;: 5
 }</component>
-  <component name="ProjectId" id="2zIXuE66T6a4TrW5Ctwuc6uetjk" />
+  <component name="ProjectId" id="30C8YlzLiML1vqu5ji03SGqFbGb" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;JavaScript Debug.LandingPage.html.executor&quot;: &quot;Run&quot;,
-    &quot;JavaScript Debug.Warehouse.html.executor&quot;: &quot;Run&quot;,
-    &quot;JavaScript Debug.pharmacist.html.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Tomcat Server.LandingPage.jsp.executor&quot;: &quot;Run&quot;,
-    &quot;Tomcat Server.Tomcat 10.1.42.executor&quot;: &quot;Run&quot;,
-    &quot;Tomcat Server.index.jsp.executor&quot;: &quot;Run&quot;,
+    &quot;Tomcat Server.Tomcat 10.executor&quot;: &quot;Run&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/admin/IdeaProjects/SWP391_CMS_2/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/ManhTD/IdeaProjects/SWP391_CMS_2/src/Main.java&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.35172415&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.build&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
-  },
-  &quot;keyToStringList&quot;: {
-    &quot;ChangesTree.GroupingKeys&quot;: [
-      &quot;directory&quot;,
-      &quot;module&quot;,
-      &quot;repository&quot;
-    ]
   }
 }</component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\admin\IdeaProjects\SWP391_CMS_2\SWP391_CMS-viet\ClinicManagementSystemMaven\src\main\webapp\view" />
-    </key>
-  </component>
   <component name="RunManager">
-    <configuration name="Tomcat 10.1.42" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.42" ALTERNATIVE_JRE_ENABLED="false" nameIsGenerated="true">
+    <configuration default="true" type="JetRunConfigurationType">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Tomcat 10" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10" ALTERNATIVE_JRE_ENABLED="false" nameIsGenerated="true">
       <option name="UPDATING_POLICY" value="restart-server" />
       <deployment>
-        <artifact name="ClinicManagementSystem:war exploded">
+        <artifact name="SWP391_CMS_2:war exploded">
           <settings>
-            <option name="CONTEXT_PATH" value="/ClinicManagementSystem_war_exploded" />
+            <option name="CONTEXT_PATH" value="/SWP391_CMS_2_war_exploded" />
           </settings>
         </artifact>
       </deployment>
       <server-settings>
-        <option name="BASE_DIRECTORY_NAME" value="64721c42-97c1-4df9-ba78-63ddc2e8d461" />
+        <option name="BASE_DIRECTORY_NAME" value="abc64590-a1e6-481b-8f41-1a05dd51bee7" />
       </server-settings>
       <predefined_log_file enabled="true" id="Tomcat" />
       <predefined_log_file enabled="true" id="Tomcat Catalina" />
@@ -124,7 +101,7 @@
       <predefined_log_file id="Tomcat Host Manager" />
       <predefined_log_file id="Tomcat Localhost Access" />
       <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="60216" />
+        <option name="DEBUG_PORT" value="12305" />
       </RunnerSettings>
       <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
         <option name="USE_ENV_VARIABLES" value="true" />
@@ -189,7 +166,7 @@
       <method v="2">
         <option name="Make" enabled="true" />
         <option name="BuildArtifacts" enabled="true">
-          <artifact name="ClinicManagementSystem:war exploded" />
+          <artifact name="SWP391_CMS_2:war exploded" />
         </option>
       </method>
     </configuration>
@@ -204,147 +181,30 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="1a732c4d-0a4a-4c87-9b47-500c54fb2c88" name="Changes" comment="" />
-      <created>1751419781792</created>
+      <changelist id="4361ac0e-71eb-4ece-b677-6e80dd541e6b" name="Changes" comment="" />
+      <created>1753120244833</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1751419781792</updated>
-      <workItem from="1751419783020" duration="1338000" />
-      <workItem from="1751421400972" duration="965000" />
-      <workItem from="1751426138368" duration="11191000" />
-      <workItem from="1751469898386" duration="144000" />
-      <workItem from="1751470069755" duration="3913000" />
-      <workItem from="1751474030993" duration="5306000" />
-      <workItem from="1751506228804" duration="993000" />
-      <workItem from="1751512270709" duration="328000" />
-      <workItem from="1751513068359" duration="3817000" />
-      <workItem from="1751517238608" duration="9441000" />
-      <workItem from="1751597232139" duration="1400000" />
-      <workItem from="1751598724309" duration="1351000" />
-      <workItem from="1751904352109" duration="10424000" />
-      <workItem from="1752071710298" duration="1959000" />
-      <workItem from="1752081709997" duration="2222000" />
-      <workItem from="1752090234516" duration="1095000" />
-      <workItem from="1752093978346" duration="2992000" />
-      <workItem from="1752097080732" duration="992000" />
-      <workItem from="1752130669177" duration="4540000" />
-      <workItem from="1752210519122" duration="7013000" />
-      <workItem from="1752250616180" duration="1213000" />
-      <workItem from="1752299181318" duration="2757000" />
-      <workItem from="1752316396843" duration="4677000" />
-      <workItem from="1752336191860" duration="4956000" />
-      <workItem from="1752410136246" duration="8669000" />
-      <workItem from="1752492812306" duration="87000" />
-      <workItem from="1752492924159" duration="2456000" />
-      <workItem from="1752540276527" duration="2249000" />
-      <workItem from="1752641770095" duration="375000" />
-      <workItem from="1752643143395" duration="357000" />
+      <updated>1753120244833</updated>
+      <workItem from="1753120246337" duration="482000" />
+      <workItem from="1753120860727" duration="584000" />
+      <workItem from="1753124825209" duration="362000" />
+      <workItem from="1753125208807" duration="7000" />
     </task>
-    <task id="LOCAL-00001" summary="added admin and system admin functions">
-      <option name="closed" value="true" />
-      <created>1751514111689</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1751514111689</updated>
-    </task>
-    <task id="LOCAL-00002" summary="added admin and system admin functions">
-      <option name="closed" value="true" />
-      <created>1752095256438</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1752095256438</updated>
-    </task>
-    <task id="LOCAL-00003" summary="added admin and system admin functions">
-      <option name="closed" value="true" />
-      <created>1752095421942</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1752095421942</updated>
-    </task>
-    <task id="LOCAL-00004" summary="added admin and system admin functions">
-      <option name="closed" value="true" />
-      <created>1752218191622</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1752218191623</updated>
-    </task>
-    <task id="LOCAL-00005" summary="added admin and system admin functions">
-      <option name="closed" value="true" />
-      <created>1752218241587</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1752218241587</updated>
-    </task>
-    <task id="LOCAL-00006" summary="added admin and system admin functions">
-      <option name="closed" value="true" />
-      <created>1752306422055</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1752306422055</updated>
-    </task>
-    <task id="LOCAL-00007" summary="more page added">
-      <option name="closed" value="true" />
-      <created>1752306631488</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1752306631488</updated>
-    </task>
-    <task id="LOCAL-00008" summary="implement all views and searches for system admin, starting work on admin">
-      <option name="closed" value="true" />
-      <created>1752422837041</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1752422837041</updated>
-    </task>
-    <task id="LOCAL-00009" summary="add all views for manager">
-      <option name="closed" value="true" />
-      <created>1752502437009</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1752502437009</updated>
-    </task>
-    <task id="LOCAL-00010" summary="fixed page links">
-      <option name="closed" value="true" />
-      <created>1752540502827</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1752540502828</updated>
-    </task>
-    <task id="LOCAL-00011" summary="changed about and help">
-      <option name="closed" value="true" />
-      <created>1752541953860</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1752541953860</updated>
-    </task>
-    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="added admin and system admin functions" />
-    <MESSAGE value="more page added" />
-    <MESSAGE value="implement all views and searches for system admin, starting work on admin" />
-    <MESSAGE value="add all views for manager" />
-    <MESSAGE value="fixed page links" />
-    <MESSAGE value="changed about and help" />
-    <option name="LAST_COMMIT_MESSAGE" value="changed about and help" />
-  </component>
-  <component name="XSLT-Support.FileAssociations.UIState">
-    <expand />
-    <select />
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Main.java</url>
+          <line>11</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

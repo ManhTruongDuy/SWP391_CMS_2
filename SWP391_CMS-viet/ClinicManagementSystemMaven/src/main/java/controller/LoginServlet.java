@@ -38,7 +38,6 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-
         if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             request.setAttribute("err", "Email and Password cannot be empty");
             request.getRequestDispatcher("/view/accountpharmacist/Login.jsp").forward(request, response);
@@ -69,10 +68,12 @@ public class LoginServlet extends HttpServlet {
         AccountStaff staff = staffDao.getAccountByEmailAndPassword(email, password);
         if (staff != null) {
             if (!"Enable".equalsIgnoreCase(staff.getStatus())) {
+
                 request.setAttribute("err", "Your account is locked.");
                 request.getRequestDispatcher("/view/accountpharmacist/Login.jsp").forward(request, response);
                 return;
             }
+
 
             session.setAttribute("account", staff);
             session.setAttribute("userType", "staff");
@@ -101,14 +102,17 @@ public class LoginServlet extends HttpServlet {
         AccountPatient patient = patientDao.getAccountByEmailAndPassword(email, password);
         if (patient != null) {
             if (!"Enable".equalsIgnoreCase(patient.getStatus())) {
+
                 request.setAttribute("err", "Your account is locked.");
                 request.getRequestDispatcher("/view/accountpharmacist/Login.jsp").forward(request, response);
                 return;
             }
 
+
             session.setAttribute("account", patient);
             session.setAttribute("userType", "patient");
             session.setAttribute("role", "Patient");
+
             response.sendRedirect("home");
             return;
         }
