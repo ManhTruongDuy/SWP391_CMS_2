@@ -27,7 +27,6 @@ public class SysAdminServlet extends HttpServlet {
                 case "managers"    -> out.print(gson.toJson(dao.getAllManagers()));
                 case "sys-admins"  -> out.print(gson.toJson(dao.getAllSysAdmins()));
                 case "patients"    -> out.print(gson.toJson(dao.getAllPatients()));
-                case "wManager"    -> out.print(gson.toJson(dao.getAllWarehouseManagers()));
                 case "doctorid"    -> {
                     String idParam = request.getParameter("id");
                     if (idParam == null || idParam.trim().isEmpty()) {
@@ -53,7 +52,7 @@ public class SysAdminServlet extends HttpServlet {
                     String idParam = request.getParameter("id");
                     if (idParam == null || idParam.trim().isEmpty()) {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.print("{\"error\":\"Manager ID is missing\"}");
+                        out.print("{\"error\":\"Doctor ID is missing\"}");
                         return;
                     }
                     try {
@@ -133,27 +132,61 @@ public class SysAdminServlet extends HttpServlet {
                         out.print("{\"error\":\"Invalid System admin ID format\"}");
                     }
                 }
-                case "wManagerid"    -> {
-                    String idParam = request.getParameter("id");
-                    if (idParam == null || idParam.trim().isEmpty()) {
+
+                case "sysadminname" -> {
+                    String nameParam = request.getParameter("name");
+                    if (nameParam == null || nameParam.trim().isEmpty()) {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.print("{\"error\":\"Warehouse manager ID is missing\"}");
+                        out.print("{\"error\":\"System admin name is missing\"}");
                         return;
                     }
-                    try {
-                        int wManagerId = Integer.parseInt(idParam);
-                        Object wManager = dao.getSysAdminById(wManagerId);
-                        if (wManager == null) {
-                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                            out.print("{\"error\":\"Warehouse manager not found\"}");
-                        } else {
-                            out.print(gson.toJson(wManager));
-                        }
-                    } catch (NumberFormatException e) {
-                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.print("{\"error\":\"Invalid Warehouse manager ID format\"}");
-                    }
+                    var list = dao.getSysAdminsByName(nameParam);
+                    out.print(gson.toJson(list));
                 }
+                case "doctorname" -> {
+                    String nameParam = request.getParameter("name");
+                    if (nameParam == null || nameParam.trim().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Doctor name is missing\"}");
+                        return;
+                    }
+                    var list = dao.getDoctorsByName(nameParam);
+                    out.print(gson.toJson(list));
+                }
+
+                case "managername" -> {
+                    String nameParam = request.getParameter("name");
+                    if (nameParam == null || nameParam.trim().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Manager name is missing\"}");
+                        return;
+                    }
+                    var list = dao.getManagersByName(nameParam);
+                    out.print(gson.toJson(list));
+                }
+
+                case "patientname" -> {
+                    String nameParam = request.getParameter("name");
+                    if (nameParam == null || nameParam.trim().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Patient name is missing\"}");
+                        return;
+                    }
+                    var list = dao.getPatientsByName(nameParam);
+                    out.print(gson.toJson(list));
+                }
+
+                case "pharmacistname" -> {
+                    String nameParam = request.getParameter("name");
+                    if (nameParam == null || nameParam.trim().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Pharmacist name is missing\"}");
+                        return;
+                    }
+                    var list = dao.getPharmacistsByName(nameParam);
+                    out.print(gson.toJson(list));
+                }
+
                 default -> {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     out.print("{\"error\":\"Unknown or missing action\"}");
@@ -167,6 +200,54 @@ public class SysAdminServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "POST not supported.");
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        String action = req.getParameter("action");
+
+        if ("toggle-status".equalsIgnoreCase(action)) {
+            try (var reader = req.getReader(); PrintWriter out = resp.getWriter()) {
+                var body = gson.fromJson(reader, java.util.Map.class);
+
+                String role = (String) body.get("role");
+                String status = (String) body.get("status");
+
+                if (role == null || status == null || !body.containsKey("id")) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"error\":\"Missing required fields (id, role, status)\"}");
+                    return;
+                }
+
+                int id = ((Double) body.get("id")).intValue();  // Gson parses numbers as Double
+                boolean result = false;
+
+                switch (role) {
+                    case "SysAdmin" -> result = dao.updateSysAdminStatus(id, status);
+                    case "Doctor" -> result = dao.updateDoctorStatus(id, status);
+                    case "BusinessAdmin" -> result = dao.updateBusinessAdminStatus(id, status);
+                    case "Pharmacist" -> result = dao.updatePharmacistStatus(id, status);
+                    case "Patient" -> result = dao.updatePatientStatus(id, status);
+                    default -> {
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Invalid role type\"}");
+                        return;
+                    }
+                }
+
+                if (result) {
+                    out.print("{\"message\":\"Cập nhật trạng thái thành công\"}");
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.print("{\"error\":\"Không thể cập nhật trạng thái\"}");
+                }
+
+            } catch (Exception e) {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+            }
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid or missing action");
+        }
     }
+
 }

@@ -1,12 +1,14 @@
 package model;
 
 public class AccountPharmacist {
- private int account_pharmacist_id;
- private String username;
- private String password;
- private String email;
- private String status;
- private String img;
+
+    private int account_pharmacist_id;
+    private String username;
+    private String password;
+    private String email;
+    private String status;
+    private String img;
+
 
     public AccountPharmacist() {
     }
@@ -69,4 +71,6 @@ public class AccountPharmacist {
     }
 
 
+
 }
+

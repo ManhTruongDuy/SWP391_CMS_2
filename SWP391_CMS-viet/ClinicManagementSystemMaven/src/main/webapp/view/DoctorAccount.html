@@ -202,7 +202,7 @@
         <!-- Desktop Menu -->
         <div class="hidden md:flex space-x-8">
             <a href="AdminDashboard.html" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Trang chủ</a>
-            <a href="#profile" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
+            <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Profile.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
             <a href="#logout" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Đăng xuất</a>
         </div>
 
@@ -217,7 +217,7 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="md:hidden hidden bg-blue-700 p-6 rounded-b-lg shadow-lg">
         <a href="SysAdminDashboard.html" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Trang chủ</a>
-        <a href="#profile" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Hồ sơ</a>
+        <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Profile.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
         <a href="#logout" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Đăng xuất</a>
     </div>
 </nav>
@@ -247,7 +247,10 @@
             <div class="search-container">
                 <input type="text" id="doctor-id-search" placeholder="Nhập ID bác sĩ" class="form-control">
                 <button id="search-btn" class="btn">Tìm kiếm</button>
+                <input type="text" id="doctor-name-search" placeholder="Nhập tên bác sĩ" class="form-control">
+                <button id="search-name-btn" class="btn">Tìm theo tên</button>
             </div>
+
 
             <table class="table table-bordered table-hover">
                 <thead class="table-primary">
@@ -331,13 +334,16 @@
                 <td>${doctor.password || 'N/A'}</td>
                 <td>${doctor.status || 'N/A'}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm delete-btn" data-id="${doctor.id}">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                    <button class="btn btn-info btn-sm select-btn" data-id="${doctor.id}">
-                        <i class="bi bi-eye"></i> Select
-                    </button>
-                </td>
+    <button class="btn btn-info btn-sm select-btn" data-id="${doctor.id}">
+        <i class="bi bi-eye"></i> Xem
+    </button>
+    <button class="btn btn-${doctor.status === "Enable" ? "warning" : "success"} btn-sm toggle-doctor-btn"
+            data-id="${doctor.id}"
+            data-status="${doctor.status}">
+        ${doctor.status === "Enable" ? "Vô hiệu hóa" : "Kích hoạt"}
+    </button>
+</td>
+
             `;
             tbody.appendChild(row);
 
@@ -417,6 +423,43 @@
             displayError(error.message);
         }
     }
+    // Search doctor by name
+    async function searchDoctorByName(name) {
+        try {
+            if (!name) {
+                getAllDoctors(); // nếu rỗng thì hiển thị lại tất cả
+                return;
+            }
+
+            const response = await fetch(`${baseUrl}/api/system-admin?action=doctorname&name=${encodeURIComponent(name)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error ${response.status}: ${errorText}`);
+            }
+
+            const text = await response.text();
+            if (!text) {
+                throw new Error("Phản hồi từ server rỗng");
+            }
+
+            const data = JSON.parse(text);
+            console.log('Kết quả tìm tên bác sĩ:', data);
+
+            if (!data || data.length === 0) {
+                displayError('Không tìm thấy bác sĩ nào khớp tên!');
+            } else {
+                displayDoctors(data);
+            }
+        } catch (error) {
+            console.error('Lỗi tìm theo tên:', error);
+            displayError(error.message);
+        }
+    }
+
 
     // Search bar event listener
     const searchBtn = document.getElementById('search-btn');
@@ -433,9 +476,60 @@
             searchDoctorById(doctorId);
         }
     });
+    const searchNameBtn = document.getElementById('search-name-btn');
+    const searchNameInput = document.getElementById('doctor-name-search');
+
+    searchNameBtn.addEventListener('click', () => {
+        const name = searchNameInput.value.trim();
+        searchDoctorByName(name);
+    });
+
+    searchNameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const name = searchNameInput.value.trim();
+            searchDoctorByName(name);
+        }
+    });
+
 
     // Load doctor list on page load
     getAllDoctors();
+    document.addEventListener("click", function (e) {
+        const btn = e.target.closest(".toggle-doctor-btn");
+        if (!btn) return;
+
+        const id = parseInt(btn.dataset.id);
+        const currentStatus = btn.dataset.status;
+        const newStatus = currentStatus === "Enable" ? "Disable" : "Enable";
+
+        const confirmMsg = currentStatus === "Enable"
+            ? `Bạn có chắc chắn muốn VÔ HIỆU HÓA tài khoản này không?`
+            : `Bạn có muốn KÍCH HOẠT lại tài khoản này không?`;
+
+        if (!confirm(confirmMsg)) return;
+
+        fetch(`${baseUrl}/api/system-admin?action=toggle-status`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: id,
+                role: "Doctor", // quan trọng: đúng với vai trò ở backend
+                status: newStatus
+            })
+        })
+            .then(res => {
+                if (!res.ok) return res.json().then(err => { throw new Error(err.error); });
+                return res.json();
+            })
+            .then(data => {
+                alert(data.message || "Cập nhật thành công");
+                getAllDoctors(); // cập nhật lại danh sách
+            })
+            .catch(err => {
+                alert("Lỗi: " + err.message);
+            });
+    });
+
 </script>
 </body>
 </html>

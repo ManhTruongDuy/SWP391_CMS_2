@@ -7,17 +7,20 @@ public class PharmacistAccount {
     private String email;
     private String username;
     private String password;
+    private String status;
+
 
     public PharmacistAccount() {
     }
 
-    public PharmacistAccount(int ID, String name, String mobile, String email, String username, String password) {
+    public PharmacistAccount(int ID, String name, String mobile, String email, String username, String password, String status) {
         this.ID = ID;
         this.name = name;
         this.mobile = mobile;
         this.email = email;
         this.username = username;
         this.password = password;
+        this.status = status;
     }
 
     public int getID() {
@@ -68,4 +71,11 @@ public class PharmacistAccount {
         this.password = password;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

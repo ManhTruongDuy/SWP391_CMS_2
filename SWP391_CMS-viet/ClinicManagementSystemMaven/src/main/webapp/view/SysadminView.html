@@ -218,6 +218,8 @@
       <div class="search-container">
         <input type="text" id="sysadmin-id-search" placeholder="Nhập ID quản trị viên" class="form-control">
         <button id="search-btn" class="btn">Tìm kiếm</button>
+        <input type="text" id="sysadmin-name-search" placeholder="Nhập tên quản trị viên" class="form-control">
+        <button id="search-name-btn" class="btn">Tìm theo tên</button>
       </div>
 
       <table class="table table-bordered table-hover">
@@ -396,6 +398,61 @@
     if (e.key === 'Enter') {
       const sysadminId = searchInput.value.trim();
       searchSysadminById(sysadminId);
+    }
+  });
+
+
+
+  async function searchSysadminByName(name) {
+    try {
+      if (!name) {
+        displaySysadmins(allSysadmins); // Nếu không nhập gì, hiện tất cả
+        return;
+      }
+
+      const response = await fetch(`${baseUrl}/api/system-admin?action=sysadminname&name=${encodeURIComponent(name)}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
+      }
+
+      const text = await response.text();
+      if (!text) {
+        throw new Error("Phản hồi từ máy chủ rỗng");
+      }
+
+      const data = JSON.parse(text);
+      console.log('Kết quả tìm kiếm theo tên:', data);
+
+      if (!Array.isArray(data) || data.length === 0) {
+        displayError('Không tìm thấy quản trị viên với tên này!');
+      } else {
+        displaySysadmins(data);
+      }
+    } catch (error) {
+      console.error('Lỗi tìm kiếm theo tên:', error);
+      displayError(error.message);
+    }
+  }
+
+  // Load system admin list on page load
+  // Search by name event listener
+  const searchNameBtn = document.getElementById('search-name-btn');
+  const searchNameInput = document.getElementById('sysadmin-name-search');
+
+  searchNameBtn.addEventListener('click', () => {
+    const name = searchNameInput.value.trim();
+    searchSysadminByName(name);
+  });
+
+  searchNameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      const name = searchNameInput.value.trim();
+      searchSysadminByName(name);
     }
   });
   // Load system admin list on page load

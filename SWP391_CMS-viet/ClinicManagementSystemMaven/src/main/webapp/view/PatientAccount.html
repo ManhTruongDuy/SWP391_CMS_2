@@ -202,7 +202,7 @@
         <!-- Desktop Menu -->
         <div class="hidden md:flex space-x-8">
             <a href="AdminDashboard.html" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Trang chủ</a>
-            <a href="#profile" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
+            <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Profile.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
             <a href="#logout" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Đăng xuất</a>
         </div>
 
@@ -217,7 +217,7 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="md:hidden hidden bg-blue-700 p-6 rounded-b-lg shadow-lg">
         <a href="SysAdminDashboard.html" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Trang chủ</a>
-        <a href="#profile" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Hồ sơ</a>
+        <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Profile.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
         <a href="#logout" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Đăng xuất</a>
     </div>
 </nav>
@@ -247,6 +247,8 @@
             <div class="search-container">
                 <input type="text" id="patient-id-search" placeholder="Nhập ID bệnh nhân" class="form-control">
                 <button id="search-btn" class="btn">Tìm kiếm</button>
+                <input type="text" id="patient-name-search" placeholder="Nhập tên bệnh nhân" class="form-control">
+                <button id="search-name-btn" class="btn">Tìm theo tên</button>
             </div>
 
             <table class="table table-bordered table-hover">
@@ -418,6 +420,41 @@
             displayError(error.message);
         }
     }
+    async function searchPatientByName(name) {
+        try {
+            if (!name) {
+                getAllPatients(); // Nếu không nhập, hiển thị toàn bộ
+                return;
+            }
+
+            const response = await fetch(`${baseUrl}/api/system-admin?action=patientname&name=${encodeURIComponent(name)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error ${response.status}: ${errorText}`);
+            }
+
+            const text = await response.text();
+            if (!text) {
+                throw new Error("Phản hồi từ máy chủ rỗng");
+            }
+
+            const data = JSON.parse(text);
+            console.log('Search result by name:', data);
+            if (!data || data.length === 0) {
+                displayError('Không tìm thấy bệnh nhân nào với tên này!');
+            } else {
+                displayPatients(data);
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            displayError(error.message);
+        }
+    }
+
 
     // Search bar event listener
     const searchBtn = document.getElementById('search-btn');
@@ -434,6 +471,22 @@
             searchPatientById(patientId);
         }
     });
+
+    const searchNameBtn = document.getElementById('search-name-btn');
+    const searchNameInput = document.getElementById('patient-name-search');
+
+    searchNameBtn.addEventListener('click', () => {
+        const name = searchNameInput.value.trim();
+        searchPatientByName(name);
+    });
+
+    searchNameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const name = searchNameInput.value.trim();
+            searchPatientByName(name);
+        }
+    });
+
 
     // Load patient list on page load
     getAllPatients();

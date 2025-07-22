@@ -201,7 +201,7 @@
         <!-- Desktop Menu -->
         <div class="hidden md:flex space-x-8">
             <a href="AdminDashboard.html" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Trang chủ</a>
-            <a href="#profile" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
+            <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Profile.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
             <a href="#logout" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Đăng xuất</a>
         </div>
 
@@ -216,7 +216,7 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="md:hidden hidden bg-blue-700 p-6 rounded-b-lg shadow-lg">
         <a href="SysAdminDashboard.html" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Trang chủ</a>
-        <a href="#profile" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Hồ sơ</a>
+        <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Profile.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
         <a href="#logout" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Đăng xuất</a>
     </div>
 </nav>
@@ -246,6 +246,8 @@
             <div class="search-container">
                 <input type="text" id="pharmacist-id-search" placeholder="Nhập ID dược sĩ" class="form-control">
                 <button id="search-btn" class="btn">Tìm kiếm</button>
+                <input type="text" id="pharmacist-name-search" placeholder="Nhập tên dược sĩ" class="form-control">
+                <button id="search-name-btn" class="btn">Tìm theo tên</button>
             </div>
 
             <table class="table table-bordered table-hover">
@@ -329,22 +331,26 @@
                 <td>${pharmacist.email || 'N/A'}</td>
                 <td>${pharmacist.username || 'N/A'}</td>
                 <td>${pharmacist.password || 'N/A'}</td>
+                <td>${pharmacist.status || 'N/A'}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm delete-btn" data-id="${pharmacist.id}">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                    <button class="btn btn-info btn-sm select-btn" data-id="${pharmacist.id}">
-                        <i class="bi bi-eye"></i> Chọn
-                    </button>
-                </td>
+    <button class="btn btn-info btn-sm update-btn" data-id="${pharmacist.ID}">
+      <i class="bi bi-pencil-square"></i> Cập nhật
+    </button>
+    <button class="btn btn-${pharmacist.status === "Enable" ? "warning" : "success"} btn-sm toggle-status-btn"
+            data-id="${pharmacist.ID}" data-status="${pharmacist.status}">
+      ${pharmacist.status === "Enable" ? "Vô hiệu hóa" : "Kích hoạt"}
+    </button>
+  </td>
             `;
             tbody.appendChild(row);
+
 
             if (index === 0) {
                 row.classList.add('selected');
                 selectedRow = row;
             }
         });
+        attachActionButtons();
     }
 
     // Display error message
@@ -381,6 +387,36 @@
             displayError(error.message);
         }
     }
+    async function searchPharmacistByName(name) {
+        try {
+            const response = await fetch(`${baseUrl}/api/system-admin?action=pharmacistname&name=${encodeURIComponent(name)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
+            }
+
+            const text = await response.text();
+            if (!text) {
+                throw new Error("Phản hồi từ máy chủ rỗng");
+            }
+
+            const data = JSON.parse(text);
+            console.log('Search result:', data);
+            if (!data || data.length === 0) {
+                displayError('Không tìm thấy dược sĩ với tên này');
+            } else {
+                displayPharmacists(data);
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            displayError(error.message);
+        }
+    }
+
 
     // Search for pharmacist by ID
     async function searchPharmacistById(id) {
@@ -433,9 +469,76 @@
             searchPharmacistById(pharmacistId);
         }
     });
+    const searchNameBtn = document.getElementById('search-name-btn');
+    const searchNameInput = document.getElementById('pharmacist-name-search');
+
+    searchNameBtn.addEventListener('click', () => {
+        const name = searchNameInput.value.trim().toLowerCase(); // ép lowercase
+        searchPharmacistByName(name);
+    });
+
+    searchNameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const name = searchNameInput.value.trim().toLowerCase(); // ép lowercase
+            searchPharmacistByName(name);
+        }
+    });
 
     // Load pharmacist list on page load
     getAllPharmacists();
+    function attachActionButtons() {
+        // Nút cập nhật
+        document.querySelectorAll(".update-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.id;
+                // Thực hiện điều hướng hoặc mở form cập nhật
+                window.location.href = `update-pharmacist.html?id=${id}`;
+            });
+        });
+
+        // Nút vô hiệu hóa / kích hoạt
+        document.querySelectorAll(".toggle-status-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const id = parseInt(btn.dataset.id);
+                const currentStatus = btn.dataset.status;
+                const newStatus = currentStatus === "Enable" ? "Disable" : "Enable";
+
+                // ✅ Thêm xác nhận từ người dùng
+                const confirmMsg = currentStatus === "Enable"
+                    ? "Bạn có chắc chắn muốn VÔ HIỆU HÓA tài khoản này không?"
+                    : "Bạn có muốn KÍCH HOẠT lại tài khoản này không?";
+
+                if (!confirm(confirmMsg)) return;
+
+                try {
+                    const response = await fetch(`${baseUrl}/api/system-admin?action=toggle-status`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                            status: newStatus,
+                            role: "Pharmacist"
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || "Không thể cập nhật trạng thái");
+                    }
+
+                    const result = await response.json();
+                    alert(result.message || "Đã cập nhật trạng thái thành công");
+                    getAllPharmacists(); // Tải lại danh sách
+                } catch (err) {
+                    alert("Lỗi khi cập nhật trạng thái: " + err.message);
+                }
+            });
+        });
+
+    }
+
 </script>
 </body>
 </html>
