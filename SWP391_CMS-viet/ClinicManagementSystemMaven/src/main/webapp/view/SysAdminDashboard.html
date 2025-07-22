@@ -72,44 +72,27 @@
         <div class="p-6">
             <h2 class="text-xl font-semibold text-blue-800 mb-6 tracking-wide">Kiểm soát tài khoản</h2>
             <ul class="space-y-3">
-                <li><a href="PharmacistAccount.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Dược sĩ</a></li>
-                <li><a href="DoctorAccount.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Bác sĩ</a></li>
-                <li><a href="ManagerAccount.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Quản lý</a></li>
-                <li><a href="SysAdminAccount.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Quản trị hệ thống</a></li>
-                <li><a href="PatientAccount.html" class="sidebar-link block p-3 hover:bg-blue-100 rounded-lg transition-all duration-200 ease-in-out text-blue-700 font-medium">Bệnh nhân</a></li>
+                <li><a href="PharmacistAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Dược sĩ</a></li>
+                <li><a href="DoctorAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-heart-pulse"></i> Bác sĩ</a></li>
+                <li><a href="ManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person-workspace"></i> Quản lý</a></li>
+                <li><a href="SysAdminAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-gear"></i> Quản trị hệ thống</a></li>
+                <li><a href="PatientAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person"></i> Bệnh nhân</a></li>
+                <li><a href="WarehouseManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Quản lý kho</a></li>
             </ul>
         </div>
     </aside>
 
     <!-- Content Area -->
     <main class="flex-1 p-6 md:ml-64">
-        <section id="dashboard" class="mb-8">
-            <h1 class="text-2xl font-bold text-blue-800 mb-4">Dashboard</h1>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold text-blue-600">Total Patients</h3>
-                    <p class="text-3xl font-bold text-gray-800">1,234</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold text-blue-600">Appointments Today</h3>
-                    <p class="text-3xl font-bold text-gray-800">45</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold text-blue-600">Pending Reports</h3>
-                    <p class="text-3xl font-bold text-gray-800">12</p>
-                </div>
-            </div>
-        </section>
-
         <section id="patients" class="mb-8">
-            <h2 class="text-xl font-bold text-blue-800 mb-4">Recent Patients</h2>
+            <h2 class="text-xl font-bold text-blue-800 mb-4">Những bệnh nhân gần đây</h2>
             <div class="bg-white p-6 rounded-lg shadow-md">
                 <table class="w-full text-left">
                     <thead>
                     <tr class="text-blue-600">
-                        <th class="p-2">Name</th>
+                        <th class="p-2">Tên</th>
                         <th class="p-2">ID</th>
-                        <th class="p-2">Last Visit</th>
+                        <th class="p-2">Lần khám gần nhất</th>
                     </tr>
                     </thead>
                     <tbody>

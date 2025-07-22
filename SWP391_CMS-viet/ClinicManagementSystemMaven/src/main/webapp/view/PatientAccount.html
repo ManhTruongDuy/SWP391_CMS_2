@@ -234,6 +234,7 @@
                 <li><a href="ManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person-workspace"></i> Quản lý</a></li>
                 <li><a href="SysAdminAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-gear"></i> Quản trị hệ thống</a></li>
                 <li><a href="PatientAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person"></i> Bệnh nhân</a></li>
+                <li><a href="WarehouseManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Quản lý kho</a></li>
             </ul>
         </div>
     </aside>
@@ -254,13 +255,13 @@
                 <thead class="table-primary">
                 <tr>
                     <th>ID</th>
-                    <th>Name</th>
-                    <th>Mobile</th>
+                    <th>Họ và tên</th>
+                    <th>Số điện thoại</th>
                     <th>Email</th>
-                    <th>Username</th>
-                    <th>Password</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>Tên người dùng</th>
+                    <th>Mật khẩu</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
                 </tr>
                 </thead>
                 <tbody id="patient-table-body">
@@ -318,7 +319,7 @@
 
         const patients = data;
         if (patients.length === 0) {
-            tummy.innerHTML = '<tr><td colspan="8" class="text-center">No patients found</td></tr>';
+            tummy.innerHTML = '<tr><td colspan="8" class="text-center">Không tìm thấy bệnh nhân</td></tr>';
             return;
         }
 

@@ -234,6 +234,7 @@
                 <li><a href="ManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person-workspace"></i> Quản lý</a></li>
                 <li><a href="SysAdminAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-gear"></i> Quản trị hệ thống</a></li>
                 <li><a href="PatientAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person"></i> Bệnh nhân</a></li>
+                <li><a href="WarehouseManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Quản lý kho</a></li>
             </ul>
         </div>
     </aside>
@@ -318,7 +319,7 @@
 
         const doctors = data;
         if (doctors.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No doctors found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">Không tìm thấy bác sĩ</td></tr>';
             return;
         }
 

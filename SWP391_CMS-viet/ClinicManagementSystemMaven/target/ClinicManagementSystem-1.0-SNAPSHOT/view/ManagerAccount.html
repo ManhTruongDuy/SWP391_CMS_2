@@ -309,6 +309,7 @@
 
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
     let selectedRow = null;
+    let allManagers = [];
 
     // Display managers
     function displayManagers(data) {
@@ -383,6 +384,7 @@
 
             const data = JSON.parse(text); // now safely parse
             console.log('Data received:', data);
+            allManagers = data;
             displayManagers(data);
         } catch (error) {
             console.error('Fetch error:', error);
@@ -394,7 +396,7 @@
     async function searchManagerById(id) {
         try {
             if (!id) {
-                getAllManagers(); // If no ID, show all managers
+                displayManagers(allManagers) // If no ID, show all managers
                 return;
             }
 

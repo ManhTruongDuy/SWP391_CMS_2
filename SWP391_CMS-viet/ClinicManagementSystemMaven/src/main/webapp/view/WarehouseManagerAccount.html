@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharmacist API</title>
+    <title>Warehouse Manager API</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,12 +13,12 @@
             font-family: 'Inter', sans-serif;
         }
 
-        #pharmacist-table-body tr:hover {
+        #wmanager-table-body tr:hover {
             background-color: #e0f0ff !important;
             cursor: pointer;
         }
 
-        #pharmacist-table-body tr.selected {
+        #wmanager-table-body tr.selected {
             background-color: #bfdbfe !important;
             font-weight: 500;
         }
@@ -164,6 +164,7 @@
             background-color: #2563eb;
             transform: translateY(-1px);
         }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -201,7 +202,7 @@
         <!-- Desktop Menu -->
         <div class="hidden md:flex space-x-8">
             <a href="AdminDashboard.html" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Trang chủ</a>
-            <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Profile.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
+            <a href="#profile" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
             <a href="#logout" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Đăng xuất</a>
         </div>
 
@@ -216,7 +217,7 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="md:hidden hidden bg-blue-700 p-6 rounded-b-lg shadow-lg">
         <a href="SysAdminDashboard.html" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Trang chủ</a>
-        <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Profile.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
+        <a href="#profile" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Hồ sơ</a>
         <a href="#logout" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Đăng xuất</a>
     </div>
 </nav>
@@ -241,29 +242,28 @@
     <!-- Content Area -->
     <main class="flex-1 p-6 md:ml-64">
         <div class="container mt-5">
-            <h4 class="mb-3">Danh sách dược sĩ</h4>
+            <h4 class="mb-3">Danh sách quản lý kho</h4>
 
             <div class="search-container">
-                <input type="text" id="pharmacist-id-search" placeholder="Nhập ID dược sĩ" class="form-control">
+                <input type="text" id="wmanager-id-search" placeholder="Nhập ID quản lý kho" class="form-control">
                 <button id="search-btn" class="btn">Tìm kiếm</button>
-                <input type="text" id="pharmacist-name-search" placeholder="Nhập tên dược sĩ" class="form-control">
-                <button id="search-name-btn" class="btn">Tìm theo tên</button>
             </div>
 
             <table class="table table-bordered table-hover">
                 <thead class="table-primary">
                 <tr>
                     <th>ID</th>
-                    <th>Họ và tên</th>
-                    <th>Số điện thoại</th>
+                    <th>Name</th>
+                    <th>Mobile</th>
                     <th>Email</th>
-                    <th>Tên người dùng</th>
-                    <th>Mật khẩu</th>
-                    <th>Hành động</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
-                <tbody id="pharmacist-table-body">
-                <!-- Pharmacist rows will be dynamically injected here -->
+                <tbody id="wmanager-table-body">
+                <!-- rows will be dynamically injected here -->
                 </tbody>
             </table>
         </div>
@@ -307,63 +307,60 @@
 
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
     let selectedRow = null;
-    let allPharmacists = []; // Store all pharmacists for filtering
+    let allWarehouseManager = []; // Store all manager for filtering
 
     // Display pharmacists
-    function displayPharmacists(data) {
-        const tbody = document.getElementById('pharmacist-table-body');
-        console.log('Rendering pharmacists:', data); // Debug
+    function displayWarehouseManagers(data) {
+        const tbody = document.getElementById('wmanager-table-body');
+        console.log('Rendering warehouse managers:', data); // Debug
         tbody.innerHTML = '';
         selectedRow = null;
 
-        const pharmacists = Array.isArray(data) ? data : [data];
-        if (pharmacists.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Không tìm thấy dược sĩ</td></tr>';
+        const wManagers = Array.isArray(data) ? data : [data];
+        if (wManagers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Không tìm thấy quản lý kho</td></tr>';
             return;
         }
 
-        pharmacists.forEach((pharmacist, index) => {
+        wManagers.forEach((wManager, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${pharmacist.ID ?? 'N/A'}</td>
-                <td>${pharmacist.name || 'N/A'}</td>
-                <td>${pharmacist.mobile || 'N/A'}</td>
-                <td>${pharmacist.email || 'N/A'}</td>
-                <td>${pharmacist.username || 'N/A'}</td>
-                <td>${pharmacist.password || 'N/A'}</td>
-                <td>${pharmacist.status || 'N/A'}</td>
+                <td>${wManager.Warehouse_manager_id ?? 'N/A'}</td>
+                <td>${wManager.full_name || 'N/A'}</td>
+                <td>${wManager.phone || 'N/A'}</td>
+                <td>${wManager.email || 'N/A'}</td>
+                <td>${wManager.username || 'N/A'}</td>
+                <td>${wManager.password || 'N/A'}</td>
+                <td>${wManager.status || 'N/A'}</td>
                 <td>
-    <button class="btn btn-info btn-sm update-btn" data-id="${pharmacist.ID}">
-      <i class="bi bi-pencil-square"></i> Cập nhật
-    </button>
-    <button class="btn btn-${pharmacist.status === "Enable" ? "warning" : "success"} btn-sm toggle-status-btn"
-            data-id="${pharmacist.ID}" data-status="${pharmacist.status}">
-      ${pharmacist.status === "Enable" ? "Vô hiệu hóa" : "Kích hoạt"}
-    </button>
-  </td>
+                    <button class="btn btn-danger btn-sm delete-btn" data-id="${sysadmin.id}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    <button class="btn btn-info btn-sm select-btn" data-id="${sysadmin.id}">
+                        <i class="bi bi-eye"></i> Select
+                    </button>
+                </td>
             `;
             tbody.appendChild(row);
-
 
             if (index === 0) {
                 row.classList.add('selected');
                 selectedRow = row;
             }
         });
-        attachActionButtons();
     }
 
     // Display error message
     function displayError(message) {
-        const tbody = document.getElementById('pharmacist-table-body');
+        const tbody = document.getElementById('wmanager-table-body');
         console.error('Error:', message); // Debug
-        tbody.innerHTML = `<tr><td colspan="7" class="text-danger text-center">${message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">${message}</td></tr>`;
     }
 
-    // Fetch all pharmacists
-    async function getAllPharmacists() {
+    // Fetch all warehouse managers
+    async function getAllWarehouseManagers() {
         try {
-            const response = await fetch(`${baseUrl}/api/system-admin?action=pharmacists`, {
+            const response = await fetch(`${baseUrl}/api/system-admin?action=wManager`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -381,52 +378,22 @@
             const data = JSON.parse(text);
             console.log('Data received:', data);
             allPharmacists = data; // Store all pharmacists
-            displayPharmacists(data);
+            displayWarehouseManagers(data);
         } catch (error) {
             console.error('Fetch error:', error);
             displayError(error.message);
         }
     }
-    async function searchPharmacistByName(name) {
-        try {
-            const response = await fetch(`${baseUrl}/api/system-admin?action=pharmacistname&name=${encodeURIComponent(name)}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
-            }
-
-            const text = await response.text();
-            if (!text) {
-                throw new Error("Phản hồi từ máy chủ rỗng");
-            }
-
-            const data = JSON.parse(text);
-            console.log('Search result:', data);
-            if (!data || data.length === 0) {
-                displayError('Không tìm thấy dược sĩ với tên này');
-            } else {
-                displayPharmacists(data);
-            }
-        } catch (error) {
-            console.error('Search error:', error);
-            displayError(error.message);
-        }
-    }
-
 
     // Search for pharmacist by ID
-    async function searchPharmacistById(id) {
+    async function searchWarehouseManagerById(id) {
         try {
             if (!id) {
-                displayPharmacists(allPharmacists); // If no ID, show all pharmacists
+                displayPharmacists(allWarehouseManager); // If no ID, show all pharmacists
                 return;
             }
 
-            const response = await fetch(`${baseUrl}/api/system-admin?action=pharmacistid&id=${id}`, {
+            const response = await fetch(`${baseUrl}/api/system-admin?action=wManagerid&id=${id}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -444,9 +411,9 @@
             const data = JSON.parse(text);
             console.log('Search result:', data);
             if (!data || Object.keys(data).length === 0) {
-                displayError('Không tìm thấy dược sĩ với ID này');
+                displayError('Không tìm thấy quản lý kho với ID này');
             } else {
-                displayPharmacists([data]);
+                displayWarehouseManagers([data]);
             }
         } catch (error) {
             console.error('Search error:', error);
@@ -456,89 +423,22 @@
 
     // Search bar event listener
     const searchBtn = document.getElementById('search-btn');
-    const searchInput = document.getElementById('pharmacist-id-search');
+    const searchInput = document.getElementById('wmanager-id-search');
     searchBtn.addEventListener('click', () => {
-        const pharmacistId = searchInput.value.trim();
-        searchPharmacistById(pharmacistId);
+        const wManagerId = searchInput.value.trim();
+        searchWarehouseManagerById(wManagerId)
     });
 
     // Allow pressing Enter to search
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            const pharmacistId = searchInput.value.trim();
-            searchPharmacistById(pharmacistId);
-        }
-    });
-    const searchNameBtn = document.getElementById('search-name-btn');
-    const searchNameInput = document.getElementById('pharmacist-name-search');
-
-    searchNameBtn.addEventListener('click', () => {
-        const name = searchNameInput.value.trim().toLowerCase(); // ép lowercase
-        searchPharmacistByName(name);
-    });
-
-    searchNameInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const name = searchNameInput.value.trim().toLowerCase(); // ép lowercase
-            searchPharmacistByName(name);
+            const wManagerId = searchInput.value.trim();
+            searchWarehouseManagerById(wManagerId)
         }
     });
 
-    // Load pharmacist list on page load
-    getAllPharmacists();
-    function attachActionButtons() {
-        // Nút cập nhật
-        document.querySelectorAll(".update-btn").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const id = btn.dataset.id;
-                // Thực hiện điều hướng hoặc mở form cập nhật
-                window.location.href = `update-pharmacist.html?id=${id}`;
-            });
-        });
-
-        // Nút vô hiệu hóa / kích hoạt
-        document.querySelectorAll(".toggle-status-btn").forEach(btn => {
-            btn.addEventListener("click", async () => {
-                const id = parseInt(btn.dataset.id);
-                const currentStatus = btn.dataset.status;
-                const newStatus = currentStatus === "Enable" ? "Disable" : "Enable";
-
-                // ✅ Thêm xác nhận từ người dùng
-                const confirmMsg = currentStatus === "Enable"
-                    ? "Bạn có chắc chắn muốn VÔ HIỆU HÓA tài khoản này không?"
-                    : "Bạn có muốn KÍCH HOẠT lại tài khoản này không?";
-
-                if (!confirm(confirmMsg)) return;
-
-                try {
-                    const response = await fetch(`${baseUrl}/api/system-admin?action=toggle-status`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            id: id,
-                            status: newStatus,
-                            role: "Pharmacist"
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || "Không thể cập nhật trạng thái");
-                    }
-
-                    const result = await response.json();
-                    alert(result.message || "Đã cập nhật trạng thái thành công");
-                    getAllPharmacists(); // Tải lại danh sách
-                } catch (err) {
-                    alert("Lỗi khi cập nhật trạng thái: " + err.message);
-                }
-            });
-        });
-
-    }
-
+    // Load warehouse managers list on page load
+    getAllWarehouseManagers()
 </script>
 </body>
 </html>
