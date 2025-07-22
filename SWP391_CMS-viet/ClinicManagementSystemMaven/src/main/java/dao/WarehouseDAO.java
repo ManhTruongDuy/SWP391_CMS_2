@@ -32,44 +32,6 @@ public class WarehouseDAO {
         }
         return null;
     }
-    public List<Warehouse> getWarehouseByName(String name) {
-        List<Warehouse> warehouses = new ArrayList<>();
-        String sql = "SELECT warehouse_id, name, location FROM Warehouse WHERE name LIKE ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, "%" + name.trim() + "%");
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Warehouse warehouse = new Warehouse();
-                    warehouse.setId(rs.getInt("warehouse_id"));
-                    warehouse.setName(rs.getString("name"));
-                    warehouse.setLocation(rs.getString("location"));
-                    warehouses.add(warehouse);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return warehouses;
-    }
-    public List<Warehouse> getWarehouseByLocation(String location) {
-        List<Warehouse> warehouses = new ArrayList<>();
-        String sql = "SELECT warehouse_id, name, location FROM Warehouse WHERE location LIKE ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, "%" + location.trim() + "%");
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Warehouse warehouse = new Warehouse();
-                    warehouse.setId(rs.getInt("warehouse_id"));
-                    warehouse.setName(rs.getString("name"));
-                    warehouse.setLocation(rs.getString("location"));
-                    warehouses.add(warehouse);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return warehouses;
-    }
 
     public List<Warehouse> getAllWarehouses() {
         List<Warehouse> list = new ArrayList<>();

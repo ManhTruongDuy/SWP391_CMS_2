@@ -3,8 +3,14 @@
   <component name="WebContextManager">
     <option name="state">
       <map>
+        <entry key="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/Login.jsp" value="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp" />
+        <entry key="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/Medicine_a.html" value="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp" />
+        <entry key="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/accountpharmacist/EnterOtp.jsp" value="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/accountpharmacist" />
+        <entry key="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/accountpharmacist/ForgotPassword.jsp" value="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/accountpharmacist" />
+        <entry key="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/accountpharmacist/Login.jsp" value="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/accountpharmacist" />
+        <entry key="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/accountpharmacist/ManagerAccount.jsp" value="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/accountpharmacist" />
+        <entry key="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/pharmacist/check-payment.html" value="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/pharmacist" />
         <entry key="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/pharmacist/counter.html" value="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/pharmacist" />
-        <entry key="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/warehouse/Warehouse.html" value="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/warehouse" />
         <entry key="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/warehouse/WarehouseManagement.html" value="file://$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/src/main/webapp/view/warehouse" />
       </map>
     </option>

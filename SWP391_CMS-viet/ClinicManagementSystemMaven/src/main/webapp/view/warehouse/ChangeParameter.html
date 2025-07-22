@@ -31,21 +31,20 @@
         <div class="spinner-border" role="status"></div>
     </div>
     <div class="row">
-        <!-- Unit Section -->
         <div class="col-md-6">
             <div class="card shadow-sm p-3 mb-4 bg-white rounded">
-                <h5 class="mb-3">Unit Management</h5>
+                <h5 class="mb-3">Quản lý Đơn vị</h5>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#addUnitModal">
-                            <i class="bi bi-plus"></i> Add Unit
+                            <i class="bi bi-plus"></i> Thêm Đơn vị
                         </button>
                     </div>
                     <div class="col-md-6">
                         <div class="input-group">
-                            <input id="unitSearchInput" class="form-control" placeholder="Search by name" type="text" onkeypress="if(event.key === 'Enter') searchUnits()">
+                            <input id="unitSearchInput" class="form-control" placeholder="Tìm kiếm theo tên" type="text" onkeypress="if(event.key === 'Enter') searchUnits()">
                             <button class="btn btn-outline-primary" onclick="searchUnits()">
-                                <i class="bi bi-search"></i> Search
+                                <i class="bi bi-search"></i> Tìm kiếm
                             </button>
                         </div>
                     </div>
@@ -57,9 +56,9 @@
                             ID <span class="sort-icon" id="unit-id-sort"></span>
                         </th>
                         <th scope="col" class="sortable" onclick="sortTable('unit', 'name')">
-                            Name <span class="sort-icon" id="unit-name-sort"></span>
+                            Tên <span class="sort-icon" id="unit-name-sort"></span>
                         </th>
-                        <th scope="col">Actions</th>
+                        <th scope="col">Hành động</th>
                     </tr>
                     </thead>
                     <tbody id="unit-table-body"></tbody>
@@ -68,7 +67,7 @@
                     <button class="btn btn-secondary btn-sm me-2" onclick="changeUnitPage('prev')" id="prevUnitPageBtn" disabled>
                         <i class="bi bi-arrow-left"></i>
                     </button>
-                    <span id="currentUnitPage">Page 1</span>
+                    <span id="currentUnitPage">Trang 1</span>
                     <button class="btn btn-secondary btn-sm ms-2" onclick="changeUnitPage('next')" id="nextUnitPageBtn">
                         <i class="bi bi-arrow-right"></i>
                     </button>
@@ -76,21 +75,20 @@
             </div>
         </div>
 
-        <!-- Category Section -->
         <div class="col-md-6">
             <div class="card shadow-sm p-3 mb-4 bg-white rounded">
-                <h5 class="mb-3">Category Management</h5>
+                <h5 class="mb-3">Quản lý Danh mục</h5>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                            <i class="bi bi-plus"></i> Add Category
+                            <i class="bi bi-plus"></i> Thêm Danh mục
                         </button>
                     </div>
                     <div class="col-md-6">
                         <div class="input-group">
-                            <input id="categorySearchInput" class="form-control" placeholder="Search by name" type="text" onkeypress="if(event.key === 'Enter') searchCategories()">
+                            <input id="categorySearchInput" class="form-control" placeholder="Tìm kiếm theo tên" type="text" onkeypress="if(event.key === 'Enter') searchCategories()">
                             <button class="btn btn-outline-primary" onclick="searchCategories()">
-                                <i class="bi bi-search"></i> Search
+                                <i class="bi bi-search"></i> Tìm kiếm
                             </button>
                         </div>
                     </div>
@@ -102,9 +100,9 @@
                             ID <span class="sort-icon" id="category-id-sort"></span>
                         </th>
                         <th scope="col" class="sortable" onclick="sortTable('category', 'name')">
-                            Name <span class="sort-icon" id="category-name-sort"></span>
+                            Tên <span class="sort-icon" id="category-name-sort"></span>
                         </th>
-                        <th scope="col">Actions</th>
+                        <th scope="col">Hành động</th>
                     </tr>
                     </thead>
                     <tbody id="category-table-body"></tbody>
@@ -113,7 +111,7 @@
                     <button class="btn btn-secondary btn-sm me-2" onclick="changeCategoryPage('prev')" id="prevCategoryPageBtn" disabled>
                         <i class="bi bi-arrow-left"></i>
                     </button>
-                    <span id="currentCategoryPage">Page 1</span>
+                    <span id="currentCategoryPage">Trang 1</span>
                     <button class="btn btn-secondary btn-sm ms-2" onclick="changeCategoryPage('next')" id="nextCategoryPageBtn">
                         <i class="bi bi-arrow-right"></i>
                     </button>
@@ -122,86 +120,82 @@
         </div>
     </div>
 
-    <!-- Modal to add unit -->
     <div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addUnitModalLabel">Add New Unit</h5>
+                    <h5 class="modal-title" id="addUnitModalLabel">Thêm Đơn vị mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addUnitForm">
                         <div class="mb-3">
-                            <label for="unitNameInput" class="form-label">Name</label>
+                            <label for="unitNameInput" class="form-label">Tên</label>
                             <input type="text" class="form-control" id="unitNameInput" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal to edit unit -->
     <div class="modal fade" id="editUnitModal" tabindex="-1" aria-labelledby="editUnitModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editUnitModalLabel">Edit Unit</h5>
+                    <h5 class="modal-title" id="editUnitModalLabel">Chỉnh sửa Đơn vị</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editUnitForm">
                         <input type="hidden" id="editUnitId">
                         <div class="mb-3">
-                            <label for="editUnitNameInput" class="form-label">Name</label>
+                            <label for="editUnitNameInput" class="form-label">Tên</label>
                             <input type="text" class="form-control" id="editUnitNameInput" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal to add category -->
     <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                    <h5 class="modal-title" id="addCategoryModalLabel">Thêm Danh mục mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addCategoryForm">
                         <div class="mb-3">
-                            <label for="categoryNameInput" class="form-label">Name</label>
+                            <label for="categoryNameInput" class="form-label">Tên</label>
                             <input type="text" class="form-control" id="categoryNameInput" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal to edit category -->
     <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                    <h5 class="modal-title" id="editCategoryModalLabel">Chỉnh sửa Danh mục</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="editCategoryForm">
                         <input type="hidden" id="editCategoryId">
                         <div class="mb-3">
-                            <label for="editCategoryNameInput" class="form-label">Name</label>
+                            <label for="editCategoryNameInput" class="form-label">Tên</label>
                             <input type="text" class="form-control" id="editCategoryNameInput" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-primary">Cập nhật</button>
                     </form>
                 </div>
             </div>

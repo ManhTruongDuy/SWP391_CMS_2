@@ -1,97 +1,958 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Danh sách đơn thuốc</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quầy thuốc - Hệ thống quản lý bệnh viện</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #2c5aa0;
+            --secondary-color: #17a2b8;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #6f42c1;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --dark-bg: #343a40;
+            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+            --border-radius: 15px;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+        }
+
         body {
-            background-color: whitesmoke;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
-        .pagination .page-link.active {
-            background-color: #0d6efd;
+        /* Vertical Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--dark-bg) 100%);
             color: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
         }
 
-        #medicine-table-body tr:hover {
-            background-color: #e0f0ff !important;
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-brand {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-brand .brand-text {
+            display: none;
+        }
+
+        .sidebar-brand:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .brand-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: -15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            display: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 0;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+
+        .sidebar.collapsed .nav-link .nav-text {
+            display: none;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar.collapsed .nav-link:hover {
+            transform: none;
+        }
+
+        .nav-link.active {
+            color: white;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+            border-right: 3px solid white;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: white;
+        }
+
+        .nav-icon {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-text {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-footer {
+            position: relative;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .user-info {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .user-details {
+            display: none;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.1rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .logout-btn {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: #ff6b6b;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .sidebar.collapsed .logout-btn .logout-text {
+            display: none;
+        }
+
+        .logout-btn:hover {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .page-header {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--success-color));
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .content-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: none;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .card-body-custom {
+            padding: 1.5rem;
+        }
+
+        .medicines-table {
+            margin-bottom: 0;
+        }
+
+        .medicines-table thead th {
+            background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+            color: white;
+            border: none;
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.8rem;
+        }
+
+        .medicines-table tbody td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+        }
+
+        .medicines-table tbody tr {
+            transition: all 0.3s ease;
             cursor: pointer;
         }
 
-        #medicine-table-body tr.selected {
-            background-color: #cce5ff !important;
+        .medicines-table tbody tr:hover {
+            background: rgba(44, 90, 160, 0.1) !important;
+            transform: scale(1.01);
         }
-        #prescription-order-detail {
+
+        .medicines-table tbody tr.selected {
+            background: rgba(44, 90, 160, 0.2) !important;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .medicine-name {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .medicine-category {
+            background: rgba(111, 66, 193, 0.1);
+            color: var(--info-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .medicine-price {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .medicine-quantity {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(40, 167, 69, 0.3);
+            color: white;
+        }
+
+        .detail-item {
+            background: var(--light-bg);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            color: var(--dark-text);
+            font-size: 1rem;
+        }
+
+        .prescription-info {
+            background: linear-gradient(135deg, rgba(44, 90, 160, 0.05) 0%, rgba(23, 162, 184, 0.05) 100%);
+            border: 1px solid rgba(44, 90, 160, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .prescription-info .info-item {
+            margin-bottom: 1rem;
+        }
+
+        .prescription-info .info-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .prescription-info .info-value {
+            color: var(--dark-text);
+            font-size: 1.1rem;
+        }
+
+        .order-section {
             max-height: 450px;
             overflow-y: auto;
             position: relative;
         }
 
-        #prescription-order-footer {
+        .order-item {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .order-item:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .order-item-header {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .order-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .order-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quantity-input {
+            width: 80px;
+            border-radius: 6px;
+            border: 2px solid #e9ecef;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .quantity-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+        }
+
+        .remove-btn {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #e74c3c 100%);
+            border: none;
+            border-radius: 6px;
+            padding: 0.4rem 0.6rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.25rem 0.5rem rgba(220, 53, 69, 0.3);
+            color: white;
+        }
+
+        .order-footer {
             position: sticky;
             bottom: 0;
-            background-color: #fff;
-            padding-top: 16px;
-            padding-bottom: 5px;
-            border-top: 1px solid #dee2e6;
+            background: var(--white);
+            padding: 1.5rem;
+            border-top: 2px solid var(--border-color);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
             z-index: 10;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .total-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--success-color);
+            text-align: right;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.75rem 1.5rem rgba(40, 167, 69, 0.3);
+            color: white;
+        }
+
+        .pagination {
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .page-link {
+            border: none;
+            padding: 0.5rem 0.75rem;
+            margin: 0 0.25rem;
+            border-radius: 6px;
+            color: var(--primary-color);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .page-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 0.25rem 0.5rem rgba(44, 90, 160, 0.3);
+        }
+
+        .page-item.active .page-link {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 0.25rem 0.5rem rgba(44, 90, 160, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+
+            .mobile-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+
+            .mobile-overlay.show {
+                display: block;
+            }
+
+            .mobile-toggle {
+                display: block;
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 0.5rem;
+                font-size: 1.2rem;
+                z-index: 1001;
+                box-shadow: var(--shadow);
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .order-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-toggle {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container-fluid mt-3">
+<!-- Mobile Overlay -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- Mobile Toggle Button -->
+<button class="mobile-toggle" onclick="openMobileSidebar()">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Vertical Sidebar Navigation -->
+<div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-left" id="toggleIcon"></i>
+    </button>
+
+    <div class="sidebar-header">
+        <a href="dashboard-pharmacist.html" class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fas fa-hospital"></i>
+            </div>
+            <span class="brand-text">MediCare System</span>
+        </a>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Chính</div>
+            <div class="nav-item">
+                <a href="dashboard-pharmacist.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span class="nav-text">Chức năng</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Quản lý</div>
+            <div class="nav-item">
+                <a href="prescription.html" class="nav-link">
+                    <i class="fas fa-file-prescription nav-icon"></i>
+                    <span class="nav-text">Đơn thuốc</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="counter.html" class="nav-link active">
+                    <i class="fas fa-cash-register nav-icon"></i>
+                    <span class="nav-text">Quầy thuốc</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="alternative-medicine.html" class="nav-link">
+                    <i class="fas fa-exchange-alt nav-icon"></i>
+                    <span class="nav-text">Thuốc thay thế</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="patients.html" class="nav-link" >
+                    <i class="fas fa-user-injured nav-icon"></i>
+                    <span class="nav-text">Bệnh nhân</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="medicines.html" class="nav-link" >
+                    <i class="fas fa-pills nav-icon"></i>
+                    <span class="nav-text">Thuốc</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="inventory.html" class="nav-link" >
+                    <i class="fas fa-boxes nav-icon"></i>
+                    <span class="nav-text">Kho thuốc</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Báo cáo</div>
+            <div class="nav-item">
+                <a href="statistic-pharmacist.html" class="nav-link">
+                    <i class="fas fa-chart-bar nav-icon"></i>
+                    <span class="nav-text">Thống kê</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="history-pharmacist.html" class="nav-link">
+                    <i class="fas fa-chart-line nav-icon"></i>
+                    <span class="nav-text">Lịch sử & Tra cứu</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Hệ thống</div>
+            <div class="nav-item">
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog nav-icon"></i>
+                    <span class="nav-text">Cài đặt</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="users.html" class="nav-link">
+                    <i class="fas fa-users nav-icon"></i>
+                    <span class="nav-text">Người dùng</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar">DT</div>
+            <div class="user-details">
+                <div class="user-name">Dược sĩ Thảo</div>
+                <div class="user-role">Quầy thuốc</div>
+            </div>
+        </div>
+        <a href="login.html" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="logout-text">Đăng xuất</span>
+        </a>
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="main-content" id="mainContent">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-cash-register me-3"></i>
+            Quầy thuốc
+        </h1>
+        <p class="page-subtitle">Quản lý bán thuốc và thanh toán đơn thuốc</p>
+    </div>
+
     <div class="row">
-        <div class="col-4">
-            <div class="card shadow-sm p-3 mb-4 bg-white rounded" style="height: 400px; overflow-y: auto">
-                <nav>
-                    <ul class="pagination" id="pagination"></ul>
-                </nav>
-                <table class="table table-bordered table-striped">
-                    <thead class="table-primary">
-                    <tr>
-                        <th>Stt</th>
-                        <th>Tên</th>
-                        <th>Thể loại</th>
-                        <th>Giá</th>
-                        <th>Số lượng</th>
-                        <th>Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody id="medicine-table-body"></tbody>
-                </table>
+        <!-- Left Column - Medicine List -->
+        <div class="col-lg-6">
+            <!-- Medicine List Card -->
+            <div class="content-card">
+                <div class="card-header-custom">
+                    <i class="fas fa-pills me-2"></i>
+                    Danh sách thuốc
+                </div>
+                <div class="card-body-custom">
+                    <!-- Pagination -->
+                    <nav>
+                        <ul class="pagination" id="pagination"></ul>
+                    </nav>
+
+                    <!-- Medicine Table -->
+                    <div class="table-responsive">
+                        <table class="table medicines-table">
+                            <thead>
+                            <tr>
+                                <th width="8%">STT</th>
+                                <th width="30%">Tên</th>
+                                <th width="20%">Loại</th>
+                                <th width="20%">Giá</th>
+                                <th width="12%">SL</th>
+                                <th width="10%">Thêm</th>
+                            </tr>
+                            </thead>
+                            <tbody id="medicine-table-body">
+                            <!-- Medicine data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <div class="card shadow-sm p-3 mb-4 bg-white rounded">
-                <h5 class="mb-3">Thông tin chi tiết thuốc</h5>
-                <div class="row" id="medicine-detail">
-                    <div class="text-muted">Chọn thuốc để xem chi tiết...</div>
+            <!-- Medicine Detail Card -->
+            <div class="content-card">
+                <div class="card-header-custom">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Thông tin chi tiết thuốc
+                </div>
+                <div class="card-body-custom">
+                    <div id="medicine-detail">
+                        <div class="empty-state">
+                            <i class="fas fa-pills"></i>
+                            <p>Chọn thuốc để xem chi tiết...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-8">
-            <div class="card shadow-sm p-3 mb-4 bg-white rounded">
-                <h5 class="mb-3">Thông tin đơn thuốc của bác sĩ</h5>
-                <div class="row" id="prescription-detail"></div>
+        <!-- Right Column - Prescription & Order -->
+        <div class="col-lg-6">
+            <!-- Prescription Info Card -->
+            <div class="content-card">
+                <div class="card-header-custom">
+                    <i class="fas fa-file-prescription me-2"></i>
+                    Thông tin đơn thuốc của bác sĩ
+                </div>
+                <div class="card-body-custom">
+                    <div class="prescription-info" id="prescription-detail">
+                        <div class="empty-state">
+                            <i class="fas fa-file-prescription"></i>
+                            <p>Đang tải thông tin đơn thuốc...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="card shadow-sm p-3 mb-4 bg-white rounded">
-                <h5 class="mb-3">Thông tin đơn mua</h5>
-                <div class="row" id="prescription-order-detail" style="height: 450px;overflow-y: auto"></div>
+            <!-- Order Card -->
+            <div class="content-card">
+                <div class="card-header-custom">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Đơn hàng thuốc
+                </div>
+                <div class="card-body-custom p-0">
+                    <div class="order-section" id="prescription-order-detail">
+                        <div class="empty-state">
+                            <i class="fas fa-shopping-cart"></i>
+                            <p>Chưa có thuốc nào được chọn</p>
+                            <small class="text-muted">Nhấn nút "Thêm" để thêm thuốc vào đơn hàng</small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const baseUrl = window.location.origin + '/ClinicManagementSystem_war_exploded';
+    // const baseUrl = window.location.origin + '/ClinicManagementSystem_war';
+    const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
     const pageSize = 10;
     let currentPage = 1;
     let selectedRow = null;
     const prescriptionOrder = [];
     let prescriptionOrderDetail = null;
+
+    // Sidebar Functions
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+
+        if (sidebar.classList.contains('collapsed')) {
+            toggleIcon.className = 'fas fa-chevron-right';
+        } else {
+            toggleIcon.className = 'fas fa-chevron-left';
+        }
+    }
+
+    function openMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+
+        sidebar.classList.add('mobile-open');
+        overlay.classList.add('show');
+    }
+
+    function closeMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('show');
+    }
+
     function loadPrescriptions(page = 1) {
         fetch(`${baseUrl}/api/medicineCounter?page=${page}&pageSize=${pageSize}`)
             .then(res => res.json())
@@ -103,17 +964,21 @@
                 data.data.forEach((p, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${p.id}</td>
-                        <td>${p.name}</td>
-                        <td>${p.category?.name || ''}</td>
-                        <td>${p.price.toLocaleString()} VND</td>
-                        <td>${p.quantity}</td>
-                        <td class="text-center">
-                            <button class="btn btn-outline-primary btn-sm" title="Thêm">
-                                <i class="bi bi-plus-circle-fill"></i>
-                            </button>
-                        </td>
-                    `;
+                            <td><strong>${p.id}</strong></td>
+                            <td class="medicine-name">${p.name}</td>
+                            <td>
+                                 <span class="medicine-category">${p.category?.categoryName || ''}</span>
+                             </td>
+                            <td class="medicine-price">${p.price.toLocaleString()} ₫</td>
+                            <td>
+                                <span class="medicine-quantity">${p.quantity}</span>
+                            </td>
+                            <td class="text-center">
+                                <button class="add-btn" title="Thêm vào đơn hàng">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </td>
+                        `;
 
                     row.addEventListener('click', () => {
                         if (selectedRow) selectedRow.classList.remove('selected');
@@ -144,37 +1009,156 @@
     function loadPrescriptionDetail() {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
+
         fetch(`${baseUrl}/api/prescriptions?id=${id}`)
             .then(res => res.json())
             .then(p => {
                 prescriptionOrderDetail = Array.isArray(p) ? p[0] : p;
                 document.getElementById('prescription-detail').innerHTML = `
-                    <div class="col-md-12 mb-2"><strong>Bệnh nhân:</strong> ${p.medicineRecord?.patient?.fullName || ''}</div>
-                    <div class="col-md-12 mb-2"><strong>Bác sĩ:</strong> ${p.doctor?.fullName || ''}</div>
-                    <div class="col-md-12 mb-2"><strong>Ngày kê đơn:</strong> ${p.prescriptionDate}</div>
-                    <div class="col-md-12 mb-2"><strong>Trạng thái:</strong> ${p.status}</div>
-                `;
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user-injured me-2"></i>
+                                Bệnh nhân
+                            </div>
+                            <div class="info-value">${p.medicineRecord?.patient?.fullName || ''}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user-md me-2"></i>
+                                Bác sĩ kê đơn
+                            </div>
+                            <div class="info-value">${p.doctor?.fullName || ''}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                Ngày kê đơn
+                            </div>
+                            <div class="info-value">${new Date(p.prescriptionDate).toLocaleDateString('vi-VN')}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Trạng thái
+                            </div>
+                            <div class="info-value">
+                                <span class="badge ${getStatusBadgeClass(p.status)}">${getStatusText(p.status)}</span>
+                            </div>
+                        </div>
+                    `;
             }).catch(() => {
-            document.getElementById('prescription-detail').innerHTML =
-                '<div class="text-danger">Không tìm thấy đơn thuốc.</div>';
+            document.getElementById('prescription-detail').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle text-danger"></i>
+                            <p class="text-danger">Không tìm thấy đơn thuốc.</p>
+                        </div>
+                    `;
         });
+    }
+
+    function getStatusBadgeClass(status) {
+        switch(status) {
+            case 'Pending': return 'bg-warning';
+            case 'Dispensed': return 'bg-success';
+            case 'Cancelled': return 'bg-danger';
+            default: return 'bg-secondary';
+        }
+    }
+
+    function getStatusText(status) {
+        switch(status) {
+            case 'Pending': return 'Chờ xử lý';
+            case 'Dispensed': return 'Đã cấp phát';
+            case 'Cancelled': return 'Đã hủy';
+            default: return status || 'N/A';
+        }
     }
 
     function showMedicineDetail(med) {
         const detailContainer = document.getElementById('medicine-detail');
         detailContainer.innerHTML = `
-            <div class="col-md-6 mb-2"><strong>Tên thuốc:</strong> ${med.name}</div>
-            <div class="col-md-6 mb-2"><strong>Đơn vị:</strong> ${med.unit?.name || ''}</div>
-            <div class="col-md-6 mb-2"><strong>Loại thuốc:</strong> ${med.category?.name || ''}</div>
-            <div class="col-md-6 mb-2"><strong>Thành phần:</strong> ${med.ingredient}</div>
-            <div class="col-md-6 mb-2"><strong>Công dụng:</strong> ${med.usage}</div>
-            <div class="col-md-6 mb-2"><strong>Bảo quản:</strong> ${med.preservation}</div>
-            <div class="col-md-6 mb-2"><strong>Ngày sản xuất:</strong> ${med.manuDate}</div>
-            <div class="col-md-6 mb-2"><strong>Hạn sử dụng:</strong> ${med.expDate}</div>
-            <div class="col-md-6 mb-2"><strong>Số lượng:</strong> ${med.quantity}</div>
-            <div class="col-md-6 mb-2"><strong>Giá:</strong> ${med.price.toLocaleString()} VND</div>
-            <div class="col-md-6 mb-2"><strong>Kho:</strong> ${med.warehouse?.name}</div>
-        `;
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="fas fa-pills me-2"></i>
+                        Tên thuốc
+                    </div>
+                    <div class="detail-value">${med.name}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="fas fa-weight me-2"></i>
+                        Đơn vị
+                    </div>
+                    <div class="detail-value">${med.unit?.unitName || 'N/A'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="fas fa-tags me-2"></i>
+                        Loại thuốc
+                    </div>
+                    <div class="detail-value">${med.category?.categoryName || 'N/A'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="fas fa-flask me-2"></i>
+                        Thành phần
+                    </div>
+                    <div class="detail-value">${med.ingredient || 'N/A'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="fas fa-hand-holding-medical me-2"></i>
+                        Công dụng
+                    </div>
+                    <div class="detail-value">${med.usage || 'N/A'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Bảo quản
+                    </div>
+                    <div class="detail-value">${med.preservation || 'N/A'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        Ngày sản xuất
+                    </div>
+                    <div class="detail-value">${med.manuDate ? new Date(med.manuDate).toLocaleDateString('vi-VN') : 'N/A'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="fas fa-calendar-times me-2"></i>
+                        Hạn sử dụng
+                    </div>
+                    <div class="detail-value">${med.expDate ? new Date(med.expDate).toLocaleDateString('vi-VN') : 'N/A'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="fas fa-boxes me-2"></i>
+                        Số lượng tồn kho
+                    </div>
+                    <div class="detail-value">
+                        <span class="medicine-quantity">${med.quantity}</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="fas fa-money-bill-wave me-2"></i>
+                        Giá bán
+                    </div>
+                    <div class="detail-value">
+                        <span class="medicine-price">${med.price.toLocaleString()} ₫</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="fas fa-warehouse me-2"></i>
+                        Kho
+                    </div>
+                    <div class="detail-value">${med.warehouse?.name || 'N/A'}</div>
+                </div>
+            `;
     }
 
     function addToOrder(med) {
@@ -189,44 +1173,81 @@
 
     function renderPrescriptionOrder() {
         const container = document.getElementById('prescription-order-detail');
-        container.innerHTML = '';
+
+        if (prescriptionOrder.length === 0) {
+            container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>Chưa có thuốc nào được chọn</p>
+                        <small class="text-muted">Nhấn nút "Thêm" để thêm thuốc vào đơn hàng</small>
+                    </div>
+                `;
+            return;
+        }
+
         let totalAmount = 0;
+        let orderHTML = '<div class="p-3">';
 
         prescriptionOrder.forEach((item, index) => {
             const subtotal = item.price * item.quantity;
             totalAmount += subtotal;
 
-            container.innerHTML += `
-                <div class="col-12 border-bottom pb-2 mb-2">
-                    <div><strong>${index + 1}. ${item.name}</strong></div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            Giá: ${item.price.toLocaleString()} VND<br>
-                            Số lượng:
-                            <input type="number" min="1" value="${item.quantity}" data-id="${item.id}"
-                                   class="form-control d-inline-block me-2" style="width: 80px;" />
-                            <button class="btn btn-outline-danger btn-sm remove-btn" data-id="${item.id}">
-                                <i class="bi bi-trash-fill"></i>
-                            </button>
+            orderHTML += `
+                    <div class="order-item">
+                        <div class="order-item-header">
+                            <i class="fas fa-pills me-2"></i>
+                            ${index + 1}. ${item.name}
                         </div>
-                        <div>
-                            <strong>Tổng:</strong> ${subtotal.toLocaleString()} VND
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="order-controls">
+<!--                                <div class="me-3">-->
+                                <div class="control-group">
+                                    <small class="text-muted">Giá đơn vị:</small>
+                                    <span class="medicine-price">${item.price.toLocaleString()} ₫</span>
+                                </div>
+<!--                                <div class="me-3">-->
+                                <div class="control-group">
+                                    <small class="text-muted">Số lượng:</small>
+                                    <input type="number" min="1" value="${item.quantity}"
+                                           data-id="${item.id}" class="form-control quantity-input" />
+                                </div>
+                                <button class="remove-btn" data-id="${item.id}" title="Xóa khỏi đơn hàng">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted">Thành tiền:</small><br>
+                                <strong class="medicine-price" style="font-size: 1.1rem;">
+                                    ${subtotal.toLocaleString()} ₫
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        });
+
+        orderHTML += '</div>';
+
+        // Add footer
+        orderHTML += `
+                <div class="order-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="submit-btn" id="submit-order">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Thanh toán & Xuất hóa đơn
+                        </button>
+                        <div class="total-amount">
+                            <small class="text-muted d-block">Tổng tiền:</small>
+                            ${totalAmount.toLocaleString()} ₫
                         </div>
                     </div>
                 </div>
             `;
-        });
 
-        container.innerHTML += `
-    <div id="prescription-order-footer" class="col-12 d-flex justify-content-between align-items-center">
-        <button class="btn btn-success" id="submit-order">
-            <i class="bi bi-receipt"></i> Thanh toán & Xuất hóa đơn
-        </button>
-        <h5 class="mb-0 text-end">Tổng tiền: ${totalAmount.toLocaleString()} VND</h5>
-    </div>
-`;
+        container.innerHTML = orderHTML;
 
-        container.querySelectorAll('input[type="number"]').forEach(input => {
+        // Add event listeners
+        container.querySelectorAll('.quantity-input').forEach(input => {
             input.addEventListener('change', (e) => {
                 const id = parseInt(e.target.getAttribute('data-id'));
                 const quantity = parseInt(e.target.value);
@@ -257,20 +1278,44 @@
                     return;
                 }
 
+                if (!prescriptionOrderDetail) {
+                    alert('Không có thông tin đơn thuốc!');
+                    return;
+                }
+
                 const urlParams = new URLSearchParams(window.location.search);
                 const prescriptionId = urlParams.get('id');
+
+                if (!prescriptionId) {
+                    alert('Không tìm thấy mã đơn thuốc!');
+                    return;
+                }
 
                 const orderData = {
                     prescriptionId: prescriptionId,
                     items: prescriptionOrder
                 };
+
                 const exportData = {
-                    data :prescriptionOrderDetail,
-                    items :prescriptionOrder
-                }
+                    data: prescriptionOrderDetail,
+                    items: prescriptionOrder
+                };
+
+                // Calculate total amount
+                let totalAmount = 0;
+                prescriptionOrder.forEach(item => {
+                    totalAmount += item.price * item.quantity;
+                });
+
+                // Show loading state
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+                submitBtn.disabled = true;
+
                 fetch(`${baseUrl}/api/medicineCounter`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify(orderData)
                 })
                     .then(res => {
@@ -280,23 +1325,39 @@
                     .then(data => {
                         alert('Đã lưu đơn thuốc thành công!');
                         localStorage.setItem('printPrescription', JSON.stringify(exportData));
-                        window.open('print-prescription.html', '_blank');
-                        prescriptionOrder.length = 0;
-                        renderPrescriptionOrder();
+                        console.log('Chuyển sang trang payment.html');
+                        window.location.href = `payment.html?amount=${encodeURIComponent(totalAmount)}&orderCode=${encodeURIComponent(data.orderCode)}`;
                     })
                     .catch(err => {
                         console.error(err);
-                        alert('Gửi đơn thuốc thất bại');
+                        alert('Gửi đơn thuốc thất bại: ' + err.message);
+
+                        // Reset button
+                        submitBtn.innerHTML = '<i class="fas fa-credit-card me-2"></i>Thanh toán & Xuất hóa đơn';
+                        submitBtn.disabled = false;
                     });
             });
-
-
         }
     }
 
     function renderPagination(current, total) {
         const pagination = document.getElementById('pagination');
         pagination.innerHTML = '';
+
+        // Previous button
+        if (current > 1) {
+            const prevLi = document.createElement('li');
+            prevLi.className = 'page-item';
+            prevLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a>';
+            prevLi.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentPage = current - 1;
+                loadPrescriptions(currentPage);
+            });
+            pagination.appendChild(prevLi);
+        }
+
+        // Page numbers
         for (let i = 1; i <= total; i++) {
             const li = document.createElement('li');
             li.className = `page-item ${i === current ? 'active' : ''}`;
@@ -308,8 +1369,22 @@
             });
             pagination.appendChild(li);
         }
+
+        // Next button
+        if (current < total) {
+            const nextLi = document.createElement('li');
+            nextLi.className = 'page-item';
+            nextLi.innerHTML = '<a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>';
+            nextLi.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentPage = current + 1;
+                loadPrescriptions(currentPage);
+            });
+            pagination.appendChild(nextLi);
+        }
     }
 
+    // Initialize page
     loadPrescriptions(currentPage);
 </script>
 </body>
