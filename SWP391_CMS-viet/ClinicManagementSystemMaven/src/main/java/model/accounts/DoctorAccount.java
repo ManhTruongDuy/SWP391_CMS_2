@@ -5,6 +5,7 @@ public class DoctorAccount {
     private String name;
     private String phone;
     private String email;
+    private String department;
     private String username;
     private String password;
     private String status;
@@ -12,11 +13,12 @@ public class DoctorAccount {
     public DoctorAccount() {
     }
 
-    public DoctorAccount(int id, String name, String phone, String email, String username, String password, String status) {
+    public DoctorAccount(int id, String name, String phone, String email, String department, String username, String password, String status) {
         this.id = id;
         this.name = name;
         this.phone = phone;
         this.email = email;
+        this.department = department;
         this.username = username;
         this.password = password;
         this.status = status;
@@ -63,5 +65,13 @@ public class DoctorAccount {
     }
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 }

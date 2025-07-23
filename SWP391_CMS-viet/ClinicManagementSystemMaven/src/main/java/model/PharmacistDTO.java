@@ -1,7 +1,7 @@
 package model;
 
 public class PharmacistDTO {
-    private String action; // "create" hoặc "update"
+    private String action;
     private int pharmacistId;
     private String name;
     private String mobile;

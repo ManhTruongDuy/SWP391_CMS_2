@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -49,13 +48,6 @@
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
     }
 
-    .logo {
-      margin-bottom: 20px;
-      color: var(--primary);
-      font-size: 24px;
-      font-weight: 600;
-    }
-
     h2 {
       color: #2b2d42;
       margin-bottom: 10px;
@@ -82,22 +74,23 @@
       font-weight: 500;
     }
 
-    input[type="email"] {
+    input[type="text"] {
       width: 100%;
       padding: 12px 16px;
       border: 2px solid #e9ecef;
       border-radius: 8px;
       font-size: 14px;
       transition: all 0.3s;
+      box-sizing: border-box;
     }
 
-    input[type="email"]:focus {
+    input[type="text"]:focus {
       outline: none;
       border-color: var(--primary-light);
       box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
     }
 
-    input[type="email"]::placeholder {
+    input[type="text"]::placeholder {
       color: var(--dark-gray);
     }
 
@@ -130,7 +123,7 @@
       margin: 15px 0;
       font-size: 14px;
       padding: 10px;
-      background-color: rgba(247, 37, 133, 0.1);
+
       border-radius: 6px;
     }
 
@@ -139,7 +132,7 @@
       margin: 15px 0;
       font-size: 14px;
       padding: 10px;
-      background-color: rgba(76, 201, 240, 0.1);
+
       border-radius: 6px;
     }
 
@@ -176,20 +169,19 @@
 </head>
 <body>
 <div class="form-container">
-  <div class="logo">YourLogo</div>
-  <h2>Forgot Password?</h2>
-  <p class="subtitle">Enter your email address and we'll send you a verification code to reset your password.</p>
+
+  <h2>Bạn quên mật khẩu?</h2>
+  <p class="subtitle">Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn mã xác minh để đặt lại mật khẩu.</p>
 
   <form action="<%=request.getContextPath()%>/forgotpassword" method="POST">
     <div class="input-group">
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" placeholder="your@email.com"
-             value="${email != null ? email : ''}" required>
+      <label for="email">Địa chỉ email</label>
+      <input type="text" id="email" name="email" placeholder="Địa chỉ email của bạn?"
+             value="${email != null ? email : ''}">
+      <p id="emailError" class="error" style="display: none;">Vui lòng nhập địa chỉ email hợp lệ.</p>
     </div>
 
-    <button type="submit">
-      Send Verification Code
-    </button>
+    <button type="submit">Gửi mã xác minh</button>
 
     <c:if test="${not empty error}">
       <p class="error">${error}</p>
@@ -200,8 +192,29 @@
   </form>
 
   <div class="footer-links">
-    <a href="Login.jsp" class="link"><i>←</i> Quay lại trang đăng nhập</a>
-  </div>
+    <a href="${pageContext.request.contextPath}/view/accountpharmacist/Login.jsp"
+       class="link"
+       onclick="return confirm('Bạn có chắc chắn muốn quay lại trang đăng nhập không?');">
+      <i>←</i> Quay lại trang đăng nhập
+    </a>  </div>
 </div>
+
+<script>
+  document.querySelector("form").addEventListener("submit", function (e) {
+    const emailInput = document.getElementById("email");
+    const emailError = document.getElementById("emailError");
+    const emailValue = emailInput.value.trim();
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+
+    if (!emailPattern.test(emailValue)) {
+      e.preventDefault();
+      emailError.style.display = "block";
+      emailInput.focus();
+    } else {
+      emailError.style.display = "none";
+    }
+  });
+</script>
 </body>
 </html>

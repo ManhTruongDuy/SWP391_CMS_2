@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import model.PharmacistDTO;
 
 public class PharmacistDAO {
     private Connection connection;
@@ -101,5 +102,36 @@ public class PharmacistDAO {
             }
         }
         return false;
+    }
+
+    public PharmacistDTO getPharmacistProfileByAccountId(int accountPharmacistId) {
+        PharmacistDTO dto = null;
+
+        String sql = "SELECT ap.account_pharmacist_id, ap.username, ap.email, ap.img, ap.status, " +
+                "       p.pharmacist_id, p.full_name, p.phone " +
+                "FROM AccountPharmacist ap " +
+                "JOIN Pharmacist p ON ap.account_pharmacist_id = p.account_pharmacist_id " +
+                "WHERE ap.account_pharmacist_id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, accountPharmacistId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    dto = new PharmacistDTO();
+                    dto.setAccountPharmacistId(rs.getInt("account_pharmacist_id"));
+                    dto.setUsername(rs.getString("username"));
+                    dto.setEmail(rs.getString("email"));
+                    dto.setImg(rs.getString("img"));
+                    dto.setStatus(rs.getString("status"));
+                    dto.setPharmacistId(rs.getInt("pharmacist_id"));
+                    dto.setName(rs.getString("full_name"));
+                    dto.setMobile(rs.getString("phone"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return dto;
     }
 }
