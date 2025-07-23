@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.tailwindcss.com"></script>
+
+
     <style>
         body {
             background-color: #f1f5f9;
@@ -187,6 +189,7 @@
             }
         }
     </style>
+
 </head>
 <body class="bg-gray-100 font-sans">
 
@@ -266,6 +269,7 @@
                     <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
+
                 </thead>
                 <tbody id="sysadmin-table-body">
                 <!-- rows will be dynamically injected here -->
@@ -660,11 +664,11 @@
         logoutLink.addEventListener('click', function (e) {
             e.preventDefault();
 
-            // 🔐 Xoá thông tin phiên đăng nhập nếu có
-            localStorage.removeItem('token'); // hoặc sessionStorage
-            sessionStorage.clear(); // tuỳ bạn đang dùng cái gì
 
-            // 🚪 Chuyển hướng về trang đăng nhập
+            localStorage.removeItem('token');
+            sessionStorage.clear();
+
+
             window.location.href = '/ClinicManagementSystem_war_exploded/view/accountpharmacist/Login.jsp'; // thay bằng URL thật của trang đăng nhập
         });
     });

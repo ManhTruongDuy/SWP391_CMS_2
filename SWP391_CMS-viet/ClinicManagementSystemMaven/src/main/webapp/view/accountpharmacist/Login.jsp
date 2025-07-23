@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
 
-    // Xóa các giá trị cũ khỏi session
+
     session.removeAttribute("otp_created_time");
     session.removeAttribute("otp");
     session.removeAttribute("email");

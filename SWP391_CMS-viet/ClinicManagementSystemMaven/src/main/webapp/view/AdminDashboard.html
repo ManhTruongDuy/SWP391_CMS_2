@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Healthcare Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     html {
       scroll-behavior: smooth;
@@ -31,6 +32,7 @@
       }
     }
   </style>
+
 </head>
 <body class="bg-gray-100 font-sans">
 <!-- Navbar -->
@@ -163,6 +165,19 @@
       // Close mobile menu after clicking
       mobileMenu.classList.add('hidden');
       sidebar.classList.remove('open');
+    });
+  });
+
+  document.querySelectorAll('a[href="#logout"]').forEach(logoutLink => {
+    logoutLink.addEventListener('click', function (e) {
+      e.preventDefault();
+
+
+      localStorage.removeItem('token');
+      sessionStorage.clear();
+
+
+      window.location.href = '/ClinicManagementSystem_war_exploded/view/accountpharmacist/Login.jsp'; // thay bằng URL thật của trang đăng nhập
     });
   });
 </script>
