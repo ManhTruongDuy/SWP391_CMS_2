@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +7,172 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
             background-color: whitesmoke;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            padding: 15px;
+            transition: width 0.3s;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .brand-text,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .nav-section-title,
+        .sidebar.collapsed .user-details,
+        .sidebar.collapsed .logout-text {
+            display: none;
+        }
+
+        .sidebar-toggle {
+            background: #fff;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            right: -15px;
+            width: 30px;
+            height: 38px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            transform: translateY(-50%);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .brand-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .sidebar-brand {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            padding-left: 16px;
+        }
+
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+
+        .nav-section-title {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin: 10px 0;
+            text-transform: uppercase;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #e9ecef;
+        }
+
+        .nav-link.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .nav-icon {
+            margin-right: 20px;
+            width: 20px;
+            text-align: center;
+            padding-left: 5px;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        .user-role {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            color: #dc3545;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .logout-btn:hover {
+            background: #e9ecef;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            transition: all 0.3s;
+        }
+
+        .main-content.collapsed {
+            margin-left: 80px;
+            width: calc(100% - 80px);
         }
 
         .card {
@@ -68,17 +231,15 @@
         }
 
         .expiry-green {
-            color: green;
+            color: green !important;
             font-weight: bold;
         }
-
         .expiry-yellow {
-            color: orange;
+            color: orange !important;
             font-weight: bold;
         }
-
         .expiry-red {
-            color: red;
+            color: red !important;
             font-weight: bold;
         }
 
@@ -92,319 +253,392 @@
     </style>
 </head>
 <body>
-<div class="container-fluid mt-3">
-    <div id="loading" class="text-center" style="display: none;">
-        <div class="spinner-border" role="status"></div>
+<div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-left" id="toggleIcon"></i>
+    </button>
+
+    <div class="sidebar-header">
+        <a href="dashboard-pharmacist.html" class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fas fa-hospital"></i>
+            </div>
+            <span class="brand-text">MediCare System</span>
+        </a>
     </div>
-    <div class="modal fade" id="expiryModal" tabindex="-1" aria-labelledby="expiryModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="expiryModalLabel">Cảnh báo</h5>
-                </div>
-                <div class="modal-body">
-                    <strong>Các loại thuốc sẽ hết hạn:</strong>
-                    <ul id="expiredMedicinesListModal"></ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Chính</div>
+            <div class="nav-item">
+                <a href="WarehouseHome.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span class="nav-text">Home</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Quản lý</div>
+
+            <div class="nav-item">
+                <a href="Warehouse.html" class="nav-link active">
+                    <i class="fas fa-warehouse nav-icon"></i>
+                    <span class="nav-text">Kho</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="ChangeParameter.html" class="nav-link ">
+                    <i class="fas fa-cubes nav-icon"></i>
+                    <span class="nav-text">Đơn vị & Danh mục</span>
+                </a>
+            </div>
+        </div>
+
+<!--        <div class="nav-section">-->
+<!--            <div class="nav-section-title">Báo cáo</div>-->
+
+<!--            <div class="nav-item">-->
+<!--                <a href="ChangeParameter.html" class="nav-link">-->
+<!--                    <i class="fas fa-chart-line nav-icon"></i>-->
+<!--                    <span class="nav-text">Lịch sử & Tra cứu</span>-->
+<!--                </a>-->
+<!--            </div>-->
+<!--        </div>-->
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar">DT</div>
+            <div class="user-details">
+                <div class="user-name">Dược sĩ Thảo</div>
+                <div class="user-role">Quầy thuốc</div>
+            </div>
+        </div>
+        <a href="login.html" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="logout-text">Đăng xuất</span>
+        </a>
+    </div>
+</div>
+
+<div class="main-content" id="main-content">
+    <div class="container-fluid mt-3">
+        <div id="loading" class="text-center" style="display: none;">
+            <div class="spinner-border" role="status"></div>
+        </div>
+        <div class="modal fade" id="expiryModal" tabindex="-1" aria-labelledby="expiryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="expiryModalLabel">Cảnh báo</h5>
+                    </div>
+                    <div class="modal-body">
+                        <strong>Các loại thuốc sẽ hết hạn:</strong>
+                        <ul id="expiredMedicinesListModal"></ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm p-3 mb-4 bg-white rounded">
-                <h5 class="mb-3">Công cụ kiểm tra API Kho</h5>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <button class="btn btn-primary" onclick="getAllWarehouses()">
-                            <i class="bi bi-list"></i> Lấy tất cả Kho
-                        </button>
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addWarehouseModal">
-                            <i class="bi bi-plus"></i> Thêm Kho
-                        </button>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <select id="warehouseSearchType" class="form-select" style="max-width: 150px;">
-                                <option value="id">ID</option>
-                                <option value="name">Tên</option>
-                                <option value="location">Địa điểm</option>
-                            </select>
-                            <input id="warehouseSearchInput" class="form-control" placeholder="Nhập giá trị tìm kiếm" type="text" onkeypress="if(event.key === 'Enter') searchWarehouse()">
-                            <button class="btn btn-outline-primary" onclick="searchWarehouse()">
-                                <i class="bi bi-search"></i> Tìm Kho
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <table class="table table-bordered table-striped">
-                    <thead class="table-primary">
-                    <tr>
-                        <th scope="col" class="sortable" onclick="sortTable('warehouse', 'id')">
-                            ID <span class="sort-icon" id="warehouse-id-sort"></span>
-                        </th>
-                        <th scope="col" class="sortable" onclick="sortTable('warehouse', 'name')">
-                            Tên <span class="sort-icon" id="warehouse-name-sort"></span>
-                        </th>
-                        <th scope="col">Địa điểm</th>
-                        <th scope="col">Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody id="warehouse-table-body"></tbody>
-                </table>
-                <div class="pagination-controls">
-                    <button class="btn btn-secondary btn-sm me-2" onclick="changeWarehousePage('prev')" id="prevWarehousePageBtn" disabled>
-                        <i class="bi bi-arrow-left"></i>
-                    </button>
-                    <span id="currentWarehousePage">Trang 1</span>
-                    <button class="btn btn-secondary btn-sm ms-2" onclick="changeWarehousePage('next')" id="nextWarehousePageBtn">
-                        <i class="bi bi-arrow-right"></i>
-                    </button>
-                </div>
-
-                <div id="medicine-section" class="expandable-section">
-                    <h6>Thuốc</h6>
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm p-3 mb-4 bg-white rounded">
+                    <h5 class="mb-3">Công cụ kiểm tra API Kho</h5>
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <button class="btn btn-info" onclick="getAllMedicines()">
-                                <i class="bi bi-capsule"></i> Lấy tất cả Thuốc
+                            <button class="btn btn-primary" onclick="getAllWarehouses()">
+                                <i class="bi bi-list"></i> Lấy tất cả Kho
                             </button>
-                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMedicineModal">
-                                <i class="bi bi-plus"></i> Thêm Thuốc
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addWarehouseModal">
+                                <i class="bi bi-plus"></i> Thêm Kho
                             </button>
                         </div>
                         <div class="col-md-6">
                             <div class="input-group">
-                                <select id="medicineSearchType" class="form-select" style="max-width: 150px;">
+                                <select id="warehouseSearchType" class="form-select" style="max-width: 150px;">
                                     <option value="id">ID</option>
                                     <option value="name">Tên</option>
+                                    <option value="location">Địa điểm</option>
                                 </select>
-                                <input id="medicineSearchInput" class="form-control" placeholder="Nhập giá trị tìm kiếm" type="text" onkeypress="if(event.key === 'Enter') searchWarehouse()">
-                                <button class="btn btn-outline-primary" onclick="searchMedicine()">
-                                    <i class="bi bi-search"></i> Tìm Thuốc
+                                <input id="warehouseSearchInput" class="form-control" placeholder="Nhập giá trị tìm kiếm" type="text" onkeypress="if(event.key === 'Enter') searchWarehouse()">
+                                <button class="btn btn-outline-primary" onclick="searchWarehouse()">
+                                    <i class="bi bi-search"></i> Tìm Kho
                                 </button>
                             </div>
                         </div>
                     </div>
                     <table class="table table-bordered table-striped">
-                        <thead>
+                        <thead class="table-primary">
                         <tr>
-                            <th scope="col" class="sortable" onclick="sortTable('medicine', 'id')">
-                                ID <span class="sort-icon" id="medicine-id-sort"></span>
+                            <th scope="col" class="sortable" onclick="sortTable('warehouse', 'id')">
+                                ID <span class="sort-icon" id="warehouse-id-sort"></span>
                             </th>
-                            <th scope="col" class="sortable" onclick="sortTable('medicine', 'name')">
-                                Tên <span class="sort-icon" id="medicine-name-sort"></span>
+                            <th scope="col" class="sortable" onclick="sortTable('warehouse', 'name')">
+                                Tên <span class="sort-icon" id="warehouse-name-sort"></span>
                             </th>
-                            <th scope="col">Kho</th>
-                            <th scope="col" class="sortable" onclick="sortTable('medicine', 'quantity')">
-                                Số lượng <span class="sort-icon" id="medicine-quantity-sort"></span>
-                            </th>
-                            <th scope="col">Đơn vị</th>
-                            <th scope="col">Ngày sản xuất</th>
-                            <th scope="col">Ngày hết hạn</th>
-                            <th scope="col">Tình trạng hết hạn</th>
-                            <th scope="col" class="sortable" onclick="sortTable('medicine', 'price')">
-                                Giá <span class="sort-icon" id="medicine-price-sort"></span>
-                            </th>
+                            <th scope="col">Địa điểm</th>
                             <th scope="col">Hành động</th>
                         </tr>
                         </thead>
-                        <tbody id="medicine-table-body"></tbody>
+                        <tbody id="warehouse-table-body"></tbody>
                     </table>
                     <div class="pagination-controls">
-                        <button class="btn btn-secondary btn-sm me-2" onclick="changeMedicinePage('prev')" id="prevMedicinePageBtn" disabled>
+                        <button class="btn btn-secondary btn-sm me-2" onclick="changeWarehousePage('prev')" id="prevWarehousePageBtn" disabled>
                             <i class="bi bi-arrow-left"></i>
                         </button>
-                        <span id="currentMedicinePage">Trang 1</span>
-                        <button class="btn btn-secondary btn-sm ms-2" onclick="changeMedicinePage('next')" id="nextMedicinePageBtn">
+                        <span id="currentWarehousePage">Trang 1</span>
+                        <button class="btn btn-secondary btn-sm ms-2" onclick="changeWarehousePage('next')" id="nextWarehousePageBtn">
                             <i class="bi bi-arrow-right"></i>
                         </button>
+                    </div>
+
+                    <div id="medicine-section" class="expandable-section">
+                        <h6>Thuốc</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <button class="btn btn-info" onclick="getAllMedicines()">
+                                    <i class="bi bi-capsule"></i> Lấy tất cả Thuốc
+                                </button>
+                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMedicineModal">
+                                    <i class="bi bi-plus"></i> Thêm Thuốc
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <select id="medicineSearchType" class="form-select" style="max-width: 150px;">
+                                        <option value="id">ID</option>
+                                        <option value="name">Tên</option>
+                                    </select>
+                                    <input id="medicineSearchInput" class="form-control" placeholder="Nhập giá trị tìm kiếm" type="text" onkeypress="if(event.key === 'Enter') searchWarehouse()">
+                                    <button class="btn btn-outline-primary" onclick="searchMedicine()">
+                                        <i class="bi bi-search"></i> Tìm Thuốc
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col" class="sortable" onclick="sortTable('medicine', 'id')">
+                                    ID <span class="sort-icon" id="medicine-id-sort"></span>
+                                </th>
+                                <th scope="col" class="sortable" onclick="sortTable('medicine', 'name')">
+                                    Tên <span class="sort-icon" id="medicine-name-sort"></span>
+                                </th>
+                                <th scope="col">Kho</th>
+                                <th scope="col" class="sortable" onclick="sortTable('medicine', 'quantity')">
+                                    Số lượng <span class="sort-icon" id="medicine-quantity-sort"></span>
+                                </th>
+                                <th scope="col">Đơn vị</th>
+                                <th scope="col">Ngày sản xuất</th>
+                                <th scope="col">Ngày hết hạn</th>
+                                <th scope="col">Tình trạng</th>
+                                <th scope="col" class="sortable" onclick="sortTable('medicine', 'price')">
+                                    Giá <span class="sort-icon" id="medicine-price-sort"></span>
+                                </th>
+                                <th scope="col">Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody id="medicine-table-body"></tbody>
+                        </table>
+                        <div class="pagination-controls">
+                            <button class="btn btn-secondary btn-sm me-2" onclick="changeMedicinePage('prev')" id="prevMedicinePageBtn" disabled>
+                                <i class="bi bi-arrow-left"></i>
+                            </button>
+                            <span id="currentMedicinePage">Trang 1</span>
+                            <button class="btn btn-secondary btn-sm ms-2" onclick="changeMedicinePage('next')" id="nextMedicinePageBtn">
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addWarehouseModal" tabindex="-1" aria-labelledby="addWarehouseModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addWarehouseModalLabel">Thêm Kho mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addWarehouseForm">
+                            <div class="mb-3">
+                                <label for="warehouseNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="warehouseNameInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="warehouseLocationInput" class="form-label">Địa điểm</label>
+                                <input type="text" class="form-control" id="warehouseLocationInput" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editWarehouseModal" tabindex="-1" aria-labelledby="editWarehouseModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editWarehouseModalLabel">Chỉnh sửa Kho</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editWarehouseForm">
+                            <input type="hidden" id="editWarehouseId">
+                            <div class="mb-3">
+                                <label for="editWarehouseNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="editWarehouseNameInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editWarehouseLocationInput" class="form-label">Địa điểm</label>
+                                <input type="text" class="form-control" id="editWarehouseLocationInput" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addMedicineModal" tabindex="-1" aria-labelledby="addMedicineModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addMedicineModalLabel">Thêm Thuốc mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addMedicineForm">
+                            <div class="mb-3">
+                                <label for="medicineNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="medicineNameInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medicineUnitIdInput" class="form-label">Đơn vị</label>
+                                <select class="form-control" id="medicineUnitIdInput" required>
+                                    <option value="">Chọn Đơn vị</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medicineCategoryIdInput" class="form-label">Danh mục</label>
+                                <select class="form-control" id="medicineCategoryIdInput" required>
+                                    <option value="">Chọn Danh mục</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medicineIngredientInput" class="form-label">Thành phần</label>
+                                <input type="text" class="form-control" id="medicineIngredientInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medicineUsageInput" class="form-label">Cách dùng</label>
+                                <input type="text" class="form-control" id="medicineUsageInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medicinePreservationInput" class="form-label">Bảo quản</label>
+                                <input type="text" class="form-control" id="medicinePreservationInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medicineManuDateInput" class="form-label">Ngày sản xuất</label>
+                                <input type="date" class="form-control" id="medicineManuDateInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medicineExpDateInput" class="form-label">Ngày hết hạn</label>
+                                <input type="date" class="form-control" id="medicineExpDateInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medicineQuantityInput" class="form-label">Số lượng</label>
+                                <input type="number" class="form-control" id="medicineQuantityInput" min="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="medicinePriceInput" class="form-label">Giá</label>
+                                <input type="number" class="form-control" id="medicinePriceInput" min="0" step="0.01" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editMedicineModal" tabindex="-1" aria-labelledby="editMedicineModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editMedicineModalLabel">Chỉnh sửa Thuốc</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editMedicineForm">
+                            <input type="hidden" id="editMedicineId">
+                            <div class="mb-3">
+                                <label for="editMedicineNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="editMedicineNameInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedicineUnitIdInput" class="form-label">Đơn vị</label>
+                                <select class="form-control" id="editMedicineUnitIdInput" required>
+                                    <option value="">Chọn Đơn vị</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedicineCategoryIdInput" class="form-label">Danh mục</label>
+                                <select class="form-control" id="editMedicineCategoryIdInput" required>
+                                    <option value="">Chọn Danh mục</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedicineIngredientInput" class="form-label">Thành phần</label>
+                                <input type="text" class="form-control" id="editMedicineIngredientInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedicineUsageInput" class="form-label">Cách dùng</label>
+                                <input type="text" class="form-control" id="editMedicineUsageInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedicinePreservationInput" class="form-label">Bảo quản</label>
+                                <input type="text" class="form-control" id="editMedicinePreservationInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedicineManuDateInput" class="form-label">Ngày sản xuất</label>
+                                <input type="date" class="form-control" id="editMedicineManuDateInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedicineExpDateInput" class="form-label">Ngày hết hạn</label>
+                                <input type="date" class="form-control" id="editMedicineExpDateInput" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedicineQuantityInput" class="form-label">Số lượng</label>
+                                <input type="number" class="form-control" id="editMedicineQuantityInput" min="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedicinePriceInput" class="form-label">Giá</label>
+                                <input type="number" class="form-control" id="editMedicinePriceInput" min="0" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedicineWarehouseIdInput" class="form-label">ID Kho</label>
+                                <input type="number" class="form-control" id="editMedicineWarehouseIdInput" min="1" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="addWarehouseModal" tabindex="-1" aria-labelledby="addWarehouseModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addWarehouseModalLabel">Thêm Kho mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addWarehouseForm">
-                        <div class="mb-3">
-                            <label for="warehouseNameInput" class="form-label">Tên</label>
-                            <input type="text" class="form-control" id="warehouseNameInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="warehouseLocationInput" class="form-label">Địa điểm</label>
-                            <input type="text" class="form-control" id="warehouseLocationInput" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Lưu</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="editWarehouseModal" tabindex="-1" aria-labelledby="editWarehouseModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editWarehouseModalLabel">Chỉnh sửa Kho</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editWarehouseForm">
-                        <input type="hidden" id="editWarehouseId">
-                        <div class="mb-3">
-                            <label for="editWarehouseNameInput" class="form-label">Tên</label>
-                            <input type="text" class="form-control" id="editWarehouseNameInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editWarehouseLocationInput" class="form-label">Địa điểm</label>
-                            <input type="text" class="form-control" id="editWarehouseLocationInput" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Cập nhật</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="addMedicineModal" tabindex="-1" aria-labelledby="addMedicineModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addMedicineModalLabel">Thêm Thuốc mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addMedicineForm">
-                        <div class="mb-3">
-                            <label for="medicineNameInput" class="form-label">Tên</label>
-                            <input type="text" class="form-control" id="medicineNameInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="medicineUnitIdInput" class="form-label">Đơn vị</label>
-                            <select class="form-control" id="medicineUnitIdInput" required>
-                                <option value="">Chọn Đơn vị</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="medicineCategoryIdInput" class="form-label">Danh mục</label>
-                            <select class="form-control" id="medicineCategoryIdInput" required>
-                                <option value="">Chọn Danh mục</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="medicineIngredientInput" class="form-label">Thành phần</label>
-                            <input type="text" class="form-control" id="medicineIngredientInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="medicineUsageInput" class="form-label">Cách dùng</label>
-                            <input type="text" class="form-control" id="medicineUsageInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="medicinePreservationInput" class="form-label">Bảo quản</label>
-                            <input type="text" class="form-control" id="medicinePreservationInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="medicineManuDateInput" class="form-label">Ngày sản xuất</label>
-                            <input type="date" class="form-control" id="medicineManuDateInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="medicineExpDateInput" class="form-label">Ngày hết hạn</label>
-                            <input type="date" class="form-control" id="medicineExpDateInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="medicineQuantityInput" class="form-label">Số lượng</label>
-                            <input type="number" class="form-control" id="medicineQuantityInput" min="0" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="medicinePriceInput" class="form-label">Giá</label>
-                            <input type="number" class="form-control" id="medicinePriceInput" min="0" step="0.01" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Lưu</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="editMedicineModal" tabindex="-1" aria-labelledby="editMedicineModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editMedicineModalLabel">Chỉnh sửa Thuốc</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editMedicineForm">
-                        <input type="hidden" id="editMedicineId">
-                        <div class="mb-3">
-                            <label for="editMedicineNameInput" class="form-label">Tên</label>
-                            <input type="text" class="form-control" id="editMedicineNameInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editMedicineUnitIdInput" class="form-label">Đơn vị</label>
-                            <select class="form-control" id="editMedicineUnitIdInput" required>
-                                <option value="">Chọn Đơn vị</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editMedicineCategoryIdInput" class="form-label">Danh mục</label>
-                            <select class="form-control" id="editMedicineCategoryIdInput" required>
-                                <option value="">Chọn Danh mục</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editMedicineIngredientInput" class="form-label">Thành phần</label>
-                            <input type="text" class="form-control" id="editMedicineIngredientInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editMedicineUsageInput" class="form-label">Cách dùng</label>
-                            <input type="text" class="form-control" id="editMedicineUsageInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editMedicinePreservationInput" class="form-label">Bảo quản</label>
-                            <input type="text" class="form-control" id="editMedicinePreservationInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editMedicineManuDateInput" class="form-label">Ngày sản xuất</label>
-                            <input type="date" class="form-control" id="editMedicineManuDateInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editMedicineExpDateInput" class="form-label">Ngày hết hạn</label>
-                            <input type="date" class="form-control" id="editMedicineExpDateInput" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editMedicineQuantityInput" class="form-label">Số lượng</label>
-                            <input type="number" class="form-control" id="editMedicineQuantityInput" min="0" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editMedicinePriceInput" class="form-label">Giá</label>
-                            <input type="number" class="form-control" id="editMedicinePriceInput" min="0" step="0.01" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editMedicineWarehouseIdInput" class="form-label">ID Kho</label>
-                            <input type="number" class="form-control" id="editMedicineWarehouseIdInput" min="1" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Cập nhật</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
     let selectedRow = null;
     let selectedWarehouseId = null;
@@ -422,7 +656,16 @@
         medicine: { column: 'id', direction: 'asc' },
         unit: { column: 'id', direction: 'asc' }
     };
-
+    function toggleSidebar() {
+        console.log('Toggling sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const toggleIcon = document.getElementById('toggleIcon');
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('collapsed');
+        toggleIcon.classList.toggle('fa-chevron-left');
+        toggleIcon.classList.toggle('fa-chevron-right');
+    }
     // Check expiry dates and show alert
     async function checkExpiringMedicines() {
         try {
@@ -444,12 +687,17 @@
                 list.innerHTML = '';
                 expiringMedicines.forEach(medicine => {
                     const daysDiff = Math.round((new Date(medicine.expDate) - new Date()) / (1000 * 60 * 60 * 24));
-                    const status = daysDiff < 0 ? 'Đã hết hạn' : `Hết hạn trong ${daysDiff} ngày`;
+                    const status = daysDiff <= 7 && daysDiff > 0
+                        ? `Hết hạn trong ${daysDiff} ngày`
+                        : daysDiff === 0
+                            ? 'Hết hạn trong hôm nay'
+                            : 'Đã hết hạn';
+
                     list.innerHTML += `<li>${medicine.name}: ${status}</li>`;
                 });
                 const expiryModal = new bootstrap.Modal(document.getElementById('expiryModal'), {
                     keyboard: false,
-                    backdrop: 'static'
+                    backdrop: true
                 });
                 expiryModal.show();
             }
@@ -463,12 +711,15 @@
         const today = new Date();
         const expiry = new Date(expDate);
         const daysDiff = (expiry - today) / (1000 * 60 * 60 * 24);
+
         if (daysDiff < 0) {
-            return { class: 'expiry-red', text: 'Expired' };
+            return { class: 'expiry-red', text: 'Đã hết hạn' };
+        } else if (daysDiff === 0) {
+            return { class: 'expiry-yellow', text: 'Hết hạn hôm nay' };
         } else if (daysDiff <= 7) {
-            return { class: 'expiry-yellow', text: 'Expiring Soon' };
+            return { class: 'expiry-yellow', text: 'Còn ' + Math.ceil(daysDiff) + ' ngày' };
         } else {
-            return { class: 'expiry-green', text: 'Safe' };
+            return { class: 'expiry-green', text: 'Tốt' };
         }
     }
 
@@ -612,7 +863,6 @@
         });
     }
 
-
     // Get warehouse name by ID
     function getWarehouseName(warehouseId) {
         const warehouse = warehouses.find(w => w.id === warehouseId);
@@ -642,18 +892,18 @@
         paginatedWarehouses.forEach((warehouse, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${warehouse.id || 'N/A'}</td>
-                <td>${warehouse.name || 'N/A'}</td>
-                <td>${warehouse.location || 'N/A'}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm edit-btn" data-id="${warehouse.id}">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm delete-btn" data-id="${warehouse.id}">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
-            `;
+                    <td>${warehouse.id || 'N/A'}</td>
+                    <td>${warehouse.name || 'N/A'}</td>
+                    <td>${warehouse.location || 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm edit-btn" data-id="${warehouse.id}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${warehouse.id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
 
             row.addEventListener('click', () => {
                 if (selectedRow) selectedRow.classList.remove('selected');
@@ -724,24 +974,24 @@
             const row = document.createElement('tr');
             const expiryStatus = getExpiryStatus(medicine.expDate);
             row.innerHTML = `
-                <td>${medicine.medicine_id || 'N/A'}</td>
-                <td>${medicine.name || 'N/A'}</td>
-                <td>${getWarehouseName(medicine.warehouse_id)}</td>
-                <td>${medicine.quantity || 'N/A'}</td>
-                <td>${getUnitName(medicine.unit_id || medicine.unit)}</td>
-                <td>${medicine.manuDate || 'N/A'}</td>
-                <td>${medicine.expDate || 'N/A'}</td>
-                <td class="${expiryStatus.class}">${expiryStatus.text}</td>
-                <td>${medicine.price?.toFixed(2) || 'N/A'}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm edit-medicine-btn" data-id="${medicine.medicine_id}">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm delete-medicine-btn" data-id="${medicine.medicine_id}">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
-            `;
+                    <td>${medicine.medicine_id || 'N/A'}</td>
+                    <td>${medicine.name || 'N/A'}</td>
+                    <td>${getWarehouseName(medicine.warehouse_id)}</td>
+                    <td>${medicine.quantity || 'N/A'}</td>
+                    <td>${getUnitName(medicine.unit_id || medicine.unit)}</td>
+                    <td>${medicine.manuDate || 'N/A'}</td>
+                    <td>${medicine.expDate || 'N/A'}</td>
+                    <td class="${expiryStatus.class}">${expiryStatus.text}</td>
+                    <td>${medicine.price?.toFixed(2) || 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm edit-medicine-btn" data-id="${medicine.medicine_id}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm delete-medicine-btn" data-id="${medicine.medicine_id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
             tbody.appendChild(row);
 
             row.querySelector('.edit-medicine-btn').addEventListener('click', (e) => {
@@ -1273,7 +1523,8 @@
 
             alert('Medicine updated successfully');
             $('#editMedicineModal').modal('hide');
-            if (selectedWarehouseId){ showMedicines(selectedWarehouseId);}else getAllMedicines();
+            if (selectedWarehouseId) showMedicines(selectedWarehouseId);
+            else getAllMedicines();
         } catch (error) {
             console.error('Update medicine error:', error);
             alert('Failed to update medicine: ' + error.message);
@@ -1309,33 +1560,32 @@
 
     // Validate medicine input
     function validateMedicineInput(medicine) {
-    const nameRegex = /^[a-zA-Z0-9\s]{1,50}$/;
-    const textRegex = /^[a-zA-Z0-9\s,]{1,200}$/;
-    if (!nameRegex.test(medicine.name)) {
-        throw new Error('Name must be 1-50 alphanumeric characters');
-    }
-    if (!Number.isInteger(medicine.unit_id) || medicine.unit_id <= 0) {
-        throw new Error('Unit must be selected');
-    }
-    if (!Number.isInteger(medicine.category_id) || medicine.category_id <= 0) {
-        throw new Error('Category must be selected');
-    }
-
-    if (!medicine.manuDate || isNaN(Date.parse(medicine.manuDate))) {
-        throw new Error('Invalid manufacture date');
-    }
-    if (!medicine.expDate || isNaN(Date.parse(medicine.expDate))) {
-        throw new Error('Invalid expiry date');
-    }
-    if (!Number.isInteger(medicine.quantity) || medicine.quantity < 0) {
-        throw new Error('Quantity must be a non-negative integer');
-    }
-    if (isNaN(medicine.price) || medicine.price < 0) {
-        throw new Error('Price must be a non-negative number');
-    }
-    if (!Number.isInteger(medicine.warehouse_id) || medicine.warehouse_id <= 0) {
-        throw new Error('Warehouse ID must be a positive integer');
-    }
+        const nameRegex = /^[a-zA-Z0-9\s]{1,50}$/;
+        const textRegex = /^[a-zA-Z0-9\s,]{1,200}$/;
+        if (!nameRegex.test(medicine.name)) {
+            throw new Error('Name must be 1-50 alphanumeric characters');
+        }
+        if (!Number.isInteger(medicine.unit_id) || medicine.unit_id <= 0) {
+            throw new Error('Unit must be selected');
+        }
+        if (!Number.isInteger(medicine.category_id) || medicine.category_id <= 0) {
+            throw new Error('Category must be selected');
+        }
+        if (!medicine.manuDate || isNaN(Date.parse(medicine.manuDate))) {
+            throw new Error('Invalid manufacture date');
+        }
+        if (!medicine.expDate || isNaN(Date.parse(medicine.expDate))) {
+            throw new Error('Invalid expiry date');
+        }
+        if (!Number.isInteger(medicine.quantity) || medicine.quantity < 0) {
+            throw new Error('Quantity must be a non-negative integer');
+        }
+        if (isNaN(medicine.price) || medicine.price < 0) {
+            throw new Error('Price must be a non-negative number');
+        }
+        if (!Number.isInteger(medicine.warehouse_id) || medicine.warehouse_id <= 0) {
+            throw new Error('Warehouse ID must be a positive integer');
+        }
     }
 
     // Event listeners
@@ -1348,7 +1598,6 @@
         e.preventDefault();
         updateWarehouse();
     });
-
 
     document.getElementById('addMedicineForm').addEventListener('submit', (e) => {
         e.preventDefault();
