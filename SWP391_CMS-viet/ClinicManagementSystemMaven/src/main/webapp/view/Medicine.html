@@ -18,9 +18,8 @@
             cursor: pointer;
         }
 
-        #medicine-table-body tr.selected {
+        #medicine-table-body tr {
             background-color: #bfdbfe !important;
-            font-weight: 500;
         }
 
         html {
@@ -86,11 +85,15 @@
         }
 
         .btn-info {
+            color: white;
+            font-weight: bold;
             background-color: #3b82f6;
             border-color: #3b82f6;
         }
 
         .btn-info:hover {
+            color: white;
+            font-weight: bold;
             background-color: #2563eb;
             border-color: #2563eb;
             transform: translateY(-1px);
@@ -246,6 +249,9 @@
                 width: 90%;
             }
         }
+        table{
+            text-align: center;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -305,7 +311,7 @@
             <h4 class="mb-3">Danh sách thuốc</h4>
 
             <div class="search-container">
-                <input type="text" id="medicine-id-search" placeholder="Nhập ID thuốc" class="form-control">
+                <input type="text" id="medicine-id-search" placeholder="Nhập ID hoặc tên thuốc" class="form-control">
                 <button id="search-btn" class="btn">Tìm kiếm</button>
             </div>
 
@@ -374,7 +380,6 @@
 
 <script>
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
-    let selectedRow = null;
     let allMedicines = []; // Store all medicines for filtering
 
     // Display medicines
@@ -393,24 +398,19 @@
         medicines.forEach((medicine, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-            <td>${medicine.id || 'N/A'}</td>
-            <td>${medicine.name || 'N/A'}</td>
-            <td>${medicine.manuDate || 'N/A'}</td>
-            <td>${medicine.expDate || 'N/A'}</td>
-            <td>${medicine.quantity || 'N/A'}</td>
-            <td>${medicine.price || 'N/A'}</td>
-            <td>
-                <button class="btn btn-info btn-sm select-btn" data-id="${medicine.id}">
-                    <i class="bi bi-eye"></i> Chọn
-                </button>
-            </td>
-        `;
+                <td>${medicine.id || 'N/A'}</td>
+                <td>${medicine.name || 'N/A'}</td>
+                <td>${medicine.manuDate || 'N/A'}</td>
+                <td>${medicine.expDate || 'N/A'}</td>
+                <td>${medicine.quantity || 'N/A'}</td>
+                <td>${medicine.price || 'N/A'}</td>
+                <td>
+                    <button class="btn btn-info btn-sm select-btn" data-id="${medicine.id}">
+                        <i class="bi bi-eye"></i> Chọn
+                    </button>
+                </td>
+            `;
             tbody.appendChild(row);
-
-            if (index === 0) {
-                row.classList.add('selected');
-                selectedRow = row;
-            }
         });
     }
 
@@ -449,35 +449,24 @@
         }
     }
 
-    // Search for medicine by ID
-    async function searchMedicineById(id) {
+    // Search for medicine by ID or Name
+    async function searchMedicine(query) {
         try {
-            if (!id) {
-                displayMedicines(allMedicines); // If no ID, show all
+            if (!query || query.trim() === '') {
+                displayMedicines(allMedicines); // Show all if no query
                 return;
             }
 
-            const response = await fetch(`${baseUrl}/api/admin?action=medicineid&id=${id}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
+            // Filter locally from allMedicines
+            const filteredMedicines = allMedicines.filter(medicine =>
+                medicine.id.toString().includes(query) ||
+                medicine.name.toLowerCase().includes(query.toLowerCase())
+            );
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
-            }
-
-            const text = await response.text();
-            if (!text) {
-                throw new Error("Phản hồi từ máy chủ rỗng");
-            }
-
-            const data = JSON.parse(text);
-            console.log('Search result:', data);
-            if (!data || Object.keys(data).length === 0) {
-                displayError('Không tìm thấy thuốc với ID này');
+            if (filteredMedicines.length === 0) {
+                displayError('Không tìm thấy thuốc với từ khóa này');
             } else {
-                displayMedicines([data]);
+                displayMedicines(filteredMedicines);
             }
         } catch (error) {
             console.error('Search error:', error);
@@ -486,9 +475,19 @@
     }
 
     // Update medicine price
-    async function updateMedicinePrice(medicineId, newPrice) {
+    async function updateMedicinePrice(medicineId, newPrice, medicineName) {
+
         try {
-            const response = await fetch(`${baseUrl}/api/admin?action=updatePrice&id=${medicineId}&price=${newPrice}`, {
+            console.log('Updating with medicineId:', medicineId, 'newPrice:', newPrice);
+            if (!medicineId || isNaN(medicineId) || medicineId <= 0) {
+                throw new Error('ID thuốc không hợp lệ');
+            }
+            if (!newPrice || isNaN(newPrice) || newPrice <= 0) {
+                throw new Error('Giá mới không hợp lệ');
+            }
+            const parsedId = parseInt(medicineId);
+            const parsedPrice = parseFloat(newPrice.replace(',', '.'));
+            const response = await fetch(`${baseUrl}/api/admin?action=updatePrice&id=${parsedId}&price=${parsedPrice}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -500,7 +499,7 @@
 
             const result = await response.json();
             if (result.message) {
-                alert(result.message);
+                alert(`Cập nhật giá ${medicineName} thành công`);
                 getAllMedicines(); // Refresh the table
                 closeModal();
             } else {
@@ -536,7 +535,7 @@
             }
 
             // Populate modal fields
-            document.getElementById('modal-medicine-id').value = medicine.id || 'N/A';
+            document.getElementById('modal-medicine-id').value = medicine.medicine_id || 'N/A';
             document.getElementById('modal-medicine-name').value = medicine.name || 'N/A';
             document.getElementById('modal-manu-date').value = medicine.manuDate || 'N/A';
             document.getElementById('modal-exp-date').value = medicine.expDate || 'N/A';
@@ -587,15 +586,15 @@
     const searchBtn = document.getElementById('search-btn');
     const searchInput = document.getElementById('medicine-id-search');
     searchBtn.addEventListener('click', () => {
-        const medicineId = searchInput.value.trim();
-        searchMedicineById(medicineId);
+        const query = searchInput.value.trim();
+        searchMedicine(query);
     });
 
     // Allow pressing Enter to search
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            const medicineId = searchInput.value.trim();
-            searchMedicineById(medicineId);
+            const query = searchInput.value.trim();
+            searchMedicine(query);
         }
     });
 
@@ -604,31 +603,22 @@
         const target = e.target.closest('button') || e.target.closest('tr');
         if (!target) return;
 
-        // Handle row selection
-        if (target.tagName === 'TR' && !e.target.closest('button')) {
-            if (selectedRow) {
-                selectedRow.classList.remove('selected');
-            }
-            target.classList.add('selected');
-            selectedRow = target;
-        }
-
-        // Handle select button
+        // Chỉ xử lý nút select-btn, bỏ qua chọn hàng
         if (target.classList.contains('select-btn')) {
             const medicineId = target.dataset.id;
             showMedicineDetails(medicineId);
         }
     });
-
     // Save price button
     document.getElementById('save-price-btn').addEventListener('click', () => {
         const medicineId = document.getElementById('modal-medicine-id').value;
         const newPrice = document.getElementById('modal-price').value;
+        const medicineName = document.getElementById('modal-medicine-name').value;
         if (!newPrice || newPrice <= 0) {
             alert('Vui lòng nhập giá hợp lệ');
             return;
         }
-        updateMedicinePrice(medicineId, newPrice);
+        updateMedicinePrice(medicineId, newPrice, medicineName);
     });
 
     // Close modal button
