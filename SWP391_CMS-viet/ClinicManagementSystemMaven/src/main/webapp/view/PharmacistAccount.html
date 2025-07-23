@@ -333,9 +333,7 @@
                 <td>${pharmacist.password || 'N/A'}</td>
                 <td>${pharmacist.status || 'N/A'}</td>
                 <td>
-    <button class="btn btn-info btn-sm update-btn" data-id="${pharmacist.ID}">
-      <i class="bi bi-pencil-square"></i> Cập nhật
-    </button>
+
     <button class="btn btn-${pharmacist.status === "Enable" ? "warning" : "success"} btn-sm toggle-status-btn"
             data-id="${pharmacist.ID}" data-status="${pharmacist.status}">
       ${pharmacist.status === "Enable" ? "Vô hiệu hóa" : "Kích hoạt"}

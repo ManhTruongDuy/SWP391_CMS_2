@@ -258,6 +258,7 @@
                     <th>ID</th>
                     <th>Họ và tên</th>
                     <th>SDT</th>
+                    <th>Phòng ban</th>
                     <th>Email</th>
                     <th>Tên người dùng</th>
                     <th>Mật khẩu</th>
@@ -329,14 +330,13 @@
                 <td>${doctor.id ?? 'N/A'}</td>
                 <td>${doctor.name || 'N/A'}</td>
                 <td>${doctor.phone || 'N/A'}</td>
+                <td>${doctor.department || 'N/A'}</td>
                 <td>${doctor.email || 'N/A'}</td>
                 <td>${doctor.username || 'N/A'}</td>
                 <td>${doctor.password || 'N/A'}</td>
                 <td>${doctor.status || 'N/A'}</td>
                 <td>
-    <button class="btn btn-info btn-sm select-btn" data-id="${doctor.id}">
-        <i class="bi bi-eye"></i> Xem
-    </button>
+
     <button class="btn btn-${doctor.status === "Enable" ? "warning" : "success"} btn-sm toggle-doctor-btn"
             data-id="${doctor.id}"
             data-status="${doctor.status}">

@@ -259,6 +259,7 @@
                     <th>ID</th>
                     <th>Họ và tên</th>
                     <th>Số điện thoại</th>
+                    <th>Phòng ban</th>
                     <th>Email</th>
                     <th>Tên người dùng</th>
                     <th>Mật khẩu</th>
@@ -329,24 +330,24 @@
         sysadmins.forEach((sysadmin, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${sysadmin.admin_id ?? 'N/A'}</td>
-                <td>${sysadmin.fullName || 'N/A'}</td>
-                <td>${sysadmin.phone || 'N/A'}</td>
-                <td>${sysadmin.email || 'N/A'}</td>
-                <td>${sysadmin.username || 'N/A'}</td>
-                <td>${sysadmin.password || 'N/A'}</td>
-                <td>${sysadmin.status || 'N/A'}</td>
-<td>
-    <button class="btn btn-info btn-sm update-btn" data-id="${sysadmin.admin_id}">
-        <i class="bi bi-pencil-square"></i> Cập nhật
-    </button>
-    <button class="btn ${sysadmin.status === 'Enable' ? 'btn-warning' : 'btn-success'} btn-sm toggle-status-btn"
-        data-id="${sysadmin.admin_id}" data-status="${sysadmin.status}">
-        <i class="bi ${sysadmin.status === 'Enable' ? 'bi-slash-circle' : 'bi-check-circle'}"></i>
-        ${sysadmin.status === 'Enable' ? 'Vô hiệu hóa' : 'Kích hoạt'}
-    </button>
-</td>
-            `;
+    <td>${sysadmin.admin_id ?? 'N/A'}</td>
+    <td>${sysadmin.fullName || 'N/A'}</td>
+    <td>${sysadmin.phone || 'N/A'}</td>
+    <td>${sysadmin.department || 'N/A'}</td>
+    <td>${sysadmin.email || 'N/A'}</td>
+    <td>${sysadmin.username || 'N/A'}</td>
+    <td>${sysadmin.password || 'N/A'}</td>
+    <td>${sysadmin.status || 'N/A'}</td>
+    <td>
+
+        <button class="btn ${sysadmin.status === 'Enable' ? 'btn-warning' : 'btn-success'} btn-sm toggle-status-btn"
+            data-id="${sysadmin.admin_id}" data-status="${sysadmin.status}">
+            <i class="bi ${sysadmin.status === 'Enable' ? 'bi-slash-circle' : 'bi-check-circle'}"></i>
+            ${sysadmin.status === 'Enable' ? 'Vô hiệu hóa' : 'Kích hoạt'}
+        </button>
+    </td>
+`;
+
             tbody.appendChild(row);
 
             if (index === 0) {
@@ -525,6 +526,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
+
                         id: Number(sysadminId),
                         role: 'SysAdmin',
                         status: newStatus,
@@ -549,5 +551,129 @@
 
 
 </script>
+
+
+<!-- Update Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="updateForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Cập nhật thông tin quản trị viên</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="update-id">
+                    <div class="mb-3">
+                        <label for="update-name" class="form-label">Họ và tên</label>
+                        <input type="text" class="form-control" id="update-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update-phone" class="form-label">Số điện thoại</label>
+                        <input type="text" class="form-control" id="update-phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="update-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="update-email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="update-department" class="form-label">Phòng ban</label>
+                        <input type="text" class="form-control" id="update-department">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('.update-btn')) {
+            console.log("🟡 Click update-btn detected"); // <-- thêm dòng này
+
+            const button = event.target.closest('.update-btn');
+            const id = button.getAttribute('data-id');
+            console.log("🟢 Clicked ID:", id);
+
+            const sysadmin = allSysadmins.find(a => a.admin_id == id);
+            if (!sysadmin) return alert("Không tìm thấy người dùng!");
+
+            document.getElementById('update-id').value = sysadmin.admin_id;
+            document.getElementById('update-name').value = sysadmin.fullName || '';
+            document.getElementById('update-phone').value = sysadmin.phone || '';
+            document.getElementById('update-email').value = sysadmin.email || '';
+            document.getElementById('update-department').value = sysadmin.department || '';
+
+            const modal = new bootstrap.Modal(document.getElementById('updateModal'));
+            modal.show();
+        }
+    });
+
+
+    document.getElementById('updateForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const id = Number(document.getElementById('update-id').value);
+        const name = document.getElementById('update-name').value.trim();
+        const phone = document.getElementById('update-phone').value.trim();
+        const email = document.getElementById('update-email').value.trim();
+        const department = document.getElementById('update-department').value.trim();
+
+        try {
+            const res = await fetch(`${baseUrl}/api/system-admin?action=update`
+        , {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'update',
+                    id: id,
+                    role: 'SysAdmin',
+                    name: name,
+                    phone: phone,
+                    email: email,
+                    department: department
+                })
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) throw new Error(result.error || "Cập nhật thất bại");
+
+            alert("✅ Cập nhật thành công!");
+            const modal = bootstrap.Modal.getInstance(document.getElementById('updateModal'));
+            modal.hide();
+            getAllSysadmins(); // Tải lại danh sách
+
+        } catch (err) {
+            alert("❌ Lỗi: " + err.message);
+        }
+    });
+
+
+
+    document.querySelectorAll('a[href="#logout"]').forEach(logoutLink => {
+        logoutLink.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            // 🔐 Xoá thông tin phiên đăng nhập nếu có
+            localStorage.removeItem('token'); // hoặc sessionStorage
+            sessionStorage.clear(); // tuỳ bạn đang dùng cái gì
+
+            // 🚪 Chuyển hướng về trang đăng nhập
+            window.location.href = '/ClinicManagementSystem_war_exploded/view/accountpharmacist/Login.jsp'; // thay bằng URL thật của trang đăng nhập
+        });
+    });
+
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
 </body>
 </html>

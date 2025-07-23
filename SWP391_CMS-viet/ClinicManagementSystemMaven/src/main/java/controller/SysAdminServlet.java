@@ -7,7 +7,8 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.io.PrintWriter;
-
+import model.accounts.*;
+import model.StaffProfileDTO;
 @WebServlet("/api/system-admin")
 public class SysAdminServlet extends HttpServlet {
     private final SysAdminDAO dao = new SysAdminDAO();
@@ -245,7 +246,90 @@ public class SysAdminServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
             }
-        } else {
+        }
+        else if ("update".equalsIgnoreCase(action)) {
+            try (var reader = req.getReader(); PrintWriter out = resp.getWriter()) {
+                var body = gson.fromJson(reader, java.util.Map.class);
+
+                String role = (String) body.get("role");
+                if (role == null || !body.containsKey("id")) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"error\":\"Missing required fields (id, role)\"}");
+                    return;
+                }
+
+                int id = ((Double) body.get("id")).intValue();
+                boolean result = false;
+
+                switch (role) {
+                    case "Doctor" -> {
+                        StaffProfileDTO doctor = new StaffProfileDTO();
+                        doctor.setDoctorId(id);
+                        doctor.setFullName((String) body.get("name"));
+                        doctor.setPhone((String) body.get("phone"));
+                        doctor.setEmail((String) body.get("email"));
+                        doctor.setDepartment((String) body.get("department"));
+                        doctor.setEduLevel((String) body.get("eduLevel"));
+                        doctor.setAvailability((String) body.get("availability"));
+                        result = dao.updateDoctorInfo(doctor);
+                    }
+                    case "Pharmacist" -> {
+                        PharmacistAccount p = new PharmacistAccount();
+                        p.setID(id);
+                        p.setName((String) body.get("name"));
+                        p.setEmail((String) body.get("email"));
+                        p.setMobile((String) body.get("phone"));
+                        result = dao.updatePharmacistInfo(p);
+                    }
+                    case "BusinessAdmin" -> {
+                        ManagerAccount m = new ManagerAccount();
+                        m.setAdmin_id(id);
+                        m.setFullName((String) body.get("name"));
+                        m.setPhone((String) body.get("phone"));
+                        m.setEmail((String) body.get("email"));
+                        m.setDepartment((String) body.get("department"));
+                        result = dao.updateManagerInfo(m);
+                    }
+                    case "SysAdmin" -> {
+                        SysAdminAccount s = new SysAdminAccount();
+                        s.setAdmin_id(id);
+                        s.setFullName((String) body.get("name"));
+                        s.setPhone((String) body.get("phone"));
+                        s.setEmail((String) body.get("email"));
+                        s.setDepartment((String) body.get("department"));
+                        result = dao.updateSysAdminInfo(s);
+                    }
+                    case "Patient" -> {
+                        PatientAccount p = new PatientAccount();
+                        p.setPatient_id(id);
+                        p.setFullName((String) body.get("name"));
+                        p.setPhone((String) body.get("phone"));
+                        p.setEmail((String) body.get("email"));
+                        result = dao.updatePatientInfo(p);
+                    }
+                    default -> {
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Invalid role type\"}");
+                        return;
+                    }
+                }
+
+                if (result) {
+                    out.print("{\"message\":\"Cập nhật thông tin thành công\"}");
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.print("{\"error\":\"Cập nhật thất bại\"}");
+                }
+
+            } catch (Exception e) {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+            }
+        }
+
+
+
+        else {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid or missing action");
         }
     }
