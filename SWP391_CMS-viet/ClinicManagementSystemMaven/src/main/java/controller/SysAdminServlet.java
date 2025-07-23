@@ -27,6 +27,7 @@ public class SysAdminServlet extends HttpServlet {
                 case "managers"    -> out.print(gson.toJson(dao.getAllManagers()));
                 case "sys-admins"  -> out.print(gson.toJson(dao.getAllSysAdmins()));
                 case "patients"    -> out.print(gson.toJson(dao.getAllPatients()));
+                case "wManager"    -> out.print(gson.toJson(dao.getAllWarehouseManager()));
                 case "doctorid"    -> {
                     String idParam = request.getParameter("id");
                     if (idParam == null || idParam.trim().isEmpty()) {
@@ -132,7 +133,27 @@ public class SysAdminServlet extends HttpServlet {
                         out.print("{\"error\":\"Invalid System admin ID format\"}");
                     }
                 }
-
+                case "wManagerid"    -> {
+                    String idParam = request.getParameter("id");
+                    if (idParam == null || idParam.trim().isEmpty()) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Warehouse manager ID is missing\"}");
+                        return;
+                    }
+                    try {
+                        int wManagerID = Integer.parseInt(idParam);
+                        Object wMana = dao.getWarehouseManagerById(wManagerID);
+                        if (wMana == null) {
+                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                            out.print("{\"error\":\"Warehouse manager not found\"}");
+                        } else {
+                            out.print(gson.toJson(wMana));
+                        }
+                    } catch (NumberFormatException e) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Invalid Warehouse manager ID format\"}");
+                    }
+                }
                 case "sysadminname" -> {
                     String nameParam = request.getParameter("name");
                     if (nameParam == null || nameParam.trim().isEmpty()) {
