@@ -1,6 +1,7 @@
 package dao;
 
 import model.Medicine;
+import model.MedicineAdmin;
 import model.Pharmacist;
 import model.accounts.*;
 
@@ -19,27 +20,19 @@ public class AdminDAO {
     }
 
     // Lấy tất cả thuốc
-    public List<Medicine> getAllMedicines() {
-        List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT * " +
-                "FROM Medicine " +
-                "ORDER BY medicine_id ";
+    public List<MedicineAdmin> getAllMedicines() {
+        List<MedicineAdmin> list = new ArrayList<>();
+        String sql = "SELECT medicine_id, name, manuDate, expDate, quantity, price FROM Medicine ORDER BY medicine_id";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Medicine m = new Medicine(
+                    MedicineAdmin m = new MedicineAdmin(
                             rs.getInt("medicine_id"),
                             rs.getString("name"),
-                            rs.getInt("unit_id"),
-                            rs.getInt("category_id"),
-                            rs.getString("ingredient"),
-                            rs.getString("usage"),
-                            rs.getString("preservation"),
                             rs.getDate("manuDate") != null ? rs.getDate("manuDate").toLocalDate() : null,
                             rs.getDate("expDate") != null ? rs.getDate("expDate").toLocalDate() : null,
                             rs.getInt("quantity"),
-                            rs.getFloat("price"),
-                            rs.getInt("warehouse_id")
+                            rs.getFloat("price")
                     );
                     list.add(m);
                 }
@@ -91,4 +84,5 @@ public class AdminDAO {
             return false;
         }
     }
+
 }
