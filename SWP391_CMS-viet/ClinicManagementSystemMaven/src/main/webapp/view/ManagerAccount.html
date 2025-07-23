@@ -363,10 +363,6 @@
                 <td>${manager.password || 'N/A'}</td>
                 <td>${manager.status || 'N/A'}</td>
                 <td>
-  <button class="btn btn-info btn-sm update-btn" data-id="${manager.admin_id}">
-        <i class="bi bi-pencil-square"></i> Cập nhật
-    </button>
-
   <button class="btn btn-${manager.status === "Enable" ? "warning" : "success"} btn-sm toggle-manager-btn"
           data-id="${manager.admin_id}"
           data-status="${manager.status}">
