@@ -155,6 +155,30 @@ public class SysAdminDAO {
         return list;
     }
 
+    public List<WarehouseManagerAccount> getAllWarehouseManager() {
+        List<WarehouseManagerAccount> list = new ArrayList<>();
+        String sql = "SELECT * FROM Warehouse_manager w JOIN AccountStaff a ON w.account_staff_id = a.account_staff_id ORDER BY Warehouse_manager_id";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    WarehouseManagerAccount wa = new WarehouseManagerAccount(
+                            rs.getInt("Warehouse_manager_id"),
+                            rs.getString("full_name"),
+                            rs.getString("phone"),
+                            rs.getString("email"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("status")
+                    );
+                    list.add(wa);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     //Lấy bác sĩ theo id
     public DoctorAccount getDoctorById(int id) {
         String sql = "SELECT * FROM Doctor d JOIN AccountStaff ast ON d.account_staff_id = ast.account_staff_id WHERE d.doctor_id = ?";
@@ -274,6 +298,33 @@ public class SysAdminDAO {
         }
         return null;
     }
+
+    //find warehouse manager by id
+    public WarehouseManagerAccount getWarehouseManagerById(int id) {
+        List<WarehouseManagerAccount> list = new ArrayList<>();
+        String sql = "SELECT * FROM Warehouse_manager w JOIN AccountStaff a ON w.account_staff_id = a.account_staff_id WHERE Warehouse_manager_id=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    WarehouseManagerAccount wa = new WarehouseManagerAccount(
+                            rs.getInt("Warehouse_manager_id"),
+                            rs.getString("full_name"),
+                            rs.getString("phone"),
+                            rs.getString("email"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("status")
+                    );
+                    return wa;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     // Tìm bác sĩ theo tên
     public List<DoctorAccount> getDoctorsByName(String name) {
         List<DoctorAccount> list = new ArrayList<>();
