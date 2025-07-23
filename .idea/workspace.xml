@@ -5,15 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4361ac0e-71eb-4ece-b677-6e80dd541e6b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/ClinicManagementSystemMaven.iml" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/ClinicManagementSystemMaven.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS-viet/ClinicManagementSystemMaven/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SWP391_CMS_2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/SWP391_CMS_2.iml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -190,6 +182,7 @@
       <workItem from="1753120860727" duration="584000" />
       <workItem from="1753124825209" duration="362000" />
       <workItem from="1753125208807" duration="7000" />
+      <workItem from="1753153118942" duration="32000" />
     </task>
     <servers />
   </component>

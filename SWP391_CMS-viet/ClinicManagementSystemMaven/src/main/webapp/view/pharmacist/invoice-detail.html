@@ -36,7 +36,7 @@
         document.getElementById("medicineDetailTable").innerHTML =
             `<tr><td colspan="6" class="text-danger text-center">Không tìm thấy mã đơn thuốc!</td></tr>`;
     } else {
-        fetch(`/ClinicManagementSystem_war/api/historyPayDetail?id=${invoiceId}`)
+        fetch(`/ClinicManagementSystem_war_exploded/api/historyPayDetail?id=${invoiceId}`)
             .then(res => res.json())
             .then(data => {
                 const table = document.getElementById("medicineDetailTable");
