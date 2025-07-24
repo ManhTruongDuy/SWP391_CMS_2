@@ -28,7 +28,7 @@
 <body>
 <h2>Tạo Tài Khoản Mới</h2>
 <form action="/api/system-admin" method="POST" id="adminForm">
-    <input type="hidden" name="action" value="createAccount">
+    <input type="hidden" name="action" value="createaccount">
     <div class="form-group">
         <label for="username">Tên Đăng Nhập:</label>
         <input type="text" id="username" name="username" required>
@@ -62,7 +62,7 @@
     </div>
     <button type="submit" class="create-button">Tạo tài khoản</button>
 </form>
-<a href="SysAdminAccount.html" class="create-button">Quay Về</a>
+<a href="SysAdminDashboard.html.html" class="create-button">Quay Về</a>
 
 <script>
     document.getElementById('adminForm').addEventListener('submit', function(event) {
@@ -91,7 +91,7 @@
             .then(data => {
                 if (data.message) {
                     // Redirect to SysAdminAccount.html on success
-                    window.location.href = 'SysAdminAccount.html';
+                    window.location.href = 'SysAdminDashboard.html';
                 } else if (data.error) {
                     alert(data.error); // Show error message
                 }

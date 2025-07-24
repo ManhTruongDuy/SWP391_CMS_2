@@ -265,7 +265,39 @@ public class SysAdminServlet extends HttpServlet {
                     resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
                 }
                 break;
+            case "createpharmacist":
+                try (PrintWriter out = resp.getWriter()) {
+                    String username = req.getParameter("username");
+                    String password = req.getParameter("password");
+                    String email = req.getParameter("email");
+                    String img = req.getParameter("img");
+                    String status = req.getParameter("status");
 
+                    if (username == null || password == null || email == null || status == null) {
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Missing required fields\"}");
+                        return;
+                    }
+
+                    AccountPharmacist ap = new AccountPharmacist();
+                    ap.setUsername(username);
+                    ap.setPassword(password);
+                    ap.setEmail(email);
+                    ap.setImg(img != null ? img : "");
+                    ap.setStatus(status);
+
+                    boolean result = dao.addAccountPharmacist(ap);
+                    if (result) {
+                        out.print("{\"message\":\"Tài khoản được tạo thành công\"}");
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        out.print("{\"error\":\"Không thể tạo tài khoản\"}");
+                    }
+                } catch (Exception e) {
+                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+                }
+                break;
             case "toggle-status":
                 try (var reader = req.getReader(); PrintWriter out = resp.getWriter()) {
                     var body = gson.fromJson(reader, java.util.Map.class);
