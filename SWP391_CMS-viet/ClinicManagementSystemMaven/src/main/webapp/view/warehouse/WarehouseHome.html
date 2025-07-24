@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Home - MediCare System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: whitesmoke;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            padding: 15px;
+            transition: width 0.3s;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .brand-text,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .nav-section-title,
+        .sidebar.collapsed .user-details,
+        .sidebar.collapsed .logout-text {
+            display: none;
+        }
+
+        .sidebar-toggle {
+            background: #fff;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            right: -15px;
+            width: 30px;
+            height: 38px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            transform: translateY(-50%);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .brand-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .sidebar-brand {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            padding-left: 16px;
+        }
+
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+
+        .nav-section-title {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin: 10px 0;
+            text-transform: uppercase;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #e9ecef;
+        }
+
+        .nav-link.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .nav-icon {
+            margin-right: 20px;
+            width: 20px;
+            text-align: center;
+            padding-left: 5px;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        .user-role {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            color: #dc3545;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .logout-btn:hover {
+            background: #e9ecef;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            transition: all 0.3s;
+        }
+
+        .main-content.collapsed {
+            margin-left: 80px;
+            width: calc(100% - 80px);
+        }
+
+        .card {
+            height: auto;
+        }
+
+        .table tbody tr:hover {
+            background-color: #e0f0ff !important;
+            cursor: pointer;
+        }
+        table{
+            text-align: center;
+        }
+
+        .modal-content {
+            border-radius: 10px;
+        }
+
+        .pagination-controls {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .sort-icon {
+            margin-left: 5px;
+        }
+
+        .sortable {
+            cursor: pointer;
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+
+        .dashboard-card {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .dashboard-card h3 {
+            margin-bottom: 15px;
+        }
+
+        .dashboard-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .expiry-green {
+            color: green !important;
+            font-weight: bold;
+        }
+        .expiry-yellow {
+            color: orange !important;
+            font-weight: bold;
+        }
+        .expiry-red {
+            color: red !important;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-left" id="toggleIcon"></i>
+    </button>
+
+    <div class="sidebar-header">
+        <a href="WarehouseHome.html" class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fas fa-hospital"></i>
+            </div>
+            <span class="brand-text">MediCare System</span>
+        </a>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Chính</div>
+            <div class="nav-item">
+                <a href="WarehouseHome.html" class="nav-link active">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span class="nav-text">Home</span>
+                </a>
+            </div>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Quản lý</div>
+            <div class="nav-item">
+                <a href="Warehouse.html" class="nav-link">
+                    <i class="fas fa-warehouse nav-icon"></i>
+                    <span class="nav-text">Kho</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="UnitAndCategory.html" class="nav-link">
+                    <i class="fas fa-cubes nav-icon"></i>
+                    <span class="nav-text">Đơn vị & Danh mục</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar">DT</div>
+            <div class="user-details">
+                <div class="user-name">Dược sĩ Thảo</div>
+                <div class="user-role">Quầy thuốc</div>
+            </div>
+        </div>
+        <a href="login.html" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="logout-text">Đăng xuất</span>
+        </a>
+    </div>
+</div>
+
+<div class="main-content" id="main-content">
+    <div class="container-fluid mt-3">
+        <div id="loading" class="text-center" style="display: none;">
+            <div class="spinner-border" role="status"></div>
+        </div>
+        <h2 class="mb-4">Warehouse Dashboard</h2>
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm dashboard-card">
+                    <h3>Tổng số kho</h3>
+                    <div class="value" id="totalWarehouses">0</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm dashboard-card">
+                    <h3>Tổng số thuốc</h3>
+                    <div class="value" id="totalMedicines">0</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm dashboard-card">
+                    <h3>Thuốc sắp hết hạn</h3>
+                    <div class="value" id="expiringMedicines">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-sm p-3 bg-white rounded">
+            <h5 class="mb-3">Thuốc sắp hết hạn</h5>
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Tên</th>
+                    <th scope="col">Kho</th>
+                    <th scope="col">Ngày hết hạn</th>
+                    <th scope="col">Tình trạng</th>
+                </tr>
+                </thead>
+                <tbody id="expiring-medicines-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const toggleIcon = document.getElementById('toggleIcon');
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('collapsed');
+        toggleIcon.classList.toggle('fa-chevron-left');
+        toggleIcon.classList.toggle('fa-chevron-right');
+    }
+
+    const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
+
+    // Get expiry status
+    function getExpiryStatus(expDate) {
+        const today = new Date();
+        const expiry = new Date(expDate);
+        const daysDiff = (expiry - today) / (1000 * 60 * 60 * 24);
+        if (daysDiff < 0) {
+            return { class: 'expiry-red', text: 'Đã hết hạn' };
+        } else if (daysDiff === 0) {
+            return { class: 'expiry-yellow', text: 'Hết hạn hôm nay' };
+        } else if (daysDiff <= 7) {
+            return { class: 'expiry-yellow', text: 'Còn ' + Math.ceil(daysDiff) + ' ngày' };
+        } else {
+            return { class: 'expiry-green', text: 'Tốt' };
+        }
+    }
+
+    // Get warehouse name by ID
+    async function getWarehouseName(warehouseId) {
+        try {
+            const response = await fetch(`${baseUrl}/api/warehouse/${warehouseId}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            const warehouse = await response.json();
+            return warehouse.name || 'N/A';
+        } catch (error) {
+            console.error('Fetch warehouse name error:', error);
+            return 'N/A';
+        }
+    }
+
+    // Fetch dashboard data
+    async function fetchDashboardData() {
+        document.getElementById('loading').style.display = 'block';
+        try {
+            // Fetch total warehouses
+            const warehouseResponse = await fetch(`${baseUrl}/api/warehouse`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!warehouseResponse.ok) throw new Error(`HTTP error ${warehouseResponse.status}`);
+            const warehouses = await warehouseResponse.json();
+            const totalWarehouses = Array.isArray(warehouses) ? warehouses.length : 1;
+            document.getElementById('totalWarehouses').textContent = totalWarehouses;
+
+            // Fetch total medicines and expiring medicines
+            const medicineResponse = await fetch(`${baseUrl}/api/MedicineWarehouse`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!medicineResponse.ok) throw new Error(`HTTP error ${medicineResponse.status}`);
+            const medicines = await medicineResponse.json();
+            const totalMedicines = Array.isArray(medicines) ? medicines.length : 1;
+            document.getElementById('totalMedicines').textContent = totalMedicines;
+
+            // Filter expiring medicines (within 7 days)
+            const expiringMedicines = medicines.filter(medicine => {
+                const expDate = new Date(medicine.expDate);
+                const today = new Date();
+                const daysDiff = (expDate - today) / (1000 * 60 * 60 * 24);
+                return daysDiff <= 7;
+            });
+            document.getElementById('expiringMedicines').textContent = expiringMedicines.length;
+
+            // Populate expiring medicines table
+            const tbody = document.getElementById('expiring-medicines-table-body');
+            tbody.innerHTML = '';
+            for (const medicine of expiringMedicines) {
+                const expiryStatus = getExpiryStatus(medicine.expDate);
+                const warehouseName = await getWarehouseName(medicine.warehouse_id);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${medicine.medicine_id || 'N/A'}</td>
+                    <td>${medicine.name || 'N/A'}</td>
+                    <td>${warehouseName}</td>
+                    <td>${medicine.expDate || 'N/A'}</td>
+                    <td class="${expiryStatus.class}">${expiryStatus.text}</td>
+                `;
+                tbody.appendChild(row);
+            }
+
+            if (expiringMedicines.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">No expiring medicines found</td></tr>';
+            }
+        } catch (error) {
+            console.error('Fetch dashboard data error:', error);
+            alert('Failed to load dashboard data. Please try again or contact support.');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchDashboardData();
+    });
+</script>
+</body>
+</html>
+```

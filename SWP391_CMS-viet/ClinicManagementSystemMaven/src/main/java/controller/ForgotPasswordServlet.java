@@ -20,6 +20,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 
         String resend = request.getParameter("resend");
         String email = request.getParameter("email");
+
         HttpSession session = request.getSession();
 
         if ("true".equals(resend) && email != null) {
@@ -48,6 +49,7 @@ public class ForgotPasswordServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String email = request.getParameter("email");
+        request.setAttribute("email", email);
         HttpSession session = request.getSession();
         AccountPharmacistDAO dao = new AccountPharmacistDAO();
 

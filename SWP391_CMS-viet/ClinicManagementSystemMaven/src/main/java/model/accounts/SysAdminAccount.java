@@ -5,6 +5,7 @@ public class SysAdminAccount {
     private String fullName;
     private String phone;
     private String email;
+    private String department;
     private String username;
     private String password;
     private String status;
@@ -12,11 +13,12 @@ public class SysAdminAccount {
     public SysAdminAccount() {
     }
 
-    public SysAdminAccount(int admin_id, String fullName, String phone, String email, String username, String password, String status) {
+    public SysAdminAccount(int admin_id, String fullName, String phone, String email,String department, String username, String password, String status) {
         this.admin_id = admin_id;
         this.fullName = fullName;
         this.phone = phone;
         this.email = email;
+        this.department = department;
         this.username = username;
         this.password = password;
         this.status = status;
@@ -76,5 +78,13 @@ public class SysAdminAccount {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 }

@@ -1,4 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="model.AccountStaff" %>
+
+<%
+    AccountStaff staff = (AccountStaff) session.getAttribute("account");
+    if (staff == null) {
+        response.sendRedirect(request.getContextPath() + "/view/accountpharmacist/Login.jsp");
+        return;
+    }
+    int staffId = staff.getAccount_staff_id();
+
+    // Lấy thông báo nếu có
+    String message = (String) request.getAttribute("message");
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,10 +20,7 @@
     <title>Đổi Mật Khẩu</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; }
         body {
             margin: 0;
             font-family: 'Quicksand', sans-serif;
@@ -19,7 +30,6 @@
             align-items: center;
             height: 100vh;
         }
-
         .form-container {
             background-color: white;
             padding: 40px 30px;
@@ -29,12 +39,24 @@
             max-width: 400px;
             text-align: center;
         }
-
-        h2 {
-            margin-bottom: 15px;
-            color: #007acc;
+        h2 { margin-bottom: 15px; color: #007acc; }
+        .notice {
+            font-size: 14px;
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: left;
         }
-
+        .notice.success {
+            color: #006600;
+            background-color: #e6ffe6;
+            border: 1px solid #99cc99;
+        }
+        .notice.error {
+            color: #990000;
+            background-color: #ffe6e6;
+            border: 1px solid #ff9999;
+        }
         .message {
             font-size: 14px;
             margin-bottom: 20px;
@@ -45,12 +67,7 @@
             border: 1px solid #99ccff;
             text-align: left;
         }
-
-        .input-wrapper {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
+        .input-wrapper { position: relative; margin-bottom: 20px; }
         input[type="password"] {
             width: 100%;
             padding: 12px;
@@ -60,12 +77,10 @@
             font-size: 15px;
             font-family: inherit;
         }
-
         input[type="password"]:focus {
             outline: none;
             border-color: #005fa3;
         }
-
         .checkmark {
             position: absolute;
             right: 12px;
@@ -74,17 +89,14 @@
             font-size: 18px;
             display: none;
         }
-
-        .checkmark.valid {
-            display: inline;
-            color: green;
+        .checkmark.valid { display: inline; color: green; }
+        .checkmark.invalid { display: inline; color: red; }
+        .footer-links {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
         }
-
-        .checkmark.invalid {
-            display: inline;
-            color: red;
-        }
-
         button[type="submit"] {
             background: linear-gradient(to right, #00b4db, #0083b0);
             color: white;
@@ -97,7 +109,6 @@
             margin-top: 10px;
             width: 100%;
         }
-
         button:hover {
             background: linear-gradient(to right, #0099cc, #006699);
         }
@@ -107,11 +118,18 @@
 <div class="form-container">
     <h2>Đổi Mật Khẩu</h2>
 
+    <% if (message != null) { %>
+    <div class="notice <%= message.startsWith("✅") ? "success" : "error" %>">
+        <%= message %>
+    </div>
+    <% } %>
+
     <div class="message">
         🔒 Mật khẩu mới phải từ <strong>8–32 ký tự</strong>, có chữ hoa, chữ thường, số và ký tự đặc biệt.
     </div>
 
-    <form id="changeForm" action="changepassword" method="post" onsubmit="return validateForm();">
+    <form id="changeForm" action="<%= request.getContextPath() %>/changepassword" method="post" onsubmit="return validateForm();">
+        <input type="hidden" name="staffId" value="<%= staffId %>" />
 
         <div class="input-wrapper">
             <input type="password" id="currentPassword" name="currentPassword" placeholder="Mật khẩu hiện tại" required>
@@ -128,6 +146,14 @@
         </div>
 
         <button type="submit">Đổi Mật Khẩu</button>
+
+        <div class="footer-links">
+            <a href="<%= request.getContextPath() %>/staff/profile.jsp"
+               class="link"
+               onclick="return confirm('Bạn có chắc chắn muốn quay lại trang hồ sơ không?');">
+                ← Quay lại hồ sơ
+            </a>
+        </div>
     </form>
 </div>
 
@@ -145,7 +171,16 @@
     function validateForm() {
         const pass = newPass.value.trim();
         const confirm = confirmPass.value.trim();
-        return isStrongPassword(pass) && pass === confirm;
+
+        if (!isStrongPassword(pass)) {
+            alert("Mật khẩu mới không đủ mạnh.");
+            return false;
+        }
+        if (pass !== confirm) {
+            alert("Mật khẩu xác nhận không khớp.");
+            return false;
+        }
+        return true;
     }
 
     function updateCheckmarks() {

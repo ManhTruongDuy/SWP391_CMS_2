@@ -111,6 +111,7 @@
 <!--</script>-->
 <!--</body>-->
 <!--</html>-->
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -121,6 +122,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
     <style>
         :root {
             --primary-color: #2c5aa0;
@@ -995,24 +997,7 @@
                     <span class="nav-text">Thuốc thay thế</span>
                 </a>
             </div>
-            <div class="nav-item">
-                <a href="patients.html" class="nav-link">
-                    <i class="fas fa-user-injured nav-icon"></i>
-                    <span class="nav-text">Bệnh nhân</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="medicines.html" class="nav-link">
-                    <i class="fas fa-pills nav-icon"></i>
-                    <span class="nav-text">Thuốc</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="inventory.html" class="nav-link">
-                    <i class="fas fa-boxes nav-icon"></i>
-                    <span class="nav-text">Kho thuốc</span>
-                </a>
-            </div>
+
         </div>
 
         <div class="nav-section">
@@ -1031,36 +1016,28 @@
             </div>
         </div>
 
-        <div class="nav-section">
-            <div class="nav-section-title">Hệ thống</div>
-            <div class="nav-item">
-                <a href="settings.html" class="nav-link">
-                    <i class="fas fa-cog nav-icon"></i>
-                    <span class="nav-text">Cài đặt</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="users.html" class="nav-link">
-                    <i class="fas fa-users nav-icon"></i>
-                    <span class="nav-text">Người dùng</span>
-                </a>
-            </div>
-        </div>
+
     </nav>
 
     <div class="sidebar-footer">
-        <div class="user-info">
-            <div class="user-avatar">DT</div>
-            <div class="user-details">
-                <div class="user-name">Dược sĩ Thảo</div>
-                <div class="user-role">Quầy thuốc</div>
+        <!-- Link tới Profile.jsp -->
+        <a href="/ClinicManagementSystem_war_exploded/view/pharmacist/PharmacistProfile.jsp" class="text-decoration-none text-dark w-100 d-block">
+            <div class="user-info">
+                <div class="user-avatar">DT</div>
+                <div class="user-details">
+                    <div class="user-name">Hồ sơ</div>
+                    <div class="user-role">Dược sĩ</div>
+                </div>
             </div>
-        </div>
+        </a>
+
+        <!-- Link tới logout -->
         <a href="login.html" class="logout-btn">
             <i class="fas fa-sign-out-alt"></i>
             <span class="logout-text">Đăng xuất</span>
         </a>
     </div>
+
 </div>
 
 <!-- Main Content Area -->
@@ -1079,16 +1056,16 @@
             <span class="breadcrumb-item active">Đơn thuốc</span>
         </div>
 
-<!--        <div class="header-actions">-->
-<!--            <button class="notification-btn">-->
-<!--                <i class="fas fa-bell"></i>-->
-<!--                <span class="notification-badge">3</span>-->
-<!--            </button>-->
-<!--            <button class="notification-btn">-->
-<!--                <i class="fas fa-envelope"></i>-->
-<!--                <span class="notification-badge">5</span>-->
-<!--            </button>-->
-<!--        </div>-->
+        <!--        <div class="header-actions">-->
+        <!--            <button class="notification-btn">-->
+        <!--                <i class="fas fa-bell"></i>-->
+        <!--                <span class="notification-badge">3</span>-->
+        <!--            </button>-->
+        <!--            <button class="notification-btn">-->
+        <!--                <i class="fas fa-envelope"></i>-->
+        <!--                <span class="notification-badge">5</span>-->
+        <!--            </button>-->
+        <!--        </div>-->
     </div>
 
     <div class="main-container">
@@ -1259,8 +1236,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // const baseUrl = window.location.origin + '/ClinicManagementSystem_war';
-    const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
+    //const baseUrl = window.location.origin + '/ClinicManagementSystem_war';
+    const baseUrl = window.location.origin + '/ClinicManagementSystem_war_exploded';
     const pageSize = 10;
     let currentPage = 1;
     let currentFilters = {};
