@@ -268,6 +268,7 @@ public class SysAdminServlet extends HttpServlet {
                     resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
                 }
                 break;
+
             case "toggle-status":
             try (var reader = req.getReader(); PrintWriter out = resp.getWriter()) {
                 var body = gson.fromJson(reader, java.util.Map.class);
