@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create New Account</title>
+    <title>Create New System Admin Account</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; }
         .form-group { margin-bottom: 15px; }
@@ -26,8 +26,9 @@
     </style>
 </head>
 <body>
-<h2>Create New Account</h2>
-<form action="insert_account.php" method="POST">
+<h2>Create New System Admin Account</h2>
+<form action="CreateAccountServlet" method="POST">
+    <input type="hidden" name="action" value="create-sysadmin">
     <div class="form-group">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
@@ -37,11 +38,16 @@
         <input type="password" id="password" name="password" required>
     </div>
     <div class="form-group">
-        <label for="role">Role:</label>
-        <select id="role" name="role" required>
-            <option value="Admin">Admin</option>
-            <option value="Staff">Staff</option>
-        </select>
+        <label for="full_name">Full Name:</label>
+        <input type="text" id="full_name" name="full_name" required>
+    </div>
+    <div class="form-group">
+        <label for="department">Department:</label>
+        <input type="text" id="department" name="department" required>
+    </div>
+    <div class="form-group">
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" required>
     </div>
     <div class="form-group">
         <label for="email">Email:</label>
@@ -58,7 +64,7 @@
             <option value="Inactive">Inactive</option>
         </select>
     </div>
-    <button type="submit" class="create-button">Create</button>
+    <button type="submit" class="create-button">Create System Admin</button>
 </form>
 </body>
 </html>

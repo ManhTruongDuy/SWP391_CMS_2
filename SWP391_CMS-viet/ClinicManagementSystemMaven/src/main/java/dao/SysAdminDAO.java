@@ -1,6 +1,7 @@
 package dao;
 
 import model.StaffProfileDTO;
+import model.Medicine;
 import model.Warehouse;
 import model.accounts.*;
 
@@ -713,4 +714,32 @@ public class SysAdminDAO {
 
 
 
+    public boolean addSystemAdmin(SystemAdminFullInsertAccount sa) {
+        String sql = "INSERT INTO [dbo].[AccountStaff] ([username], [password], [role], [email], [img], [status]) VALUES (?, ?, ?, ?, ?, ?) " +
+                "INSERT INTO [dbo].[AdminSystem] ([full_name], [department], [phone], [account_staff_id]) " +
+                "VALUES (?, ?, ?, (SELECT SCOPE_IDENTITY()))";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, sa.getUsername());
+            ps.setString(2, sa.getPassword());
+            ps.setString(3, "AdminSys");
+            ps.setString(4, sa.getEmail());
+            ps.setString(5, sa.getImg());
+            ps.setString(6, sa.getStatus());
+            ps.setString(7, sa.getFull_name());
+            ps.setString(8, sa.getDepartment());
+            ps.setString(9, sa.getPhone());
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        sa.setAdmin_id(generatedKeys.getInt(1));
+                    }
+                }
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

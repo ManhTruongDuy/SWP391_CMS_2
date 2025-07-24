@@ -227,7 +227,48 @@ public class SysAdminServlet extends HttpServlet {
 
         String action = req.getParameter("action");
 
-        if ("toggle-status".equalsIgnoreCase(action)) {
+        switch (action != null ? action.toLowerCase() : "") {
+            case "create-sysadmin":
+                try (var out = resp.getWriter()) {
+                    String username = req.getParameter("username");
+                    String password = req.getParameter("password");
+                    String full_name = req.getParameter("full_name");
+                    String department = req.getParameter("department");
+                    String phone = req.getParameter("phone");
+                    String email = req.getParameter("email");
+                    String img = req.getParameter("img");
+                    String status = req.getParameter("status");
+
+                    if (username == null || password == null || full_name == null || department == null ||
+                            phone == null || email == null || status == null) {
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        out.print("{\"error\":\"Missing required fields\"}");
+                        return;
+                    }
+
+                    SystemAdminFullInsertAccount sa = new SystemAdminFullInsertAccount();
+                    sa.setUsername(username);
+                    sa.setPassword(password);
+                    sa.setFull_name(full_name);
+                    sa.setDepartment(department);
+                    sa.setPhone(phone);
+                    sa.setEmail(email);
+                    sa.setImg(img);
+                    sa.setStatus(status);
+
+                    boolean result = dao.addSystemAdmin(sa);
+                    if (result) {
+                        out.print("{\"message\":\"System admin created successfully\", \"admin_id\":" + sa.getAdmin_id() + "}");
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        out.print("{\"error\":\"Failed to create system admin\"}");
+                    }
+                } catch (Exception e) {
+                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+                }
+                break;
+            case "toggle-status":
             try (var reader = req.getReader(); PrintWriter out = resp.getWriter()) {
                 var body = gson.fromJson(reader, java.util.Map.class);
 
@@ -251,108 +292,23 @@ public class SysAdminServlet extends HttpServlet {
                     case "Patient" -> result = dao.updatePatientStatus(id, status);
                     default -> {
                         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.print("{\"error\":\"Invalid role type\"}");
+                        out.print("{\"error\":\"Vai trò không hợp lệ\"}");
                         return;
                     }
                 }
-
                 if (result) {
                     out.print("{\"message\":\"Cập nhật trạng thái thành công\"}");
                 } else {
                     resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     out.print("{\"error\":\"Không thể cập nhật trạng thái\"}");
                 }
-
             } catch (Exception e) {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
             }
-        }
-        else if ("update".equalsIgnoreCase(action)) {
-            try (var reader = req.getReader(); PrintWriter out = resp.getWriter()) {
-                var body = gson.fromJson(reader, java.util.Map.class);
-
-                String role = (String) body.get("role");
-                if (role == null || !body.containsKey("id")) {
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    out.print("{\"error\":\"Missing required fields (id, role)\"}");
-                    return;
-                }
-
-                int id = ((Double) body.get("id")).intValue();
-                boolean result = false;
-
-                switch (role) {
-                    case "Doctor" -> {
-                        StaffProfileDTO doctor = new StaffProfileDTO();
-                        doctor.setDoctorId(id);
-                        doctor.setFullName((String) body.get("name"));
-                        doctor.setPhone((String) body.get("phone"));
-                        doctor.setEmail((String) body.get("email"));
-                        doctor.setDepartment((String) body.get("department"));
-                        doctor.setEduLevel((String) body.get("eduLevel"));
-                        doctor.setAvailability((String) body.get("availability"));
-                        result = dao.updateDoctorInfo(doctor);
-                    }
-                    case "Pharmacist" -> {
-                        PharmacistAccount p = new PharmacistAccount();
-                        p.setID(id);
-                        p.setName((String) body.get("name"));
-                        p.setEmail((String) body.get("email"));
-                        p.setMobile((String) body.get("phone"));
-                        result = dao.updatePharmacistInfo(p);
-                    }
-                    case "BusinessAdmin" -> {
-                        ManagerAccount m = new ManagerAccount();
-                        m.setAdmin_id(id);
-                        m.setFullName((String) body.get("name"));
-                        m.setPhone((String) body.get("phone"));
-                        m.setEmail((String) body.get("email"));
-                        m.setDepartment((String) body.get("department"));
-                        result = dao.updateManagerInfo(m);
-                    }
-                    case "SysAdmin" -> {
-                        SysAdminAccount s = new SysAdminAccount();
-                        s.setAdmin_id(id);
-                        s.setFullName((String) body.get("name"));
-                        s.setPhone((String) body.get("phone"));
-                        s.setEmail((String) body.get("email"));
-                        s.setDepartment((String) body.get("department"));
-                        result = dao.updateSysAdminInfo(s);
-                    }
-                    case "Patient" -> {
-                        PatientAccount p = new PatientAccount();
-                        p.setPatient_id(id);
-                        p.setFullName((String) body.get("name"));
-                        p.setPhone((String) body.get("phone"));
-                        p.setEmail((String) body.get("email"));
-                        result = dao.updatePatientInfo(p);
-                    }
-                    default -> {
-                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.print("{\"error\":\"Invalid role type\"}");
-                        return;
-                    }
-                }
-
-                if (result) {
-                    out.print("{\"message\":\"Cập nhật thông tin thành công\"}");
-                } else {
-                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.print("{\"error\":\"Cập nhật thất bại\"}");
-                }
-
-            } catch (Exception e) {
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+            default:
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid or missing action");
             }
-        }
-
-
-
-        else {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid or missing action");
-        }
     }
 
 }
