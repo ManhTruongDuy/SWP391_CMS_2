@@ -8,7 +8,7 @@ import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import model.accounts.*;
-import model.StaffProfileDTO;
+
 @WebServlet("/api/system-admin")
 public class SysAdminServlet extends HttpServlet {
     private final SysAdminDAO dao = new SysAdminDAO();
@@ -228,40 +228,37 @@ public class SysAdminServlet extends HttpServlet {
         String action = req.getParameter("action");
 
         switch (action != null ? action.toLowerCase() : "") {
-            case "create-sysadmin":
-                try (var out = resp.getWriter()) {
+            case "createaccount":
+                try (PrintWriter out = resp.getWriter()) {
                     String username = req.getParameter("username");
                     String password = req.getParameter("password");
-                    String full_name = req.getParameter("full_name");
-                    String department = req.getParameter("department");
-                    String phone = req.getParameter("phone");
+                    String role = req.getParameter("role");
                     String email = req.getParameter("email");
                     String img = req.getParameter("img");
                     String status = req.getParameter("status");
 
-                    if (username == null || password == null || full_name == null || department == null ||
-                            phone == null || email == null || status == null) {
+                    if (username == null || password == null || role == null || email == null || status == null) {
                         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         out.print("{\"error\":\"Missing required fields\"}");
                         return;
                     }
 
-                    SystemAdminFullInsertAccount sa = new SystemAdminFullInsertAccount();
+                    // Create StaffAccount object
+                    StaffAccount sa = new StaffAccount();
                     sa.setUsername(username);
-                    sa.setPassword(password);
-                    sa.setFull_name(full_name);
-                    sa.setDepartment(department);
-                    sa.setPhone(phone);
+                    sa.setPassword(password); // Hash in production
+                    sa.setRole(role);
                     sa.setEmail(email);
-                    sa.setImg(img);
+                    sa.setImg(img != null ? img : "");
                     sa.setStatus(status);
 
-                    boolean result = dao.addSystemAdmin(sa);
+                    // Insert into AccountStaff
+                    boolean result = dao.addAccountStaff(sa);
                     if (result) {
-                        out.print("{\"message\":\"System admin created successfully\", \"admin_id\":" + sa.getAdmin_id() + "}");
+                        out.print("{\"message\":\"Tài khoản được tạo thành công\"}");
                     } else {
                         resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                        out.print("{\"error\":\"Failed to create system admin\"}");
+                        out.print("{\"error\":\"Không thể tạo tài khoản\"}");
                     }
                 } catch (Exception e) {
                     resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -270,46 +267,47 @@ public class SysAdminServlet extends HttpServlet {
                 break;
 
             case "toggle-status":
-            try (var reader = req.getReader(); PrintWriter out = resp.getWriter()) {
-                var body = gson.fromJson(reader, java.util.Map.class);
+                try (var reader = req.getReader(); PrintWriter out = resp.getWriter()) {
+                    var body = gson.fromJson(reader, java.util.Map.class);
+                    String role = (String) body.get("role");
+                    String status = (String) body.get("status");
 
-                String role = (String) body.get("role");
-                String status = (String) body.get("status");
-
-                if (role == null || status == null || !body.containsKey("id")) {
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    out.print("{\"error\":\"Missing required fields (id, role, status)\"}");
-                    return;
-                }
-
-                int id = ((Double) body.get("id")).intValue();  // Gson parses numbers as Double
-                boolean result = false;
-
-                switch (role) {
-                    case "SysAdmin" -> result = dao.updateSysAdminStatus(id, status);
-                    case "Doctor" -> result = dao.updateDoctorStatus(id, status);
-                    case "BusinessAdmin" -> result = dao.updateBusinessAdminStatus(id, status);
-                    case "Pharmacist" -> result = dao.updatePharmacistStatus(id, status);
-                    case "Patient" -> result = dao.updatePatientStatus(id, status);
-                    default -> {
+                    if (role == null || status == null || !body.containsKey("id")) {
                         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.print("{\"error\":\"Vai trò không hợp lệ\"}");
+                        out.print("{\"error\":\"Missing required fields (id, role, status)\"}");
                         return;
                     }
-                }
-                if (result) {
-                    out.print("{\"message\":\"Cập nhật trạng thái thành công\"}");
-                } else {
+
+                    int id = ((Double) body.get("id")).intValue(); // Gson parses numbers as Double
+                    boolean result = false;
+
+                    switch (role) {
+                        case "SysAdmin" -> result = dao.updateSysAdminStatus(id, status);
+                        case "Doctor" -> result = dao.updateDoctorStatus(id, status);
+                        case "BusinessAdmin" -> result = dao.updateBusinessAdminStatus(id, status);
+                        case "Pharmacist" -> result = dao.updatePharmacistStatus(id, status);
+                        case "Patient" -> result = dao.updatePatientStatus(id, status);
+                        default -> {
+                            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            out.print("{\"error\":\"Vai trò không hợp lệ\"}");
+                            return;
+                        }
+                    }
+                    if (result) {
+                        out.print("{\"message\":\"Cập nhật trạng thái thành công\"}");
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        out.print("{\"error\":\"Không thể cập nhật trạng thái\"}");
+                    }
+                } catch (Exception e) {
                     resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    out.print("{\"error\":\"Không thể cập nhật trạng thái\"}");
+                    resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
                 }
-            } catch (Exception e) {
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
-            }
+                break;
+
             default:
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid or missing action");
-            }
+        }
     }
 
 }

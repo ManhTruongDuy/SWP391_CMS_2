@@ -1,7 +1,6 @@
 package dao;
 
 import model.StaffProfileDTO;
-import model.Medicine;
 import model.Warehouse;
 import model.accounts.*;
 
@@ -711,30 +710,33 @@ public class SysAdminDAO {
         return departments;
     }
 
-
-
-
-    public boolean addSystemAdmin(SystemAdminFullInsertAccount sa) {
-        String sql = "INSERT INTO [dbo].[AccountStaff] ([username], [password], [role], [email], [img], [status]) VALUES (?, ?, ?, ?, ?, ?) " +
-                "INSERT INTO [dbo].[AdminSystem] ([full_name], [department], [phone], [account_staff_id]) " +
-                "VALUES (?, ?, ?, (SELECT SCOPE_IDENTITY()))";
+    public boolean addAccountStaff(StaffAccount sa) {
+        String sql = "INSERT INTO AccountStaff (username, password, role, email, img, status) VALUES (?, ?, ?, ?, ?, ?);";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, sa.getUsername());
             ps.setString(2, sa.getPassword());
-            ps.setString(3, "AdminSys");
+            ps.setString(3, sa.getRole());
             ps.setString(4, sa.getEmail());
             ps.setString(5, sa.getImg());
             ps.setString(6, sa.getStatus());
-            ps.setString(7, sa.getFull_name());
-            ps.setString(8, sa.getDepartment());
-            ps.setString(9, sa.getPhone());
-            int affectedRows = ps.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        sa.setAdmin_id(generatedKeys.getInt(1));
-                    }
-                }
+            if (ps.executeUpdate() > 0) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean addAccountPharmacist(AccountPharmacist ap) {
+        String sql = "INSERT INTO AccountStaff (username, password, email, img, status) VALUES (?, ?, ?, ?, ?);";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, ap.getUsername());
+            ps.setString(2, ap.getPassword());
+            ps.setString(3, ap.getEmail());
+            ps.setString(4, ap.getImg());
+            ps.setString(5, ap.getStatus());
+            if (ps.executeUpdate() > 0) {
                 return true;
             }
         } catch (SQLException e) {

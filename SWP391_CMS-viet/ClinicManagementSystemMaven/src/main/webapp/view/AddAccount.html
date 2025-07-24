@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo Tài Khoản Quản Trị Hệ Thống Mới</title>
+    <title>Create new account</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; }
         .form-group { margin-bottom: 15px; }
@@ -26,9 +26,9 @@
     </style>
 </head>
 <body>
-<h2>Tạo Tài Khoản Quản Trị Hệ Thống Mới</h2>
+<h2>Tạo Tài Khoản Nhân Viên Mới</h2>
 <form action="/api/system-admin" method="POST" id="adminForm">
-    <input type="hidden" name="action" value="create-sysadmin">
+    <input type="hidden" name="action" value="createAccount">
     <div class="form-group">
         <label for="username">Tên Đăng Nhập:</label>
         <input type="text" id="username" name="username" required>
@@ -38,16 +38,12 @@
         <input type="password" id="password" name="password" required>
     </div>
     <div class="form-group">
-        <label for="full_name">Họ Tên:</label>
-        <input type="text" id="full_name" name="full_name" required>
-    </div>
-    <div class="form-group">
-        <label for="department">Phòng Ban:</label>
-        <input type="text" id="department" name="department" required>
-    </div>
-    <div class="form-group">
-        <label for="phone">Số Điện Thoại:</label>
-        <input type="text" id="phone" name="phone" required>
+        <label for="role">Chức vụ:</label>
+        <select id="role" name="role" required>
+            <option value="AdminBusiness">Quản lý</option>
+            <option value="AdminSys">Quản trị viên</option>
+            <option value="Warehouse Manager">Quản lý kho</option>
+        </select>
     </div>
     <div class="form-group">
         <label for="email">Email:</label>
@@ -60,11 +56,11 @@
     <div class="form-group">
         <label for="status">Trạng Thái:</label>
         <select id="status" name="status" required>
-            <option value="Active">Hoạt Động</option>
-            <option value="Inactive">Không Hoạt Động</option>
+            <option value="Enable">Hoạt Động</option>
+            <option value="Disable">Không Hoạt Động</option>
         </select>
     </div>
-    <button type="submit" class="create-button">Tạo Quản Trị Hệ Thống</button>
+    <button type="submit" class="create-button">Tạo tài khoản</button>
 </form>
 <a href="SysAdminAccount.html" class="create-button">Quay Về</a>
 
@@ -79,7 +75,15 @@
             },
             body: new URLSearchParams(new FormData(this)).toString()
         })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP error! Status: ${response.status}, Body: ${text}`);
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.message) {
                     // Redirect to SysAdminAccount.html on success
@@ -89,6 +93,7 @@
                 }
             })
             .catch(error => {
+                console.error('Error:', error);
                 alert('Lỗi: ' + error.message);
             });
     });
