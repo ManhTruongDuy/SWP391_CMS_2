@@ -1,6 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="exploded-war" name="ROOT">
-    <output-path>$USER_HOME$/OneDrive/Documents/apache-tomcat-10.1.35/webapps/ROOT</output-path>
-    <root id="root" />
-  </artifact>
-</component>
