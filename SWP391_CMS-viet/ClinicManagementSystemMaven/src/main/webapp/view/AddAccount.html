@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Tài Khoản Mới</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+        .create-button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #6D9DC5;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .create-button:hover { background-color: #5B8AB2; transform: translateY(-2px); }
+        .create-button:active { transform: translateY(0); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body>
+<h2>Tạo Tài Khoản Mới</h2>
+<form action="/api/system-admin" method="POST" id="adminForm">
+    <input type="hidden" name="action" value="createaccount">
+    <div class="form-group">
+        <label for="username">Tên Đăng Nhập:</label>
+        <input type="text" id="username" name="username" required>
+    </div>
+    <div class="form-group">
+        <label for="password">Mật Khẩu:</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <div class="form-group">
+        <label for="role">Chức vụ:</label>
+        <select id="role" name="role" required>
+            <option value="AdminBusiness">Quản lý</option>
+            <option value="AdminSys">Quản trị viên</option>
+            <option value="Warehouse Manager">Quản lý kho</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+    </div>
+    <div class="form-group">
+        <label for="img">URL Hình Ảnh (tùy chọn):</label>
+        <input type="text" id="img" name="img">
+    </div>
+    <div class="form-group">
+        <label for="status">Trạng Thái:</label>
+        <select id="status" name="status" required>
+            <option value="Enable">Hoạt Động</option>
+            <option value="Disable">Không Hoạt Động</option>
+        </select>
+    </div>
+    <button type="submit" class="create-button">Tạo tài khoản</button>
+</form>
+<a href="SysAdminDashboard.html.html" class="create-button">Quay Về</a>
+
+<script>
+    document.getElementById('adminForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        // Determine context path based on deployment
+        const baseUrl = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1)) || '';
+        const url = baseUrl + '/api/system-admin';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(new FormData(this)).toString()
+        })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP error! Status: ${response.status}, Body: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.message) {
+                    // Redirect to SysAdminAccount.html on success
+                    window.location.href = 'SysAdminDashboard.html';
+                } else if (data.error) {
+                    alert(data.error); // Show error message
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Lỗi: ' + error.message);
+            });
+    });
+</script>
+</body>
+</html>

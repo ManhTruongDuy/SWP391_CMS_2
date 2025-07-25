@@ -710,7 +710,38 @@ public class SysAdminDAO {
         return departments;
     }
 
+    public boolean addAccountStaff(StaffAccount sa) {
+        String sql = "INSERT INTO AccountStaff (username, password, role, email, img, status) VALUES (?, ?, ?, ?, ?, ?);";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, sa.getUsername());
+            ps.setString(2, sa.getPassword());
+            ps.setString(3, sa.getRole());
+            ps.setString(4, sa.getEmail());
+            ps.setString(5, sa.getImg());
+            ps.setString(6, sa.getStatus());
+            if (ps.executeUpdate() > 0) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
-
-
+    public boolean addAccountPharmacist(AccountPharmacist ap) {
+        String sql = "INSERT INTO AccountStaff (username, password, email, img, status) VALUES (?, ?, ?, ?, ?);";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, ap.getUsername());
+            ps.setString(2, ap.getPassword());
+            ps.setString(3, ap.getEmail());
+            ps.setString(4, ap.getImg());
+            ps.setString(5, ap.getStatus());
+            if (ps.executeUpdate() > 0) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
