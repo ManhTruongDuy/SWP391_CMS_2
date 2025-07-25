@@ -90,8 +90,8 @@ public class LoginServlet extends HttpServlet {
                 case "AdminBusiness":
                     response.sendRedirect(request.getContextPath() + "/view/AdminDashboard.html");
                     break;
-                case"Warehouse":
-                    response.sendRedirect(request.getContextPath() + "/view/WarehouseHome.html");
+                case"Warehouse Manager":
+                    response.sendRedirect(request.getContextPath() + "/view/warehouse/WarehouseHome.html");
                     break;
                 default:
                     request.setAttribute("err", "Invalid staff role.");
