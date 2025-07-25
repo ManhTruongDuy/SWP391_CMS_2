@@ -1,0 +1,755 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="vi">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8" />-->
+<!--    <title>In đơn thuốc</title>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            margin: 20px;-->
+<!--        }-->
+<!--        h2, h4 {-->
+<!--            margin: 4px 0;-->
+<!--        }-->
+<!--        table {-->
+<!--            width: 100%;-->
+<!--            border-collapse: collapse;-->
+<!--            margin-top: 15px;-->
+<!--        }-->
+<!--        th, td {-->
+<!--            border: 1px solid #ccc;-->
+<!--            padding: 8px;-->
+<!--            text-align: center;-->
+<!--        }-->
+<!--        th {-->
+<!--            background-color: #eee;-->
+<!--        }-->
+<!--        @media print {-->
+<!--            @page {-->
+<!--                margin: 2cm;-->
+<!--            }-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--<h2 id="prescription-id"></h2>-->
+<!--<h4 id="prescription-date"></h4>-->
+<!--<h4 id="patient-name"></h4>-->
+<!--<h4 id="doctor-name"></h4>-->
+
+<!--<table>-->
+<!--    <thead>-->
+<!--    <tr>-->
+<!--        <th>STT</th>-->
+<!--        <th>Tên</th>-->
+<!--        <th>Thể loại</th>-->
+<!--        <th>Giá</th>-->
+<!--        <th>Số lượng</th>-->
+<!--    </tr>-->
+<!--    </thead>-->
+<!--    <tbody id="medicine-table">-->
+<!--    </tbody>-->
+<!--</table>-->
+
+<!--<script>-->
+<!--    const data = JSON.parse(localStorage.getItem("printPrescription"));-->
+<!--    if (!data) {-->
+<!--        document.body.innerHTML = "<p style='color:red;'>Không có dữ liệu để in!</p>";-->
+<!--    } else {-->
+<!--        document.getElementById("prescription-id").textContent = `Đơn thuốc #${data.data.id}`;-->
+<!--        document.getElementById("prescription-date").textContent = `Ngày kê: ${data.data.prescriptionDate}`;-->
+<!--        document.getElementById("patient-name").textContent = `Bệnh nhân: ${data.data.medicineRecord.patient.fullName}`;-->
+<!--        document.getElementById("doctor-name").textContent = `Bác sĩ: ${data.data.doctor.fullName}`;-->
+
+<!--        const tbody = document.getElementById("medicine-table");-->
+<!--        data.items.forEach((item, index) => {-->
+<!--            const row = document.createElement("tr");-->
+<!--            row.innerHTML = `-->
+<!--          <td>${index + 1}</td>-->
+<!--          <td>${item.name}</td>-->
+<!--          <td>${item.category.name}</td>-->
+<!--          <td>${parseInt(item.price).toLocaleString()}₫</td>-->
+<!--          <td>${item.quantity}</td>-->
+<!--        `;-->
+<!--            tbody.appendChild(row);-->
+<!--        });-->
+
+<!--        setTimeout(() => {-->
+<!--            window.print();-->
+<!--        }, 300);-->
+<!--    }-->
+<!--</script>-->
+
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In đơn thuốc - Hệ thống quản lý bệnh viện</title>
+    <style>
+        :root {
+            --primary-color: #2c5aa0;
+            --secondary-color: #17a2b8;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #6f42c1;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --dark-text: #333333;
+            --border-color: #dee2e6;
+            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background: var(--white);
+            padding: 2rem;
+            max-width: 210mm;
+            margin: 0 auto;
+        }
+
+        .prescription-container {
+            background: var(--white);
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .prescription-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .prescription-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="medical" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.1"/><rect x="5" y="15" width="10" height="1" fill="white" opacity="0.1"/><rect x="8" y="5" width="4" height="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23medical)"/></svg>');
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hospital-logo {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+        }
+
+        .hospital-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hospital-info {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .prescription-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .prescription-body {
+            padding: 2rem;
+        }
+
+        .prescription-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            background: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .info-section {
+            background: var(--white);
+            padding: 1.25rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            word-wrap: break-word;
+        }
+
+        .prescription-id {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .medicines-section {
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .medicines-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .medicines-table thead {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        .medicines-table th {
+            padding: 1rem 0.75rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+        }
+
+        .medicines-table td {
+            padding: 1rem 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .medicines-table tbody tr:nth-child(even) {
+            background: rgba(44, 90, 160, 0.05);
+        }
+
+        .medicines-table tbody tr:hover {
+            background: rgba(44, 90, 160, 0.1);
+        }
+
+        .medicine-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            text-align: left;
+        }
+
+        .medicine-category {
+            background: rgba(111, 66, 193, 0.1);
+            color: var(--info-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .medicine-price {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .medicine-quantity {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .row-number {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 auto;
+        }
+
+        .prescription-footer {
+            padding: 2rem;
+            background: var(--light-bg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .signature-section {
+            text-align: center;
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 2px dashed var(--border-color);
+        }
+
+        .signature-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 3rem;
+            font-size: 1rem;
+        }
+
+        .signature-line {
+            border-top: 2px solid var(--dark-text);
+            margin-top: 3rem;
+            padding-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .prescription-notes {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .notes-title {
+            font-weight: 600;
+            color: var(--warning-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notes-content {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #856404;
+        }
+
+        .print-info {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 3rem;
+            color: var(--danger-color);
+            font-size: 1.2rem;
+            background: rgba(220, 53, 69, 0.1);
+            border: 2px solid rgba(220, 53, 69, 0.3);
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Print Styles */
+        @media print {
+            @page {
+                margin: 1.5cm;
+                size: A4;
+            }
+
+            body {
+                padding: 0;
+                background: white;
+                font-size: 12pt;
+                line-height: 1.4;
+            }
+
+            .prescription-container {
+                border: 2px solid #000;
+                box-shadow: none;
+            }
+
+            .prescription-header {
+                background: #f0f0f0 !important;
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .hospital-logo {
+                background: #e0e0e0 !important;
+                color: #000 !important;
+            }
+
+            .prescription-title {
+                background: #e0e0e0 !important;
+                color: #000 !important;
+            }
+
+            .medicines-table thead {
+                background: #f0f0f0 !important;
+                color: #000 !important;
+            }
+
+            .prescription-id {
+                background: #e0e0e0 !important;
+                color: #000 !important;
+            }
+
+            .row-number {
+                background: #e0e0e0 !important;
+                color: #000 !important;
+            }
+
+            .medicine-category,
+            .medicine-quantity {
+                background: #f5f5f5 !important;
+                color: #000 !important;
+            }
+
+            .prescription-notes {
+                background: #f9f9f9 !important;
+                border: 1px solid #ccc !important;
+            }
+
+            .info-section {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            .prescription-info {
+                background: #f9f9f9 !important;
+            }
+
+            .signature-section {
+                background: white !important;
+            }
+
+            .prescription-footer {
+                background: #f9f9f9 !important;
+            }
+
+            .print-info {
+                display: none;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .prescription-info {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .footer-info {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .hospital-name {
+                font-size: 1.5rem;
+            }
+
+            .prescription-title {
+                font-size: 1.2rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .medicines-table {
+                font-size: 0.85rem;
+            }
+
+            .medicines-table th,
+            .medicines-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="prescription-container">
+    <!-- Header Section -->
+    <div class="prescription-header">
+        <div class="header-content">
+            <div class="hospital-logo">
+                <i class="fas fa-hospital" style="font-family: 'Font Awesome 6 Free'; font-weight: 900;">🏥</i>
+            </div>
+            <div class="hospital-name">BỆNH VIỆN ĐA KHOA MEDICARE</div>
+            <div class="hospital-info">
+                Địa chỉ: 123 Đường Sức Khỏe, Quận 1, TP.HCM<br>
+                Điện thoại: (028) 1234-5678 | Email: info@medicare.vn
+            </div>
+            <div class="prescription-title">
+                <span style="font-family: 'Font Awesome 6 Free'; font-weight: 900; margin-right: 0.5rem;">📋</span>
+                ĐÔN THUỐC
+            </div>
+        </div>
+    </div>
+
+    <!-- Body Section -->
+    <div class="prescription-body">
+        <!-- Prescription Information -->
+        <div class="prescription-info">
+            <div class="info-section">
+                <div class="info-label">
+                    <span style="font-family: 'Font Awesome 6 Free'; font-weight: 900;">🆔</span>
+                    Mã đơn thuốc
+                </div>
+                <div class="info-value">
+                    <span class="prescription-id" id="prescription-id"></span>
+                </div>
+            </div>
+            <div class="info-section">
+                <div class="info-label">
+                    <span style="font-family: 'Font Awesome 6 Free'; font-weight: 900;">📅</span>
+                    Ngày kê đơn
+                </div>
+                <div class="info-value" id="prescription-date"></div>
+            </div>
+            <div class="info-section">
+                <div class="info-label">
+                    <span style="font-family: 'Font Awesome 6 Free'; font-weight: 900;">🤒</span>
+                    Bệnh nhân
+                </div>
+                <div class="info-value" id="patient-name"></div>
+            </div>
+            <div class="info-section">
+                <div class="info-label">
+                    <span style="font-family: 'Font Awesome 6 Free'; font-weight: 900;">👨‍⚕️</span>
+                    Bác sĩ kê đơn
+                </div>
+                <div class="info-value" id="doctor-name"></div>
+            </div>
+        </div>
+
+        <!-- Medicines Section -->
+        <div class="medicines-section">
+            <h3 class="section-title">
+                <span style="font-family: 'Font Awesome 6 Free'; font-weight: 900;">💊</span>
+                Danh sách thuốc được kê
+            </h3>
+            <table class="medicines-table">
+                <thead>
+                <tr>
+                    <th width="8%">STT</th>
+                    <th width="35%">Tên thuốc</th>
+                    <th width="20%">Thể loại</th>
+                    <th width="20%">Giá tiền</th>
+                    <th width="17%">Số lượng</th>
+                </tr>
+                </thead>
+                <tbody id="medicine-table">
+                <!-- Medicine data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Prescription Notes -->
+        <div class="prescription-notes">
+            <div class="notes-title">
+                <span style="font-family: 'Font Awesome 6 Free'; font-weight: 900;">⚠️</span>
+                Lưu ý quan trọng
+            </div>
+            <div class="notes-content">
+                • Sử dụng thuốc theo đúng chỉ định của bác sĩ<br>
+                • Không tự ý thay đổi liều lượng hoặc ngừng thuốc<br>
+                • Bảo quản thuốc ở nơi khô ráo, thoáng mát<br>
+                • Liên hệ bác sĩ nếu có tác dụng phụ bất thường<br>
+                • Đơn thuốc có hiệu lực trong vòng 30 ngày
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="prescription-footer">
+        <div class="footer-info">
+            <div class="signature-section">
+                <div class="signature-title">Chữ ký bệnh nhân</div>
+                <div class="signature-line">
+                    (Ký và ghi rõ họ tên)
+                </div>
+            </div>
+            <div class="signature-section">
+                <div class="signature-title">Chữ ký bác sĩ</div>
+                <div class="signature-line" id="doctor-signature">
+                    (Ký và đóng dấu)
+                </div>
+            </div>
+        </div>
+
+        <div class="print-info">
+            <p><strong>Thời gian in:</strong> <span id="print-time"></span></p>
+            <p><em>Đơn thuốc này được tạo bởi Hệ thống quản lý bệnh viện MediCare</em></p>
+        </div>
+        <a href="history-pharmacist.html" id="homeButton" class="btn btn-primary home-btn" style="display: none;">
+            <i class="fas fa-home"></i> Ve Lich Su
+        </a>
+    </div>
+</div>
+
+<script>
+    // Set print time
+    document.getElementById('print-time').textContent = new Date().toLocaleString('vi-VN');
+
+    // Get prescription data
+    const data = JSON.parse(localStorage.getItem("printPrescription"));
+    console.log(data)
+    if (!data) {
+        document.body.innerHTML = `
+                <div class="error-message">
+                    <span class="error-icon">❌</span>
+                    <strong>Không có dữ liệu để in!</strong><br>
+                    Vui lòng quay lại trang trước và thử lại.
+                </div>
+            `;
+    } else {
+        // Populate prescription information
+        document.getElementById("prescription-id").textContent = `#${data.data.id}`;
+
+        // Format date
+        const prescriptionDate = new Date(data.data.prescriptionDate);
+        document.getElementById("prescription-date").textContent = prescriptionDate.toLocaleDateString('vi-VN', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        document.getElementById("patient-name").textContent = data.data.medicineRecord.patient.fullName;
+        document.getElementById("doctor-name").textContent = data.data.doctor.fullName;
+
+        // Populate medicines table
+        const tbody = document.getElementById("medicine-table");
+        let totalAmount = 0;
+
+        data.items.forEach((item, index) => {
+            const itemTotal = parseInt(item.price) * item.quantity;
+            totalAmount += itemTotal;
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                    <td>
+                        <div class="row-number">${index + 1}</div>
+                    </td>
+                    <td class="medicine-name">${item.name}</td>
+                    <td>
+                        <span class="medicine-category">${item.category?.name || "N/A"}</span>
+                    </td>
+                    <td class="medicine-price">${parseInt(item.price).toLocaleString('vi-VN')}₫</td>
+                    <td>
+                        <span class="medicine-quantity">${item.quantity}</span>
+                    </td>
+                `;
+            tbody.appendChild(row);
+        });
+
+        // Add total row
+        const totalRow = document.createElement("tr");
+        totalRow.style.background = "rgba(44, 90, 160, 0.1)";
+        totalRow.style.fontWeight = "bold";
+        totalRow.innerHTML = `
+                <td colspan="3" style="text-align: right; color: var(--primary-color); font-size: 1.1rem;">
+                    <strong>TỔNG CỘNG:</strong>
+                </td>
+                <td style="color: var(--success-color); font-size: 1.2rem; font-weight: 700;">
+                    ${totalAmount.toLocaleString('vi-VN')}₫
+                </td>
+                <td style="color: var(--primary-color); font-weight: 600;">
+                    ${data.items.reduce((sum, item) => sum + item.quantity, 0)} viên
+                </td>
+            `;
+        tbody.appendChild(totalRow);
+
+        // Auto print after a short delay
+        setTimeout(() => {
+            window.print();
+        }, 500);
+    }
+
+    // Handle print events
+    window.addEventListener('beforeprint', function() {
+        document.title = `Đơn thuốc #${data?.data?.id || 'N/A'} - ${data?.data?.medicineRecord?.patient?.fullName || 'N/A'}`;
+    });
+
+    window.addEventListener('afterprint', function() {
+        window.location.href = 'history-pharmacist.html';
+    });
+</script>
+</body>
+</html>
+

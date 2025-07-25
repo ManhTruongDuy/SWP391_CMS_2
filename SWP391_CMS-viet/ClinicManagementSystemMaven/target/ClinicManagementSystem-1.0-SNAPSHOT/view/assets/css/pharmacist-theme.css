@@ -1,0 +1,213 @@
+/* Pharmacist Theme - Inspired by KiviCare */
+
+body {
+    background: #f6f8fb;
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    color: #222;
+}
+
+.pharma-header {
+    background: linear-gradient(90deg, #0d6efd 0%, #5bc0f8 100%);
+    color: #fff;
+    padding: 2.5rem 0 1.5rem 0;
+    border-radius: 0 0 2rem 2rem;
+    box-shadow: 0 4px 24px rgba(13,110,253,0.10);
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+.pharma-header .pharma-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+.pharma-header .pharma-slogan {
+    font-size: 1.2rem;
+    font-weight: 400;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+.pharma-dashboard-row {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+.pharma-card {
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 24px rgba(13,110,253,0.08);
+    transition: box-shadow 0.2s, transform 0.2s;
+    background: #fff;
+    min-height: 270px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.pharma-card:hover {
+    box-shadow: 0 8px 32px rgba(13,110,253,0.18);
+    transform: translateY(-4px) scale(1.03);
+}
+.pharma-card .pharma-icon {
+    font-size: 2.8rem;
+    margin-bottom: 0.7rem;
+    border-radius: 50%;
+    padding: 0.7rem;
+    background: linear-gradient(135deg, #e0f2fe 0%, #b6e0fe 100%);
+    color: #0d6efd;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.10);
+}
+.pharma-card .pharma-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+.pharma-card .pharma-desc {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 0.7rem;
+}
+.pharma-card .btn {
+    border-radius: 2rem;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 0.5rem 1.5rem;
+    margin-top: 0.3rem;
+}
+
+.pharma-nav-btns {
+    margin-top: 2.5rem;
+}
+.pharma-nav-btns .btn {
+    border-radius: 2rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0 0.5rem;
+    padding: 0.6rem 2rem;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+    transition: background 0.2s, color 0.2s;
+}
+.pharma-nav-btns .btn:hover {
+    background: #0d6efd;
+    color: #fff;
+}
+
+.pharma-page-header {
+    background: linear-gradient(90deg, #0d6efd 0%, #5bc0f8 100%);
+    color: #fff;
+    padding: 2rem 0 1.2rem 0;
+    border-radius: 0 0 2rem 2rem;
+    box-shadow: 0 4px 24px rgba(13,110,253,0.10);
+    margin-bottom: 2.5rem;
+    text-align: center;
+    position: relative;
+}
+.pharma-page-header .pharma-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+.pharma-page-header .pharma-slogan {
+    font-size: 1.1rem;
+    font-weight: 400;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+.pharma-form {
+    background: #fff;
+    border-radius: 1.2rem;
+    box-shadow: 0 2px 12px rgba(13,110,253,0.06);
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+}
+.pharma-form label {
+    font-weight: 600;
+    color: #0d6efd;
+    margin-right: 0.5rem;
+}
+.pharma-form input[type="text"],
+.pharma-form input[type="date"] {
+    border-radius: 2rem;
+    border: 1px solid #e0e6ed;
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+    min-width: 180px;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.04);
+    transition: border 0.2s;
+}
+.pharma-form input:focus {
+    border: 1.5px solid #0d6efd;
+    outline: none;
+}
+.pharma-form .btn {
+    border-radius: 2rem;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 0.5rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+}
+
+.pharma-table {
+    background: #fff;
+    border-radius: 1.2rem;
+    box-shadow: 0 2px 12px rgba(13,110,253,0.06);
+    overflow: hidden;
+}
+.pharma-table table {
+    margin-bottom: 0;
+    border-radius: 1.2rem;
+    overflow: hidden;
+}
+.pharma-table thead {
+    background: linear-gradient(90deg, #0d6efd 0%, #5bc0f8 100%);
+    color: #fff;
+    font-size: 1.05rem;
+}
+.pharma-table tbody tr:hover {
+    background: #f0f6ff;
+}
+.pharma-table td, .pharma-table th {
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+    font-size: 1rem;
+}
+
+.pharma-status {
+    font-size: 1.1rem;
+    color: #dc3545;
+    font-weight: 500;
+    padding: 1.2rem 0;
+    text-align: center;
+}
+
+@media (max-width: 767px) {
+    .pharma-header {
+        padding: 1.5rem 0 1rem 0;
+        border-radius: 0 0 1rem 1rem;
+    }
+    .pharma-card {
+        min-height: 200px;
+        padding: 1rem 0.5rem;
+    }
+    .pharma-header .pharma-title {
+        font-size: 1.5rem;
+    }
+    .pharma-page-header {
+        padding: 1.2rem 0 0.7rem 0;
+        border-radius: 0 0 1rem 1rem;
+    }
+    .pharma-form {
+        padding: 1rem 0.5rem;
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+    .pharma-table td, .pharma-table th {
+        padding: 0.6rem 0.5rem;
+        font-size: 0.95rem;
+    }
+} 

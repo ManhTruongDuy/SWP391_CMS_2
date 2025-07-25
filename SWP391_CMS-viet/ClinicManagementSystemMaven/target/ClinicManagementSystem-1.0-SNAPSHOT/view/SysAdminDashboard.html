@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        .sidebar {
+            transition: all 0.3s ease-in-out;
+        }
+        .navbar {
+            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        .sidebar {
+            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        .nav-link:hover, .sidebar-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+    </style>
+
+</head>
+<body class="bg-gray-100 font-sans">
+<!-- Navbar -->
+<nav class="navbar text-white p-4 fixed w-full top-0 z-10 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+        <!-- Logo -->
+        <div class="flex items-center space-x-3" href="SysAdminDashboard.html">
+            <img src=".\assets\images\logo-mini.png" alt="Logo" class="h-12 w-12 rounded-full border-2 border-white">
+            <span class="text-2xl font-bold tracking-tight">HealthCare</span>
+        </div>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex space-x-8">
+            <a href="SysAdminDashboard.html" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Trang chủ</a>
+            <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Profile.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
+            <a href="./accountpharmacist/Login.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Đăng xuất</a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="md:hidden focus:outline-none p-2 rounded-lg hover:bg-blue-500 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="md:hidden hidden bg-blue-700 p-6 rounded-b-lg shadow-lg">
+        <a href="SysAdminDashboard.html" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Trang chủ</a>
+        <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Profile.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
+        <a href="#logout" class="block py-3 px-4 hover:bg-blue-500 rounded-lg transition-colors">Đăng xuất</a>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="flex mt-16">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar w-64 h-screen fixed md:static shadow-xl">
+        <div class="p-6">
+            <h2 class="text-xl font-semibold text-blue-800 mb-6 tracking-wide">Kiểm soát tài khoản</h2>
+            <ul class="space-y-3">
+                <li><a href="PharmacistAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Dược sĩ</a></li>
+                <li><a href="DoctorAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-heart-pulse"></i> Bác sĩ</a></li>
+                <li><a href="ManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person-workspace"></i> Quản lý</a></li>
+                <li><a href="SysAdminAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-gear"></i> Quản trị hệ thống</a></li>
+                <li><a href="PatientAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-person"></i> Bệnh nhân</a></li>
+                <li><a href="WarehouseManagerAccount.html" class="sidebar-link block text-blue-700 font-medium"><i class="bi bi-capsule"></i> Quản lý kho</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="flex-1 p-6 md:ml-64">
+        <section id="patients" class="mb-8">
+            <h2 class="text-xl font-bold text-blue-800 mb-4">Những bệnh nhân gần đây</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <table class="w-full text-left">
+                    <thead>
+                    <tr class="text-blue-600">
+                        <th class="p-2">Tên</th>
+                        <th class="p-2">ID</th>
+                        <th class="p-2">Lần khám gần nhất</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="border-t">
+                        <td class="p-2">John Doe</td>
+                        <td class="p-2">P12345</td>
+                        <td class="p-2">2025-07-10</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-2">Jane Smith</td>
+                        <td class="p-2">P12346</td>
+                        <td class="p-2">2025-07-09</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Mobile Sidebar Toggle Button -->
+<button id="sidebar-toggle" class="md:hidden fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
+    <svg class="w-6 h-6" fill="none" strokeindrome="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+    </svg>
+</button>
+
+<script>
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // Sidebar Toggle for Mobile
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+            // Close mobile menu after clicking
+            mobileMenu.classList.add('hidden');
+            sidebar.classList.remove('open');
+        });
+    });
+
+    document.querySelectorAll('a[href="#logout"]').forEach(logoutLink => {
+        logoutLink.addEventListener('click', function (e) {
+            e.preventDefault();
+
+
+            localStorage.removeItem('token');
+            sessionStorage.clear();
+
+
+            window.location.href = '/ClinicManagementSystem_war_exploded/view/accountpharmacist/Login.jsp'; // thay bằng URL thật của trang đăng nhập
+        });
+    });
+</script>
+</body>
+</html>

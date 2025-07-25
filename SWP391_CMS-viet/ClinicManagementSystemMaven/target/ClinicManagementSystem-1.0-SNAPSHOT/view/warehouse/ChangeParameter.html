@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn vị & danh mục</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: whitesmoke;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            padding: 15px;
+            transition: width 0.3s;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .brand-text,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .nav-section-title,
+        .sidebar.collapsed .user-details,
+        .sidebar.collapsed .logout-text {
+            display: none;
+        }
+
+        .sidebar-toggle {
+            background: #fff;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            right: -15px;
+            width: 30px;
+            height: 38px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            transform: translateY(-50%);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .brand-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .sidebar-brand {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            padding-left: 16px;
+        }
+
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+
+        .nav-section-title {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin: 10px 0;
+            text-transform: uppercase;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #e9ecef;
+        }
+
+        .nav-link.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .nav-icon {
+            margin-right: 20px;
+            width: 20px;
+            text-align: center;
+            padding-left: 5px;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        .user-role {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            color: #dc3545;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .logout-btn:hover {
+            background: #e9ecef;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            transition: all 0.3s;
+        }
+
+        .main-content.collapsed {
+            margin-left: 80px;
+            width: calc(100% - 80px);
+        }
+
+        .card {
+            height: auto;
+        }
+
+        .table tbody tr:hover {
+            background-color: #e0f0ff !important;
+            cursor: pointer;
+        }
+        table{
+            text-align: center;
+        }
+
+        .modal-content {
+            border-radius: 10px;
+        }
+
+        .pagination-controls {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .sort-icon {
+            margin-left: 5px;
+        }
+
+        .sortable {
+            cursor: pointer;
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-left" id="toggleIcon"></i>
+    </button>
+
+    <div class="sidebar-header">
+        <a href="dashboard-pharmacist.html" class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fas fa-hospital"></i>
+            </div>
+            <span class="brand-text">MediCare System</span>
+        </a>
+    </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Chính</div>
+                <div class="nav-item">
+                    <a href="WarehouseHome.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        <span class="nav-text">Home</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Quản lý</div>
+
+                <div class="nav-item">
+                    <a href="Warehouse.html" class="nav-link ">
+                        <i class="fas fa-warehouse nav-icon"></i>
+                        <span class="nav-text">Kho</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="ChangeParameter.html" class="nav-link active">
+                        <i class="fas fa-cubes nav-icon"></i>
+                        <span class="nav-text">Đơn vị & Danh mục</span>
+                    </a>
+                </div>
+            </div>
+
+            <!--        <div class="nav-section">-->
+            <!--            <div class="nav-section-title">Báo cáo</div>-->
+
+            <!--            <div class="nav-item">-->
+            <!--                <a href="ChangeParameter.html" class="nav-link">-->
+            <!--                    <i class="fas fa-chart-line nav-icon"></i>-->
+            <!--                    <span class="nav-text">Lịch sử & Tra cứu</span>-->
+            <!--                </a>-->
+            <!--            </div>-->
+            <!--        </div>-->
+        </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar">DT</div>
+            <div class="user-details">
+                <div class="user-name">Dược sĩ Thảo</div>
+                <div class="user-role">Quầy thuốc</div>
+            </div>
+        </div>
+        <a href="login.html" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="logout-text">Đăng xuất</span>
+        </a>
+    </div>
+</div>
+
+<div class="main-content" id="main-content">
+    <div class="container-fluid mt-3">
+        <div id="loading" class="text-center" style="display: none;">
+            <div class="spinner-border" role="status"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm p-3 mb-4 bg-white rounded">
+                    <h5 class="mb-3">Quản lý Đơn vị</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#addUnitModal">
+                                <i class="bi bi-plus"></i> Thêm Đơn vị
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input id="unitSearchInput" class="form-control" placeholder="Tìm kiếm theo tên" type="text" onkeypress="if(event.key === 'Enter') searchUnits()">
+                                <button class="btn btn-outline-primary" onclick="searchUnits()">
+                                    <i class="bi bi-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="sortable" onclick="sortTable('unit', 'id')">
+                                ID <span class="sort-icon" id="unit-id-sort"></span>
+                            </th>
+                            <th scope="col" class="sortable" onclick="sortTable('unit', 'name')">
+                                Tên <span class="sort-icon" id="unit-name-sort"></span>
+                            </th>
+                            <th scope="col">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody id="unit-table-body"></tbody>
+                    </table>
+                    <div class="pagination-controls">
+                        <button class="btn btn-secondary btn-sm me-2" onclick="changeUnitPage('prev')" id="prevUnitPageBtn" disabled>
+                            <i class="bi bi-arrow-left"></i>
+                        </button>
+                        <span id="currentUnitPage">Trang 1</span>
+                        <button class="btn btn-secondary btn-sm ms-2" onclick="changeUnitPage('next')" id="nextUnitPageBtn">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm p-3 mb-4 bg-white rounded">
+                    <h5 class="mb-3">Quản lý Danh mục</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                                <i class="bi bi-plus"></i> Thêm Danh mục
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input id="categorySearchInput" class="form-control" placeholder="Tìm kiếm theo tên" type="text" onkeypress="if(event.key === 'Enter') searchCategories()">
+                                <button class="btn btn-outline-primary" onclick="searchCategories()">
+                                    <i class="bi bi-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="sortable" onclick="sortTable('category', 'id')">
+                                ID <span class="sort-icon" id="category-id-sort"></span>
+                            </th>
+                            <th scope="col" class="sortable" onclick="sortTable('category', 'name')">
+                                Tên <span class="sort-icon" id="category-name-sort"></span>
+                            </th>
+                            <th scope="col">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody id="category-table-body"></tbody>
+                    </table>
+                    <div class="pagination-controls">
+                        <button class="btn btn-secondary btn-sm me-2" onclick="changeCategoryPage('prev')" id="prevCategoryPageBtn" disabled>
+                            <i class="bi bi-arrow-left"></i>
+                        </button>
+                        <span id="currentCategoryPage">Trang 1</span>
+                        <button class="btn btn-secondary btn-sm ms-2" onclick="changeCategoryPage('next')" id="nextCategoryPageBtn">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addUnitModalLabel">Thêm Đơn vị mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addUnitForm">
+                            <div class="mb-3">
+                                <label for="unitNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="unitNameInput" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editUnitModal" tabindex="-1" aria-labelledby="editUnitModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editUnitModalLabel">Chỉnh sửa Đơn vị</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editUnitForm">
+                            <input type="hidden" id="editUnitId">
+                            <div class="mb-3">
+                                <label for="editUnitNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="editUnitNameInput" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCategoryModalLabel">Thêm Danh mục mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addCategoryForm">
+                            <div class="mb-3">
+                                <label for="categoryNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="categoryNameInput" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editCategoryModalLabel">Chỉnh sửa Danh mục</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editCategoryForm">
+                            <input type="hidden" id="editCategoryId">
+                            <div class="mb-3">
+                                <label for="editCategoryNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="editCategoryNameInput" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded/api';
+    let allUnits = [];
+    let allCategories = [];
+    let currentUnitPage = 0;
+    let currentCategoryPage = 0;
+    const itemsPerPage = 10;
+    let unitSortStates = { column: 'id', direction: 'asc' };
+    let categorySortStates = { column: 'id', direction: 'asc' };
+    function toggleSidebar() {
+        console.log('Toggling sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const toggleIcon = document.getElementById('toggleIcon');
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('collapsed');
+        toggleIcon.classList.toggle('fa-chevron-left');
+        toggleIcon.classList.toggle('fa-chevron-right');
+    }
+    // Check if name exists (for both units and categories)
+    async function checkNameExists(type, name) {
+        const url = `${baseUrl}/${type === 'unit' ? 'units' : 'categories'}`;
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            const data = await response.json();
+            return data.some(item =>
+                item[type === 'unit' ? 'unitName' : 'categoryName'].toLowerCase() === name.toLowerCase()
+            );
+        } catch (error) {
+            console.error(`Check ${type} name error:`, error);
+            alert(`Failed to check ${type} existence: ${error.message}`);
+            return false;
+        }
+    }
+
+    // Fetch all units
+    async function getAllUnits() {
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/units`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            allUnits = await response.json();
+            console.log('Fetched units:', allUnits); // Debug
+            displayUnits(allUnits, 0);
+        } catch (error) {
+            console.error('Fetch units error:', error);
+            alert('Failed to load units');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Fetch all categories
+    async function getAllCategories() {
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/categories`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            allCategories = await response.json();
+            console.log('Fetched categories:', allCategories); // Debug
+            displayCategories(allCategories, 0);
+        } catch (error) {
+            console.error('Fetch categories error:', error);
+            alert('Failed to load categories');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Display units with pagination
+    function displayUnits(units, page = 0) {
+        const tbody = document.getElementById('unit-table-body');
+        tbody.innerHTML = '';
+
+        const start = page * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedUnits = units.slice(start, end);
+
+        if (paginatedUnits.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3">No units found</td></tr>';
+        } else {
+            paginatedUnits.forEach(unit => {
+                const row = `<tr>
+                    <td>${unit.idUnit || 'N/A'}</td>
+                    <td>${unit.unitName || 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="editUnit(${unit.idUnit})"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteUnit(${unit.idUnit})"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        updateUnitPaginationControls(page, units.length);
+    }
+
+    // Display categories with pagination
+    function displayCategories(categories, page = 0) {
+        const tbody = document.getElementById('category-table-body');
+        tbody.innerHTML = '';
+
+        const start = page * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedCategories = categories.slice(start, end);
+
+        if (paginatedCategories.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3">No categories found</td></tr>';
+        } else {
+            paginatedCategories.forEach(category => {
+                const row = `<tr>
+                    <td>${category.category_id || 'N/A'}</td>
+                    <td>${category.categoryName || 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="editCategory(${category.category_id})"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCategory(${category.category_id})"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        updateCategoryPaginationControls(page, categories.length);
+    }
+
+    // Update unit pagination controls
+    function updateUnitPaginationControls(page, totalItems) {
+        currentUnitPage = page;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        document.getElementById('currentUnitPage').textContent = `Page ${page + 1} of ${totalPages || 1}`;
+        document.getElementById('prevUnitPageBtn').disabled = page === 0;
+        document.getElementById('nextUnitPageBtn').disabled = page >= totalPages - 1 || totalPages === 0;
+    }
+
+    // Update category pagination controls
+    function updateCategoryPaginationControls(page, totalItems) {
+        currentCategoryPage = page;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        document.getElementById('currentCategoryPage').textContent = `Page ${page + 1} of ${totalPages || 1}`;
+        document.getElementById('prevCategoryPageBtn').disabled = page === 0;
+        document.getElementById('nextCategoryPageBtn').disabled = page >= totalPages - 1 || totalPages === 0;
+    }
+
+    // Change unit page
+    function changeUnitPage(direction) {
+        if (direction === 'prev' && currentUnitPage > 0) {
+            displayUnits(allUnits, currentUnitPage - 1);
+        } else if (direction === 'next' && currentUnitPage < Math.ceil(allUnits.length / itemsPerPage) - 1) {
+            displayUnits(allUnits, currentUnitPage + 1);
+        }
+    }
+
+    // Change category page
+    function changeCategoryPage(direction) {
+        if (direction === 'prev' && currentCategoryPage > 0) {
+            displayCategories(allCategories, currentCategoryPage - 1);
+        } else if (direction === 'next' && currentCategoryPage < Math.ceil(allCategories.length / itemsPerPage) - 1) {
+            displayCategories(allCategories, currentCategoryPage + 1);
+        }
+    }
+
+    // Sort table
+    function sortTable(type, column) {
+        let data, sortStates;
+        if (type === 'unit') {
+            data = allUnits;
+            sortStates = unitSortStates;
+        } else if (type === 'category') {
+            data = allCategories;
+            sortStates = categorySortStates;
+        }
+
+        if (sortStates.column === column) {
+            sortStates.direction = sortStates.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortStates.column = column;
+            sortStates.direction = 'asc';
+        }
+
+        data.sort((a, b) => {
+            let valA, valB;
+            if (column === 'id') {
+                valA = type === 'unit' ? a.idUnit : a.category_id;
+                valB = type === 'unit' ? b.idUnit : b.category_id;
+            } else if (column === 'name') {
+                valA = type === 'unit' ? a.unitName.toLowerCase() : a.categoryName.toLowerCase();
+                valB = type === 'unit' ? b.unitName.toLowerCase() : b.categoryName.toLowerCase();
+            }
+            return sortStates.direction === 'asc' ? (valA > valB ? 1 : -1) : (valA < valB ? 1 : -1);
+        });
+
+        document.querySelectorAll(`#${type}-id-sort, #${type}-name-sort`).forEach(icon => icon.innerHTML = '');
+        document.getElementById(`${type}-${column}-sort`).innerHTML = sortStates.direction === 'asc' ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>';
+
+        if (type === 'unit') displayUnits(data, 0);
+        else if (type === 'category') displayCategories(data, 0);
+    }
+
+    // Search units
+    function searchUnits() {
+        const searchValue = document.getElementById('unitSearchInput').value.toLowerCase();
+        const filteredUnits = allUnits.filter(unit => unit.unitName.toLowerCase().includes(searchValue));
+        displayUnits(filteredUnits, 0);
+    }
+
+    // Search categories
+    function searchCategories() {
+        const searchValue = document.getElementById('categorySearchInput').value.toLowerCase();
+        const filteredCategories = allCategories.filter(category => category.categoryName.toLowerCase().includes(searchValue));
+        displayCategories(filteredCategories, 0);
+    }
+
+    // Add unit
+    async function addUnit() {
+        const name = document.getElementById('unitNameInput').value.trim();
+        if (!name) {
+            alert('Please enter a unit name');
+            return;
+        }
+        const exists = await checkNameExists('unit', name);
+        if (exists) {
+            alert('Unit name already exists!');
+            return;
+        }
+        console.log('Adding unit with name:', name);
+        try {
+            document.getElementById('loading').style.display = 'block';
+            const response = await fetch(`${baseUrl}/units`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ unitName: name })
+            });
+            console.log('Add unit response status:', response.status);
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            const unit = await response.json();
+            alert('Unit added successfully');
+            $('#addUnitModal').modal('hide');
+            getAllUnits();
+        } catch (error) {
+            console.error('Add unit error:', error);
+            alert('Failed to add unit: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Edit unit
+    async function editUnit(id) {
+        console.log('Fetching unit with id:', id);
+        try {
+            document.getElementById('loading').style.display = 'block';
+            const response = await fetch(`${baseUrl}/units/${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            console.log('Edit unit response status:', response.status);
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            const unit = await response.json();
+            document.getElementById('editUnitId').value = unit.idUnit;
+            document.getElementById('editUnitNameInput').value = unit.unitName;
+            $('#editUnitModal').modal('show');
+        } catch (error) {
+            console.error('Fetch unit error:', error);
+            alert('Failed to load unit: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Update unit
+    async function updateUnit() {
+        const id = document.getElementById('editUnitId').value;
+        const name = document.getElementById('editUnitNameInput').value.trim();
+        if (!name) {
+            alert('Please enter a unit name');
+            return;
+        }
+        const originalUnit = allUnits.find(unit => unit.idUnit === parseInt(id));
+        if (originalUnit && originalUnit.unitName.toLowerCase() !== name.toLowerCase()) {
+            const exists = await checkNameExists('unit', name);
+            if (exists) {
+                alert('Unit name already exists!');
+                return;
+            }
+        }
+        console.log('Updating unit with id:', id, 'name:', name);
+        try {
+            document.getElementById('loading').style.display = 'block';
+            const response = await fetch(`${baseUrl}/units/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idUnit: id, unitName: name })
+            });
+            console.log('Update unit response status:', response.status);
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            alert('Unit updated successfully');
+            $('#editUnitModal').modal('hide');
+            getAllUnits();
+        } catch (error) {
+            console.error('Update unit error:', error);
+            alert('Failed to update unit: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Delete unit
+    async function deleteUnit(id) {
+        if (confirm('Are you sure you want to delete this unit?')) {
+            console.log('Deleting unit with id:', id);
+            try {
+                document.getElementById('loading').style.display = 'block';
+                const response = await fetch(`${baseUrl}/units/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                console.log('Delete unit response status:', response.status);
+                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                alert('Unit deleted successfully');
+                getAllUnits();
+            } catch (error) {
+                console.error('Delete unit error:', error);
+                alert('Failed to delete unit: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    }
+
+    // Add category
+    async function addCategory() {
+        const name = document.getElementById('categoryNameInput').value.trim();
+        if (!name) {
+            alert('Please enter a category name');
+            return;
+        }
+        const exists = await checkNameExists('category', name);
+        if (exists) {
+            alert('Category name already exists!');
+            return;
+        }
+        console.log('Adding category with name:', name);
+        try {
+            document.getElementById('loading').style.display = 'block';
+            const response = await fetch(`${baseUrl}/categories`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ categoryName: name })
+            });
+            console.log('Add category response status:', response.status);
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            const category = await response.json();
+            alert('Category added successfully');
+            $('#addCategoryModal').modal('hide');
+            getAllCategories();
+        } catch (error) {
+            console.error('Add category error:', error);
+            alert('Failed to add category: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Edit category
+    async function editCategory(id) {
+        console.log('Fetching category with id:', id);
+        try {
+            document.getElementById('loading').style.display = 'block';
+            const response = await fetch(`${baseUrl}/categories/${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            console.log('Edit category response status:', response.status);
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            const category = await response.json();
+            document.getElementById('editCategoryId').value = category.category_id;
+            document.getElementById('editCategoryNameInput').value = category.categoryName;
+            $('#editCategoryModal').modal('show');
+        } catch (error) {
+            console.error('Fetch category error:', error);
+            alert('Failed to load category: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Update category
+    async function updateCategory() {
+        const id = document.getElementById('editCategoryId').value;
+        const name = document.getElementById('editCategoryNameInput').value.trim();
+        if (!name) {
+            alert('Please enter a category name');
+            return;
+        }
+        const originalCategory = allCategories.find(category => category.category_id === parseInt(id));
+        if (originalCategory && originalCategory.categoryName.toLowerCase() !== name.toLowerCase()) {
+            const exists = await checkNameExists('category', name);
+            if (exists) {
+                alert('Category name already exists!');
+                return;
+            }
+        }
+        console.log('Updating category with id:', id, 'name:', name);
+        try {
+            document.getElementById('loading').style.display = 'block';
+            const response = await fetch(`${baseUrl}/categories/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category_id: id, categoryName: name })
+            });
+            console.log('Update category response status:', response.status);
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            alert('Category updated successfully');
+            $('#editCategoryModal').modal('hide');
+            getAllCategories();
+        } catch (error) {
+            console.error('Update category error:', error);
+            alert('Failed to update category: ' + error.message);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    // Delete category
+    async function deleteCategory(id) {
+        if (confirm('Are you sure you want to delete this category?')) {
+            console.log('Deleting category with id:', id);
+            try {
+                document.getElementById('loading').style.display = 'block';
+                const response = await fetch(`${baseUrl}/categories/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                console.log('Delete category response status:', response.status);
+                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                alert('Category deleted successfully');
+                getAllCategories();
+            } catch (error) {
+                console.error('Delete category error:', error);
+                alert('Failed to delete category: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    }
+
+    // Event listeners
+    document.getElementById('addUnitForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        addUnit();
+    });
+
+    document.getElementById('editUnitForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        updateUnit();
+    });
+
+    document.getElementById('addCategoryForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        addCategory();
+    });
+
+    document.getElementById('editCategoryForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        updateCategory();
+    });
+
+    // Initialize
+    async function init() {
+        await getAllUnits();
+        await getAllCategories();
+    }
+
+    init();
+</script>
+</body>
+</html>
