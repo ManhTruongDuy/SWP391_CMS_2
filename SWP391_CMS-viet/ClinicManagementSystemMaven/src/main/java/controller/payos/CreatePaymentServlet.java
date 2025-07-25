@@ -39,8 +39,8 @@ public class CreatePaymentServlet extends HttpServlet {
                 .orderCode(orderCode)
                 .amount(amount)
                 .description("thanh toan ")
-                .returnUrl("http://localhost:9999/ClinicManagementSystem_war/view/pharmacist/paySuccess.html?orderCode=" + orderCode)
-                .cancelUrl("http://localhost:9999/ClinicManagementSystem_war/view/pharmacist/payFail.html")
+                .returnUrl("http://localhost:9999/ClinicManagementSystem_war_exploded/view/pharmacist/paySuccess.html?orderCode=" + orderCode)
+                .cancelUrl("http://localhost:9999/ClinicManagementSystem_war_exploded/view/pharmacist/payFail.html")
                 .item(item)
                 .build();
 
