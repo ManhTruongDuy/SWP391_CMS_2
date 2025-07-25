@@ -1,7 +1,9 @@
 package dao;
 
 import model.Category;
+import model.History;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +26,7 @@ public class CategoryDAO {
                 list.add(category);
             }
         } catch (SQLException e) {
-            System.out.println("Error fetching all categories: " + e.getMessage());
+            System.err.println("Lỗi khi lấy danh sách danh mục: " + e.getMessage());
             e.printStackTrace();
         }
         return list;
@@ -43,7 +45,7 @@ public class CategoryDAO {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Error fetching category by id: " + e.getMessage());
+            System.err.println("Lỗi khi lấy danh mục: " + e.getMessage());
             e.printStackTrace();
         }
         return category;
@@ -51,6 +53,7 @@ public class CategoryDAO {
 
     public boolean addCategory(Category category) {
         String sql = "INSERT INTO Category (categoryName) VALUES (?)";
+        HistoryDAO historyDAO = new HistoryDAO();
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, category.getCategoryName());
             int affectedRows = ps.executeUpdate();
@@ -58,12 +61,21 @@ public class CategoryDAO {
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         category.setCategory_id(generatedKeys.getInt(1));
+                        // Ghi lịch sử
+                        History history = new History(
+                                "CREATE",
+                                "Category",
+                                category.getCategory_id(),
+                                String.format("Thêm danh mục: %s", category.getCategoryName())
+                        );
+                        history.setActionTime(LocalDateTime.now());
+                        historyDAO.addHistory(history);
                     }
                 }
                 return true;
             }
         } catch (SQLException e) {
-            System.out.println("Error adding category: " + e.getMessage());
+            System.err.println("Lỗi khi thêm danh mục: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -71,27 +83,71 @@ public class CategoryDAO {
 
     public boolean updateCategory(Category category) {
         String sql = "UPDATE Category SET categoryName = ? WHERE category_id = ?";
+        HistoryDAO historyDAO = new HistoryDAO();
+        // Lấy dữ liệu cũ
+        Category oldCategory = getCategoryById(category.getCategory_id());
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, category.getCategoryName());
             ps.setInt(2, category.getCategory_id());
             int affectedRows = ps.executeUpdate();
-            return affectedRows > 0;
+            if (affectedRows > 0) {
+                // Ghi lịch sử
+                String details = oldCategory != null ?
+                        String.format("Cập nhật danh mục: %s -> %s", oldCategory.getCategoryName(), category.getCategoryName())
+                        : String.format("Cập nhật danh mục: ID %d, Tên: %s", category.getCategory_id(), category.getCategoryName());
+                History history = new History(
+                        "UPDATE",
+                        "Category",
+                        category.getCategory_id(),
+                        details
+                );
+                history.setActionTime(LocalDateTime.now());
+                historyDAO.addHistory(history);
+                return true;
+            }
         } catch (SQLException e) {
-            System.out.println("Error updating category: " + e.getMessage());
+            System.err.println("Lỗi khi cập nhật danh mục: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
 
-    public boolean deleteCategory(int id) {
+    public boolean deleteCategory(int id) throws SQLException {
+        String checkSql = "SELECT COUNT(*) FROM Medicine WHERE category_id = ?";
         String sql = "DELETE FROM Category WHERE category_id = ?";
+        HistoryDAO historyDAO = new HistoryDAO();
+
+        // Kiểm tra ràng buộc khóa ngoại
+        try (PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
+            checkPs.setInt(1, id);
+            try (ResultSet rs = checkPs.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    throw new SQLException("Không thể xóa danh mục: Có thuốc đang sử dụng danh mục này.");
+                }
+            }
+        }
+
+        // Lấy thông tin danh mục trước khi xóa
+        Category category = getCategoryById(id);
+        String details = category != null ?
+                String.format("Xóa danh mục: %s", category.getCategoryName())
+                : String.format("Xóa danh mục: ID %d", id);
+
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             int affectedRows = ps.executeUpdate();
-            return affectedRows > 0;
-        } catch (SQLException e) {
-            System.out.println("Error deleting category: " + e.getMessage());
-            e.printStackTrace();
+            if (affectedRows > 0) {
+                // Ghi lịch sử
+                History history = new History(
+                        "DELETE",
+                        "Category",
+                        id,
+                        details
+                );
+                history.setActionTime(LocalDateTime.now());
+                historyDAO.addHistory(history);
+                return true;
+            }
         }
         return false;
     }

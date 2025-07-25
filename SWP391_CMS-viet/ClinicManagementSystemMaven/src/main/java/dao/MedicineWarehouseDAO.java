@@ -1,9 +1,10 @@
 package dao;
 
+import model.History;
 import model.Medicine;
-import model.Warehouse;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,6 +106,7 @@ public class MedicineWarehouseDAO {
     // Thêm mới thuốc
     public boolean addMedicine(Medicine med) {
         String sql = "INSERT INTO Medicine (name, unit_id, category_id, ingredient, usage, preservation, manuDate, expDate, quantity, price, warehouse_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        HistoryDAO historyDAO = new HistoryDAO();
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, med.getName());
             ps.setInt(2, med.getUnit_id());
@@ -112,8 +114,10 @@ public class MedicineWarehouseDAO {
             ps.setString(4, med.getIngredient());
             ps.setString(5, med.getUsage());
             ps.setString(6, med.getPreservation());
-            if (med.getManuDate() != null) ps.setDate(7, Date.valueOf(med.getManuDate())); else ps.setNull(7, Types.DATE);
-            if (med.getExpDate() != null) ps.setDate(8, Date.valueOf(med.getExpDate())); else ps.setNull(8, Types.DATE);
+            if (med.getManuDate() != null) ps.setDate(7, Date.valueOf(med.getManuDate()));
+            else ps.setNull(7, Types.DATE);
+            if (med.getExpDate() != null) ps.setDate(8, Date.valueOf(med.getExpDate()));
+            else ps.setNull(8, Types.DATE);
             ps.setInt(9, med.getQuantity());
             ps.setFloat(10, med.getPrice());
             ps.setInt(11, med.getWarehouse_id());
@@ -122,19 +126,32 @@ public class MedicineWarehouseDAO {
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         med.setMedicine_id(generatedKeys.getInt(1));
+                        History history = new History(
+                                "CREATE",
+                                "Medicine",
+                                med.getMedicine_id(),
+                                String.format("Thêm thuốc: %s, Số lượng: %d, Giá: %.2f", med.getName(), med.getQuantity(), med.getPrice())
+                        );
+                        history.setActionTime(LocalDateTime.now());
+                        historyDAO.addHistory(history);
                     }
                 }
                 return true;
             }
         } catch (SQLException e) {
+            System.err.println("Lỗi SQL khi thêm thuốc: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("Invalid body or data: " + e.getMessage());
         }
         return false;
     }
 
     // Cập nhật thuốc
     public boolean updateMedicine(Medicine med) {
-        String sql = "UPDATE Medicine SET name=?, unit_id=?, category_id=?, ingredient=?, usage=?, preservation=?, manuDate=?, expDate=?, quantity=?, price=?, warehouse_id=? WHERE medicine_id=?";
+        String sql = "UPDATE Medicine SET name = ?, unit_id = ?, category_id = ?, ingredient = ?, usage = ?, preservation = ?, manuDate = ?, expDate = ?, quantity = ?, price = ?, warehouse_id = ? WHERE medicine_id = ?";
+        HistoryDAO historyDAO = new HistoryDAO();
+        // Lấy dữ liệu cũ
+        Medicine oldMed = getMedicineById(med.getMedicine_id());
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, med.getName());
             ps.setInt(2, med.getUnit_id());
@@ -142,27 +159,68 @@ public class MedicineWarehouseDAO {
             ps.setString(4, med.getIngredient());
             ps.setString(5, med.getUsage());
             ps.setString(6, med.getPreservation());
-            if (med.getManuDate() != null) ps.setDate(7, Date.valueOf(med.getManuDate())); else ps.setNull(7, Types.DATE);
-            if (med.getExpDate() != null) ps.setDate(8, Date.valueOf(med.getExpDate())); else ps.setNull(8, Types.DATE);
+            if (med.getManuDate() != null) ps.setDate(7, Date.valueOf(med.getManuDate()));
+            else ps.setNull(7, Types.DATE);
+            if (med.getExpDate() != null) ps.setDate(8, Date.valueOf(med.getExpDate()));
+            else ps.setNull(8, Types.DATE);
             ps.setInt(9, med.getQuantity());
             ps.setFloat(10, med.getPrice());
             ps.setInt(11, med.getWarehouse_id());
             ps.setInt(12, med.getMedicine_id());
-            return ps.executeUpdate() > 0;
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                StringBuilder details = new StringBuilder("Cập nhật thuốc: " + med.getName());
+                if (!med.getName().equals(oldMed.getName())) details.append(String.format(", Tên: %s -> %s", oldMed.getName(), med.getName()));
+                if (med.getQuantity() != oldMed.getQuantity()) details.append(String.format(", Số lượng: %d -> %d", oldMed.getQuantity(), med.getQuantity()));
+                if (med.getPrice() != oldMed.getPrice()) details.append(String.format(", Giá: %.2f -> %.2f", oldMed.getPrice(), med.getPrice()));
+                History history = new History("UPDATE", "Medicine", med.getMedicine_id(), details.toString());
+                history.setActionTime(LocalDateTime.now());
+                historyDAO.addHistory(history);
+                return true;
+            }
         } catch (SQLException e) {
+            System.err.println("Lỗi SQL khi cập nhật thuốc: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
 
     // Xóa thuốc
-    public boolean deleteMedicine(int id) {
+    public boolean deleteMedicine(int id) throws SQLException {
+        String checkMedicines = "SELECT COUNT(*) FROM Medicines WHERE medicine_id = ?";
+        String checkImportInfo = "SELECT COUNT(*) FROM ImportInfo WHERE medicine_id = ?";
         String deleteMedicines = "DELETE FROM Medicines WHERE medicine_id = ?";
         String deleteImportInfo = "DELETE FROM ImportInfo WHERE medicine_id = ?";
         String deleteMedicine = "DELETE FROM Medicine WHERE medicine_id = ?";
+        HistoryDAO historyDAO = new HistoryDAO();
 
         try {
             conn.setAutoCommit(false); // Bắt đầu transaction
+
+            // Kiểm tra ràng buộc khóa ngoại
+            try (PreparedStatement checkPs1 = conn.prepareStatement(checkMedicines)) {
+                checkPs1.setInt(1, id);
+                try (ResultSet rs = checkPs1.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        throw new SQLException("Không thể xóa thuốc: Có bản ghi trong Medicines tham chiếu thuốc này.");
+                    }
+                }
+            }
+            try (PreparedStatement checkPs2 = conn.prepareStatement(checkImportInfo)) {
+                checkPs2.setInt(1, id);
+                try (ResultSet rs = checkPs2.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        throw new SQLException("Không thể xóa thuốc: Có bản ghi trong ImportInfo tham chiếu thuốc này.");
+                    }
+                }
+            }
+
+            // Lấy thông tin thuốc trước khi xóa
+            Medicine medicine = getMedicineById(id);
+            String details = medicine != null ?
+                    String.format("Xóa thuốc: %s, Số lượng: %d, Giá: %.2f",
+                            medicine.getName(), medicine.getQuantity(), medicine.getPrice())
+                    : "Xóa thuốc: ID " + id;
 
             // Xóa ở bảng Medicines
             try (PreparedStatement ps1 = conn.prepareStatement(deleteMedicines)) {
@@ -183,23 +241,35 @@ public class MedicineWarehouseDAO {
                 affectedRows = ps3.executeUpdate();
             }
 
+            // Ghi lịch sử nếu xóa thành công
+            if (affectedRows > 0) {
+                History history = new History(
+                        "DELETE",
+                        "Medicine",
+                        id,
+                        details
+                );
+                history.setActionTime(LocalDateTime.now());
+                historyDAO.addHistory(history);
+            }
+
             conn.commit(); // Xác nhận transaction
             return affectedRows > 0;
+
         } catch (SQLException e) {
             try {
-                conn.rollback(); // Nếu lỗi, rollback về trạng thái ban đầu
+                conn.rollback(); // Rollback nếu lỗi
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                throw new SQLException("Lỗi rollback: " + ex.getMessage(), ex);
             }
-            e.printStackTrace();
+            throw e; // Ném lại SQLException để servlet xử lý
         } finally {
             try {
-                conn.setAutoCommit(true); // Trả lại chế độ auto commit mặc định
+                conn.setAutoCommit(true); // Trả lại auto commit
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new SQLException("Lỗi auto commit: " + e.getMessage(), e);
             }
         }
-        return false;
     }
 
 

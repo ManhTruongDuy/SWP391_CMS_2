@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/api/units/*")
@@ -111,26 +112,45 @@ public class UnitServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
-        String pathInfo = req.getPathInfo();
-        try (PrintWriter out = resp.getWriter()) {
-            if (pathInfo == null || !pathInfo.matches("/\\d+")) {
+        resp.setCharacterEncoding("UTF-8");
+        try {
+            String pathInfo = req.getPathInfo();
+            if (pathInfo == null || pathInfo.length() <= 1) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write("{\"error\":\"Invalid or missing ID\"}");
+                new Gson().toJson(new ErrorResponse("ID đơn vị không hợp lệ"), resp.getWriter());
                 return;
             }
             int id = Integer.parseInt(pathInfo.substring(1));
-            if (unitDAO.deleteUnit(id)) {
-                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            boolean success = unitDAO.deleteUnit(id);
+            if (success) {
+                resp.setStatus(HttpServletResponse.SC_OK);
+                new Gson().toJson(new SuccessResponse("Xóa đơn vị thành công"), resp.getWriter());
             } else {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                out.write("{\"error\":\"Delete failed\"}");
+                new Gson().toJson(new ErrorResponse("Đơn vị không tồn tại"), resp.getWriter());
             }
+        } catch (SQLException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            new Gson().toJson(new ErrorResponse(e.getMessage()), resp.getWriter());
         } catch (NumberFormatException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write("{\"error\":\"Invalid ID\"}");
-        } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("{\"error\":\"Failed to delete unit\"}");
+            new Gson().toJson(new ErrorResponse("ID đơn vị không hợp lệ"), resp.getWriter());
+        }
+    }
+
+    // Inner class for error response
+    private static class ErrorResponse {
+        String error;
+        ErrorResponse(String error) {
+            this.error = error;
+        }
+    }
+
+    // Inner class for success response
+    private static class SuccessResponse {
+        String message;
+        SuccessResponse(String message) {
+            this.message = message;
         }
     }
 }

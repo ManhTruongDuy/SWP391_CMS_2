@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -120,24 +121,40 @@ public class WarehouseServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
-        String pathInfo = req.getPathInfo();
-        if (pathInfo != null && !pathInfo.equals("/")) {
-            try {
-                int id = Integer.parseInt(pathInfo.substring(1));
-                if (warehouseDAO.deleteWarehouse(id)) {
-                    resp.getWriter().write("{\"message\":\"Warehouse deleted\"}");
-                } else {
-                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    resp.getWriter().write("{\"error\":\"Warehouse not found\"}");
-                }
-            } catch (NumberFormatException e) {
+        resp.setCharacterEncoding("UTF-8");
+        try {
+            String pathInfo = req.getPathInfo();
+            if (pathInfo == null || pathInfo.length() <= 1) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().write("{\"error\":\"Invalid ID\"}");
+                new Gson().toJson(new ErrorResponse("ID kho không hợp lệ"), resp.getWriter());
+                return;
             }
-        } else {
+            int id = Integer.parseInt(pathInfo.substring(1));
+            boolean success = warehouseDAO.deleteWarehouse(id);
+            if (success) {
+                resp.setStatus(HttpServletResponse.SC_OK);
+                new Gson().toJson(new SuccessResponse("Xóa kho thành công"), resp.getWriter());
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                new Gson().toJson(new ErrorResponse("Kho không tồn tại"), resp.getWriter());
+            }
+        } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write("{\"error\":\"ID required for deletion\"}");
+            new Gson().toJson(new ErrorResponse(e.getMessage()), resp.getWriter());
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            new Gson().toJson(new ErrorResponse("ID kho không hợp lệ"), resp.getWriter());
         }
+    }
+
+    private static class ErrorResponse {
+        String error;
+        ErrorResponse(String error) { this.error = error; }
+    }
+
+    private static class SuccessResponse {
+        String message;
+        SuccessResponse(String message) { this.message = message; }
     }
 
     @Override

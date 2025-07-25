@@ -195,14 +195,6 @@
             text-align: center;
         }
 
-        .sort-icon {
-            margin-left: 5px;
-        }
-
-        .sortable {
-            cursor: pointer;
-        }
-
         #loading {
             position: fixed;
             top: 50%;
@@ -226,14 +218,22 @@
             color: #007bff;
         }
 
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
         .expiry-green {
             color: green !important;
             font-weight: bold;
         }
+
         .expiry-yellow {
             color: orange !important;
             font-weight: bold;
         }
+
         .expiry-red {
             color: red !important;
             font-weight: bold;
@@ -274,7 +274,7 @@
                 </a>
             </div>
             <div class="nav-item">
-                <a href="UnitAndCategory.html" class="nav-link">
+                <a href="ChangeParameter.html" class="nav-link">
                     <i class="fas fa-cubes nav-icon"></i>
                     <span class="nav-text">Đơn vị & Danh mục</span>
                 </a>
@@ -286,11 +286,10 @@
         <div class="user-info">
             <div class="user-avatar">DT</div>
             <div class="user-details">
-                <div class="user-name">Dược sĩ Thảo</div>
-                <div class="user-role">Quầy thuốc</div>
+                <div class="user-name">Quản lí kho</div>
             </div>
         </div>
-        <a href="login.html" class="logout-btn">
+        <a href="../accountpharmacist/Login.jsp" class="logout-btn">
             <i class="fas fa-sign-out-alt"></i>
             <span class="logout-text">Đăng xuất</span>
         </a>
@@ -338,6 +337,45 @@
                 <tbody id="expiring-medicines-table-body"></tbody>
             </table>
         </div>
+        <div class="card shadow-sm p-3 bg-white rounded">
+            <h5 class="mb-3">Lịch sử chỉnh sửa</h5>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <select class="form-select" id="historyActionType" style="width: auto;">
+                    <option value="">Tất cả hành động</option>
+                    <option value="CREATE">Thêm</option>
+                    <option value="UPDATE">Sửa</option>
+                    <option value="DELETE">Xóa</option>
+                </select>
+
+                <select class="form-select" id="historyEntityType" style="width: auto;">
+                    <option value="">Tất cả đối tượng</option>
+                    <option value="Medicine">Thuốc</option>
+                    <option value="Warehouse">Kho</option>
+                    <option value="Unit">Đơn vị</option>
+                    <option value="Category">Danh mục</option>
+                </select>
+
+                <input type="date" id="historyDate" class="form-control" style="width: auto;">
+
+                <button type="button"
+                        class="btn btn-outline-primary"
+                        style="width: auto; white-space: nowrap;"
+                        onclick="searchHistory()">Tìm kiếm</button>
+            </div>
+            <table id="historyTable" class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Thời gian</th>
+                    <th>Người thực hiện</th>
+                    <th>Hành động</th>
+                    <th>Đối tượng</th>
+                    <th>Chi tiết</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div id="historyPagination" class="pagination-controls"></div>
+        </div>
     </div>
 </div>
 
@@ -356,6 +394,8 @@
     }
 
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
+    let historyCurrentPage = 1;
+    const historyPageSize = 10;
 
     // Get expiry status
     function getExpiryStatus(expDate) {
@@ -440,21 +480,78 @@
             }
 
             if (expiringMedicines.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center">No expiring medicines found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Không có thuốc sắp hết hạn</td></tr>';
             }
         } catch (error) {
             console.error('Fetch dashboard data error:', error);
-            alert('Failed to load dashboard data. Please try again or contact support.');
+            alert('Không thể tải dữ liệu dashboard. Vui lòng thử lại.');
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
     }
 
+    // Fetch and display history
+    async function showHistory(page = 1) {
+        historyCurrentPage = page;
+        try {
+            const actionType = document.getElementById('historyActionType').value;
+            const entityType = document.getElementById('historyEntityType').value;
+            const date = document.getElementById('historyDate').value;
+            const response = await fetch(`${baseUrl}/api/history?actionType=${actionType}&entityType=${entityType}&date=${date}&page=${page}&pageSize=${historyPageSize}`);
+            if (!response.ok) throw new Error('Lỗi khi lấy lịch sử');
+            const data = await response.json();
+            const histories = data.histories;
+            const totalItems = data.totalItems;
+
+            const tbody = document.querySelector('#historyTable tbody');
+            tbody.innerHTML = '';
+            histories.forEach(history => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(history.actionTime).toLocaleString('vi-VN')}</td>
+                    <td>Quản lí kho</td>
+                    <td>${history.actionType === 'CREATE' ? 'Thêm' : history.actionType === 'UPDATE' ? 'Sửa' : 'Xóa'}</td>
+                    <td>${history.entityType === 'Medicine' ? 'Thuốc' : history.entityType === 'Warehouse' ? 'Kho' : history.entityType === 'Unit' ? 'Đơn vị' : 'Danh mục'} (ID: ${history.entityId})</td>
+                    <td>${history.details}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            if (histories.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Không có lịch sử nào</td></tr>';
+            }
+
+            renderHistoryPagination(totalItems);
+        } catch (error) {
+            console.error('Lỗi khi hiển thị lịch sử:', error);
+            alert('Không thể tải lịch sử');
+        }
+    }
+
+    // Render pagination controls
+    function renderHistoryPagination(totalItems) {
+        const totalPages = Math.ceil(totalItems / historyPageSize);
+        const pagination = document.getElementById('historyPagination');
+        pagination.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+            const button = document.createElement('button');
+            button.textContent = i;
+            button.className = i === historyCurrentPage ? 'active' : '';
+            button.onclick = () => showHistory(i);
+            pagination.appendChild(button);
+        }
+    }
+
+    // Search history
+    function searchHistory() {
+        showHistory(1);
+    }
+
     // Initialize page
     document.addEventListener('DOMContentLoaded', () => {
         fetchDashboardData();
+        showHistory();
     });
 </script>
 </body>
 </html>
-```

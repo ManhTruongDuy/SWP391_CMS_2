@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -152,27 +153,42 @@ public class MedicineWarehouseServlet extends HttpServlet {
     // DELETE: xóa thuốc
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String pathInfo = req.getPathInfo();
-        PrintWriter out = resp.getWriter();
-        if (pathInfo != null && pathInfo.split("/").length == 2) {
-            try {
-                int id = Integer.parseInt(pathInfo.split("/")[1]);
-                boolean ok = dao.deleteMedicine(id);
-                if (ok) {
-                    resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                } else {
-                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    out.print("{\"error\":\"Medicine not found\"}");
-                }
-            } catch (NumberFormatException e) {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        try {
+            MedicineWarehouseDAO dao = new MedicineWarehouseDAO();
+            String pathInfo = req.getPathInfo();
+            if (pathInfo == null || pathInfo.length() <= 1) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print("{\"error\":\"Invalid ID\"}");
+                new Gson().toJson(new ErrorResponse("ID thuốc không hợp lệ"), resp.getWriter());
+                return;
             }
-        } else {
+            int id = Integer.parseInt(pathInfo.substring(1));
+            boolean success = dao.deleteMedicine(id);
+            if (success) {
+                resp.setStatus(HttpServletResponse.SC_OK);
+                new Gson().toJson(new SuccessResponse("Xóa thuốc thành công"), resp.getWriter());
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                new Gson().toJson(new ErrorResponse("Thuốc không tồn tại"), resp.getWriter());
+            }
+        } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("{\"error\":\"Invalid request\"}");
+            new Gson().toJson(new ErrorResponse(e.getMessage()), resp.getWriter());
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            new Gson().toJson(new ErrorResponse("ID thuốc không hợp lệ"), resp.getWriter());
         }
-        out.flush();
+    }
+
+    private static class ErrorResponse {
+        String error;
+        ErrorResponse(String error) { this.error = error; }
+    }
+
+    private static class SuccessResponse {
+        String message;
+        SuccessResponse(String message) { this.message = message; }
     }
 
     @Override
