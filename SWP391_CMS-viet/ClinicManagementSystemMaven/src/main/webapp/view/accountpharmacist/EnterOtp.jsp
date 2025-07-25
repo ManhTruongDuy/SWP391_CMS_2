@@ -91,6 +91,12 @@
     button:hover:not(:disabled) {
       background: linear-gradient(135deg, #f86a3c, #fd9963);
     }
+    .footer-links {
+      margin-top: 25px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
 
     .resend {
       margin-top: 18px;
@@ -132,7 +138,7 @@
   <h2>XÁC THỰC OTP</h2>
 
   <p class="info-email">
-    Vui lòng nhập mã số chúng tôi đã gửi qua email<br>
+    Vui lòng nhập mã số xác nhận chúng tôi đã gửi qua email<br>
     <strong>${maskedEmail}</strong>.
   </p>
 
@@ -163,9 +169,12 @@
     Chưa nhận được mã? <a id="resendLink" href="<%=request.getContextPath()%>/forgotpassword?resend=true&email=${email}">Gửi lại</a>
   </div>
 
-  <div class="resend" style="margin-top: 10px;">
-    <a href="<%=request.getContextPath()%>/loginservlet" onclick="return confirmBack()">Quay lại trang đăng nhập</a>
-  </div>
+  <div class="footer-links">
+    <a href="${pageContext.request.contextPath}/view/accountpharmacist/Login.jsp"
+       class="link"
+       onclick="return confirm('Bạn có chắc chắn muốn quay lại trang đăng nhập không?');">
+      <i>←</i> Quay lại trang đăng nhập
+    </a>  </div>
 </div>
 
 <script>
@@ -364,3 +373,14 @@ resendLink.addEventListener("click", function (e) {
   startCountdown();
 })();
 </script>
+<script>
+  document.querySelectorAll('.otp-input input').forEach((input) => {
+    input.oninvalid = function (e) {
+      e.target.setCustomValidity("Vui lòng nhập đầy đủ mã xác minh.");
+    };
+    input.oninput = function (e) {
+      e.target.setCustomValidity(""); // Reset khi người dùng gõ lại
+    };
+  });
+</script>
+

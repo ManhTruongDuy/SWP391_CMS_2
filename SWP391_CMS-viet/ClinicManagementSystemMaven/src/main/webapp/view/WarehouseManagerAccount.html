@@ -165,6 +165,29 @@
             transform: translateY(-1px);
         }
 
+        .create-button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #6D9DC5; /* Soft blue background */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .create-button:hover {
+            background-color: #5B8AB2; /* Slightly darker soft blue on hover */
+            transform: translateY(-2px);
+        }
+
+        .create-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -247,6 +270,8 @@
             <div class="search-container">
                 <input type="text" id="wmanager-id-search" placeholder="Nhập ID quản lý kho" class="form-control">
                 <button id="search-btn" class="btn">Tìm kiếm</button>
+
+                <button class="create-button"><a href="AddAccount.html">Tạo tài khoản mới</a></button>
             </div>
 
             <table class="table table-bordered table-hover">
@@ -318,7 +343,7 @@
 
         const wManagers = Array.isArray(data) ? data : [data];
         if (wManagers.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Không tìm thấy quản lý kho</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">Không tìm thấy quản lý kho</td></tr>';
             return;
         }
 

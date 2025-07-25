@@ -59,7 +59,8 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("account", pharmacist);
             session.setAttribute("userType", "pharmacist");
             session.setAttribute("role", "Pharmacist");
-            response.sendRedirect(request.getContextPath() + "view/pharmacist/dashboard-pharmacist.html"); // Gợi ý: nên có trang riêng
+            response.sendRedirect(request.getContextPath() + "/view/pharmacist/dashboard-pharmacist.html"); // Gợi ý: nên có trang riêng
+            System.out.println("Redirecting to: " + request.getContextPath() + "/view/pharmacist/dashboard-pharmacist.html");
             return;
         }
 
@@ -88,6 +89,9 @@ public class LoginServlet extends HttpServlet {
                     break;
                 case "AdminBusiness":
                     response.sendRedirect(request.getContextPath() + "/view/AdminDashboard.html");
+                    break;
+                case"Warehouse Manager":
+                    response.sendRedirect(request.getContextPath() + "/view/warehouse/WarehouseHome.html");
                     break;
                 default:
                     request.setAttribute("err", "Invalid staff role.");

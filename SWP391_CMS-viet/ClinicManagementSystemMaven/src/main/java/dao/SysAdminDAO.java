@@ -1,5 +1,6 @@
 package dao;
 
+import model.StaffProfileDTO;
 import model.Warehouse;
 import model.accounts.*;
 
@@ -54,6 +55,7 @@ public class SysAdminDAO {
                             rs.getString("full_name"),
                             rs.getString("phone"),
                             rs.getString("email"),
+                            rs.getString("department"),
                             rs.getString("username"),
                             rs.getString("password"),
                             rs.getString("status")
@@ -113,6 +115,7 @@ public class SysAdminDAO {
                             rs.getString("full_name"),
                             rs.getString("phone"),
                             rs.getString("email"),
+                            rs.getString("department"),
                             rs.getString("username"),
                             rs.getString("password"),
                             rs.getString("status")
@@ -155,6 +158,30 @@ public class SysAdminDAO {
         return list;
     }
 
+    public List<WarehouseManagerAccount> getAllWarehouseManager() {
+        List<WarehouseManagerAccount> list = new ArrayList<>();
+        String sql = "SELECT * FROM Warehouse_manager w JOIN AccountStaff a ON w.account_staff_id = a.account_staff_id ORDER BY Warehouse_manager_id";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    WarehouseManagerAccount wa = new WarehouseManagerAccount(
+                            rs.getInt("Warehouse_manager_id"),
+                            rs.getString("full_name"),
+                            rs.getString("phone"),
+                            rs.getString("email"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("status")
+                    );
+                    list.add(wa);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     //Lấy bác sĩ theo id
     public DoctorAccount getDoctorById(int id) {
         String sql = "SELECT * FROM Doctor d JOIN AccountStaff ast ON d.account_staff_id = ast.account_staff_id WHERE d.doctor_id = ?";
@@ -166,6 +193,7 @@ public class SysAdminDAO {
                         da.setId(rs.getInt("doctor_id"));
                         da.setName(rs.getString("full_name"));
                         da.setPhone(rs.getString("phone"));
+                        da.setDepartment(rs.getString("department"));
                         da.setEmail(rs.getString("email"));
                         da.setUsername(rs.getString("username"));
                         da.setPassword(rs.getString("password"));
@@ -214,6 +242,7 @@ public class SysAdminDAO {
                         ma.setAdmin_id(rs.getInt("doctor_id"));
                         ma.setFullName(rs.getString("full_name"));
                         ma.setPhone(rs.getString("phone"));
+                        ma.setDepartment(rs.getString("department"));
                         ma.setEmail(rs.getString("email"));
                         ma.setUsername(rs.getString("username"));
                         ma.setPassword(rs.getString("password"));
@@ -238,6 +267,7 @@ public class SysAdminDAO {
                         sa.setAdmin_id(rs.getInt("admin_id"));
                         sa.setFullName(rs.getString("full_name"));
                         sa.setPhone(rs.getString("phone"));
+                        sa.setDepartment(rs.getString("department"));
                         sa.setEmail(rs.getString("email"));
                         sa.setUsername(rs.getString("username"));
                         sa.setPassword(rs.getString("password"));
@@ -274,6 +304,33 @@ public class SysAdminDAO {
         }
         return null;
     }
+
+    //find warehouse manager by id
+    public WarehouseManagerAccount getWarehouseManagerById(int id) {
+        List<WarehouseManagerAccount> list = new ArrayList<>();
+        String sql = "SELECT * FROM Warehouse_manager w JOIN AccountStaff a ON w.account_staff_id = a.account_staff_id WHERE Warehouse_manager_id=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    WarehouseManagerAccount wa = new WarehouseManagerAccount(
+                            rs.getInt("Warehouse_manager_id"),
+                            rs.getString("full_name"),
+                            rs.getString("phone"),
+                            rs.getString("email"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("status")
+                    );
+                    return wa;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     // Tìm bác sĩ theo tên
     public List<DoctorAccount> getDoctorsByName(String name) {
         List<DoctorAccount> list = new ArrayList<>();
@@ -287,6 +344,7 @@ public class SysAdminDAO {
                     da.setId(rs.getInt("doctor_id"));
                     da.setName(rs.getString("full_name"));
                     da.setPhone(rs.getString("phone"));
+                    da.setDepartment(rs.getString("department"));
                     da.setEmail(rs.getString("email"));
                     da.setUsername(rs.getString("username"));
                     da.setPassword(rs.getString("password"));
@@ -313,6 +371,7 @@ public class SysAdminDAO {
                     pa.setID(rs.getInt("pharmacist_id"));
                     pa.setName(rs.getString("full_name"));
                     pa.setMobile(rs.getString("phone"));
+
                     pa.setEmail(rs.getString("email"));
                     pa.setUsername(rs.getString("username"));
                     pa.setPassword(rs.getString("password"));
@@ -340,7 +399,7 @@ public class SysAdminDAO {
                     ma.setFullName(rs.getString("full_name"));
                     ma.setPhone(rs.getString("phone"));
                     ma.setEmail(rs.getString("email"));
-
+                    ma.setDepartment(rs.getString("department"));
                     ma.setUsername(rs.getString("username"));
                     ma.setPassword(rs.getString("password"));
                     ma.setStatus(rs.getString("status"));
@@ -369,6 +428,7 @@ public class SysAdminDAO {
                     sa.setAdmin_id(rs.getInt("admin_id"));
                     sa.setFullName(rs.getString("full_name"));
                     sa.setPhone(rs.getString("phone"));
+                    sa.setDepartment(rs.getString("department"));
                     sa.setEmail(rs.getString("email"));
                     sa.setUsername(rs.getString("username"));
                     sa.setPassword(rs.getString("password"));
@@ -479,5 +539,209 @@ public class SysAdminDAO {
         return false;
     }
 
+    // ======================== DOCTOR ========================
+    public boolean updateDoctorInfo(StaffProfileDTO doctor) {
+        String sql1 = "UPDATE AccountStaff SET full_name = ?, phone = ?, email = ?, department = ? " +
+                "WHERE account_staff_id = (SELECT account_staff_id FROM Doctor WHERE doctor_id = ?)";
+        String sql2 = "UPDATE Doctor SET eduLevel = ?, availability = ? WHERE doctor_id = ?";
 
+        try {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement ps1 = conn.prepareStatement(sql1);
+                 PreparedStatement ps2 = conn.prepareStatement(sql2)) {
+
+                ps1.setString(1, doctor.getFullName());
+                ps1.setString(2, doctor.getPhone());
+                ps1.setString(3, doctor.getEmail());
+                ps1.setString(4, doctor.getDepartment());
+                ps1.setInt(5, doctor.getDoctorId());
+
+                ps2.setString(1, doctor.getEduLevel());
+                ps2.setString(2, doctor.getAvailability());
+                ps2.setInt(3, doctor.getDoctorId());
+
+                ps1.executeUpdate();
+                ps2.executeUpdate();
+
+                conn.commit();
+                return true;
+            }
+
+        } catch (SQLException e) {
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            e.printStackTrace();
+        } finally {
+            try { conn.setAutoCommit(true); } catch (SQLException e) { e.printStackTrace(); }
+        }
+
+        return false;
+    }
+
+    // ======================== PHARMACIST ========================
+    public boolean updatePharmacistInfo(PharmacistAccount pharmacist) {
+        String sql = "UPDATE AccountPharmacist SET full_name = ?, phone = ?, email = ? " +
+                "WHERE account_pharmacist_id = (SELECT account_pharmacist_id FROM Pharmacist WHERE pharmacist_id = ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, pharmacist.getName());
+            ps.setString(2, pharmacist.getMobile());
+            ps.setString(3, pharmacist.getEmail());
+            ps.setInt(4, pharmacist.getID());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // ======================== MANAGER ========================
+    public boolean updateManagerInfo(ManagerAccount manager) {
+        String sql = "UPDATE AccountStaff SET full_name = ?, phone = ?, email = ?, department = ? " +
+                "WHERE account_staff_id = (SELECT account_staff_id FROM AdminBusiness WHERE admin_id = ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, manager.getFullName());
+            ps.setString(2, manager.getPhone());
+            ps.setString(3, manager.getEmail());
+            ps.setString(4, manager.getDepartment());
+            ps.setInt(5, manager.getAdmin_id());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // ======================== SYSTEM ADMIN ========================
+    public boolean updateSysAdminInfo(SysAdminAccount admin) {
+        String getIdSql = "SELECT account_staff_id FROM AdminSystem WHERE admin_id = ?";
+        String updateSql = "UPDATE AccountStaff SET full_name = ?, phone = ?, email = ?, department = ? WHERE account_staff_id = ?";
+
+        try (
+                PreparedStatement ps1 = conn.prepareStatement(getIdSql);
+                PreparedStatement ps2 = conn.prepareStatement(updateSql)
+        ) {
+            ps1.setInt(1, admin.getAdmin_id());
+            ResultSet rs = ps1.executeQuery();
+
+            if (rs.next()) {
+                int accountStaffId = rs.getInt("account_staff_id");
+
+                ps2.setString(1, admin.getFullName());
+                ps2.setString(2, admin.getPhone());
+                ps2.setString(3, admin.getEmail());
+                ps2.setString(4, admin.getDepartment());
+                ps2.setInt(5, accountStaffId);
+
+                return ps2.executeUpdate() > 0;
+            } else {
+                System.out.println("🔧 Đã chạy vào DAO updateSysAdminInfo");
+                System.out.println("Thông tin update: " + admin.getFullName() + " | " + admin.getPhone() + " | " + admin.getEmail() + " | " + admin.getDepartment() + " | " + admin.getAdmin_id());
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    // ======================== PATIENT ========================
+    public boolean updatePatientInfo(PatientAccount patient) {
+        String sql = "UPDATE AccountPatient SET full_name = ?, phone = ?, email = ? " +
+                "WHERE account_patient_id = (SELECT account_patient_id FROM Patient_AccountPatient WHERE patient_id = ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, patient.getFullName());
+            ps.setString(2, patient.getPhone());
+            ps.setString(3, patient.getEmail());
+            ps.setInt(4, patient.getPatient_id());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+// get department doctor
+    public List<String> getDoctorDepartments() {
+        List<String> departments = new ArrayList<>();
+        String sql = "SELECT DISTINCT department FROM Doctor";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                departments.add(rs.getString("department"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return departments;
+    }
+
+
+    public List<String> getBusinessAdminDepartments() {
+        List<String> departments = new ArrayList<>();
+        String sql = "SELECT DISTINCT department FROM AdminBusiness";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                departments.add(rs.getString("department"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return departments;
+    }
+
+    public List<String> getSystemAdminDepartments() {
+        List<String> departments = new ArrayList<>();
+        String sql = "SELECT DISTINCT department FROM AdminSystem";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                departments.add(rs.getString("department"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return departments;
+    }
+
+    public boolean addAccountStaff(StaffAccount sa) {
+        String sql = "INSERT INTO AccountStaff (username, password, role, email, img, status) VALUES (?, ?, ?, ?, ?, ?);";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, sa.getUsername());
+            ps.setString(2, sa.getPassword());
+            ps.setString(3, sa.getRole());
+            ps.setString(4, sa.getEmail());
+            ps.setString(5, sa.getImg());
+            ps.setString(6, sa.getStatus());
+            if (ps.executeUpdate() > 0) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean addAccountPharmacist(AccountPharmacist ap) {
+        String sql = "INSERT INTO AccountStaff (username, password, email, img, status) VALUES (?, ?, ?, ?, ?);";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, ap.getUsername());
+            ps.setString(2, ap.getPassword());
+            ps.setString(3, ap.getEmail());
+            ps.setString(4, ap.getImg());
+            ps.setString(5, ap.getStatus());
+            if (ps.executeUpdate() > 0) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

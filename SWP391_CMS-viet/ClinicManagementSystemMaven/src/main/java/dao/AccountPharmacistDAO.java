@@ -5,7 +5,7 @@ import model.AccountPharmacist;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.mindrot.jbcrypt.BCrypt;
 public class AccountPharmacistDAO extends DBContext {
 
     /* ---------------- map row dùng chung ---------------- */
@@ -67,19 +67,23 @@ public class AccountPharmacistDAO extends DBContext {
 
     /* ---------------- LOGIN ---------------- */
     public AccountPharmacist getAccountByEmailAndPassword(String email, String password) {
-        AccountPharmacist account = null;
-        String sql = "SELECT * FROM AccountPharmacist WHERE email = ? AND password = ?";
+        String sql = "SELECT * FROM AccountPharmacist WHERE email = ?";
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setString(1, email != null ? email.trim() : null);
-            stm.setString(2, password);
+            stm.setString(1, email);
             try (ResultSet rs = stm.executeQuery()) {
-                if (rs.next()) account = mapRow(rs);
+                if (rs.next()) {
+                    String hashedPassword = rs.getString("password");
+                    if (BCrypt.checkpw(password, hashedPassword)) {
+                        return mapRow(rs);
+                    }
+                }
             }
         } catch (SQLException ex) {
             System.out.println("Error getting account: " + ex.getMessage());
         }
-        return account;
+        return null;
     }
+
 
     /* ---------------- EXISTS ---------------- */
     public boolean isEmailExist(String email) {
@@ -140,18 +144,22 @@ public class AccountPharmacistDAO extends DBContext {
     public boolean updateAccount(int id, String username, String password, String email, String status, String img) {
         String sql = "UPDATE AccountPharmacist SET username=?, password=?, email=?, status=?, img=? WHERE account_pharmacist_id=?";
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
             stm.setString(1, username);
-            stm.setString(2, password);
+            stm.setString(2, hashedPassword);
             stm.setString(3, email);
             stm.setString(4, status);
             stm.setString(5, img);
             stm.setInt(6, id);
+
             return stm.executeUpdate() > 0;
         } catch (SQLException ex) {
             System.out.println("Error updateAccount: " + ex.getMessage());
             return false;
         }
     }
+
 
     /* ---------------- PARTIAL UPDATES ---------------- */
     public boolean updatePassword(String email, String newPassword) {
@@ -183,7 +191,9 @@ public class AccountPharmacistDAO extends DBContext {
     public boolean changePassword(String username, String newPassword) {
         String sql = "UPDATE AccountPharmacist SET password = ? WHERE username = ?";
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setString(1, newPassword);
+            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+            stm.setString(1, hashedPassword);
+
             stm.setString(2, username);
             return stm.executeUpdate() > 0;
         } catch (SQLException ex) {

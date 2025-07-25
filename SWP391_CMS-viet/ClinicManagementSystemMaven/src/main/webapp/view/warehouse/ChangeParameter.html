@@ -3,200 +3,458 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unit and Category Management</title>
+    <title>Đơn vị & danh mục</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
             background-color: whitesmoke;
+            display: flex;
+            min-height: 100vh;
         }
+
+        .sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            padding: 15px;
+            transition: width 0.3s;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .brand-text,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .nav-section-title,
+        .sidebar.collapsed .user-details,
+        .sidebar.collapsed .logout-text {
+            display: none;
+        }
+
+        .sidebar-toggle {
+            background: #fff;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            right: -15px;
+            width: 30px;
+            height: 38px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            transform: translateY(-50%);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .brand-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .sidebar-brand {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            padding-left: 16px;
+        }
+
+        .sidebar-nav {
+            flex-grow: 1;
+        }
+
+        .nav-section-title {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin: 10px 0;
+            text-transform: uppercase;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #e9ecef;
+        }
+
+        .nav-link.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .nav-icon {
+            margin-right: 20px;
+            width: 20px;
+            text-align: center;
+            padding-left: 5px;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        .user-role {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            color: #dc3545;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .logout-btn:hover {
+            background: #e9ecef;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            transition: all 0.3s;
+        }
+
+        .main-content.collapsed {
+            margin-left: 80px;
+            width: calc(100% - 80px);
+        }
+
         .card {
             height: auto;
         }
+
         .table tbody tr:hover {
             background-color: #e0f0ff !important;
             cursor: pointer;
         }
+        table{
+            text-align: center;
+        }
+
         .modal-content {
             border-radius: 10px;
         }
-        .pagination {
+
+        .pagination-controls {
             margin-top: 10px;
+            text-align: center;
+        }
+
+        .sort-icon {
+            margin-left: 5px;
+        }
+
+        .sortable {
+            cursor: pointer;
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
-<div class="container-fluid mt-3">
-    <div id="loading" class="text-center" style="display: none;">
-        <div class="spinner-border" role="status"></div>
+<div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-left" id="toggleIcon"></i>
+    </button>
+
+    <div class="sidebar-header">
+        <a href="dashboard-pharmacist.html" class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fas fa-hospital"></i>
+            </div>
+            <span class="brand-text">MediCare System</span>
+        </a>
     </div>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow-sm p-3 mb-4 bg-white rounded">
-                <h5 class="mb-3">Quản lý Đơn vị</h5>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#addUnitModal">
-                            <i class="bi bi-plus"></i> Thêm Đơn vị
-                        </button>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <input id="unitSearchInput" class="form-control" placeholder="Tìm kiếm theo tên" type="text" onkeypress="if(event.key === 'Enter') searchUnits()">
-                            <button class="btn btn-outline-primary" onclick="searchUnits()">
-                                <i class="bi bi-search"></i> Tìm kiếm
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Chính</div>
+                <div class="nav-item">
+                    <a href="WarehouseHome.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        <span class="nav-text">Home</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Quản lý</div>
+
+                <div class="nav-item">
+                    <a href="Warehouse.html" class="nav-link ">
+                        <i class="fas fa-warehouse nav-icon"></i>
+                        <span class="nav-text">Kho</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="ChangeParameter.html" class="nav-link active">
+                        <i class="fas fa-cubes nav-icon"></i>
+                        <span class="nav-text">Đơn vị & Danh mục</span>
+                    </a>
+                </div>
+            </div>
+
+            <!--        <div class="nav-section">-->
+            <!--            <div class="nav-section-title">Báo cáo</div>-->
+
+            <!--            <div class="nav-item">-->
+            <!--                <a href="ChangeParameter.html" class="nav-link">-->
+            <!--                    <i class="fas fa-chart-line nav-icon"></i>-->
+            <!--                    <span class="nav-text">Lịch sử & Tra cứu</span>-->
+            <!--                </a>-->
+            <!--            </div>-->
+            <!--        </div>-->
+        </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar">DT</div>
+            <div class="user-details">
+                <div class="user-name">Dược sĩ Thảo</div>
+                <div class="user-role">Quầy thuốc</div>
+            </div>
+        </div>
+        <a href="login.html" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="logout-text">Đăng xuất</span>
+        </a>
+    </div>
+</div>
+
+<div class="main-content" id="main-content">
+    <div class="container-fluid mt-3">
+        <div id="loading" class="text-center" style="display: none;">
+            <div class="spinner-border" role="status"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm p-3 mb-4 bg-white rounded">
+                    <h5 class="mb-3">Quản lý Đơn vị</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#addUnitModal">
+                                <i class="bi bi-plus"></i> Thêm Đơn vị
                             </button>
                         </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input id="unitSearchInput" class="form-control" placeholder="Tìm kiếm theo tên" type="text" onkeypress="if(event.key === 'Enter') searchUnits()">
+                                <button class="btn btn-outline-primary" onclick="searchUnits()">
+                                    <i class="bi bi-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <table class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                        <th scope="col" class="sortable" onclick="sortTable('unit', 'id')">
-                            ID <span class="sort-icon" id="unit-id-sort"></span>
-                        </th>
-                        <th scope="col" class="sortable" onclick="sortTable('unit', 'name')">
-                            Tên <span class="sort-icon" id="unit-name-sort"></span>
-                        </th>
-                        <th scope="col">Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody id="unit-table-body"></tbody>
-                </table>
-                <div class="pagination-controls">
-                    <button class="btn btn-secondary btn-sm me-2" onclick="changeUnitPage('prev')" id="prevUnitPageBtn" disabled>
-                        <i class="bi bi-arrow-left"></i>
-                    </button>
-                    <span id="currentUnitPage">Trang 1</span>
-                    <button class="btn btn-secondary btn-sm ms-2" onclick="changeUnitPage('next')" id="nextUnitPageBtn">
-                        <i class="bi bi-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card shadow-sm p-3 mb-4 bg-white rounded">
-                <h5 class="mb-3">Quản lý Danh mục</h5>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                            <i class="bi bi-plus"></i> Thêm Danh mục
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="sortable" onclick="sortTable('unit', 'id')">
+                                ID <span class="sort-icon" id="unit-id-sort"></span>
+                            </th>
+                            <th scope="col" class="sortable" onclick="sortTable('unit', 'name')">
+                                Tên <span class="sort-icon" id="unit-name-sort"></span>
+                            </th>
+                            <th scope="col">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody id="unit-table-body"></tbody>
+                    </table>
+                    <div class="pagination-controls">
+                        <button class="btn btn-secondary btn-sm me-2" onclick="changeUnitPage('prev')" id="prevUnitPageBtn" disabled>
+                            <i class="bi bi-arrow-left"></i>
+                        </button>
+                        <span id="currentUnitPage">Trang 1</span>
+                        <button class="btn btn-secondary btn-sm ms-2" onclick="changeUnitPage('next')" id="nextUnitPageBtn">
+                            <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <input id="categorySearchInput" class="form-control" placeholder="Tìm kiếm theo tên" type="text" onkeypress="if(event.key === 'Enter') searchCategories()">
-                            <button class="btn btn-outline-primary" onclick="searchCategories()">
-                                <i class="bi bi-search"></i> Tìm kiếm
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm p-3 mb-4 bg-white rounded">
+                    <h5 class="mb-3">Quản lý Danh mục</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                                <i class="bi bi-plus"></i> Thêm Danh mục
                             </button>
                         </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input id="categorySearchInput" class="form-control" placeholder="Tìm kiếm theo tên" type="text" onkeypress="if(event.key === 'Enter') searchCategories()">
+                                <button class="btn btn-outline-primary" onclick="searchCategories()">
+                                    <i class="bi bi-search"></i> Tìm kiếm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="sortable" onclick="sortTable('category', 'id')">
+                                ID <span class="sort-icon" id="category-id-sort"></span>
+                            </th>
+                            <th scope="col" class="sortable" onclick="sortTable('category', 'name')">
+                                Tên <span class="sort-icon" id="category-name-sort"></span>
+                            </th>
+                            <th scope="col">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody id="category-table-body"></tbody>
+                    </table>
+                    <div class="pagination-controls">
+                        <button class="btn btn-secondary btn-sm me-2" onclick="changeCategoryPage('prev')" id="prevCategoryPageBtn" disabled>
+                            <i class="bi bi-arrow-left"></i>
+                        </button>
+                        <span id="currentCategoryPage">Trang 1</span>
+                        <button class="btn btn-secondary btn-sm ms-2" onclick="changeCategoryPage('next')" id="nextCategoryPageBtn">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
-                <table class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                        <th scope="col" class="sortable" onclick="sortTable('category', 'id')">
-                            ID <span class="sort-icon" id="category-id-sort"></span>
-                        </th>
-                        <th scope="col" class="sortable" onclick="sortTable('category', 'name')">
-                            Tên <span class="sort-icon" id="category-name-sort"></span>
-                        </th>
-                        <th scope="col">Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody id="category-table-body"></tbody>
-                </table>
-                <div class="pagination-controls">
-                    <button class="btn btn-secondary btn-sm me-2" onclick="changeCategoryPage('prev')" id="prevCategoryPageBtn" disabled>
-                        <i class="bi bi-arrow-left"></i>
-                    </button>
-                    <span id="currentCategoryPage">Trang 1</span>
-                    <button class="btn btn-secondary btn-sm ms-2" onclick="changeCategoryPage('next')" id="nextCategoryPageBtn">
-                        <i class="bi bi-arrow-right"></i>
-                    </button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addUnitModalLabel">Thêm Đơn vị mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addUnitForm">
+                            <div class="mb-3">
+                                <label for="unitNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="unitNameInput" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addUnitModalLabel">Thêm Đơn vị mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addUnitForm">
-                        <div class="mb-3">
-                            <label for="unitNameInput" class="form-label">Tên</label>
-                            <input type="text" class="form-control" id="unitNameInput" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Lưu</button>
-                    </form>
+        <div class="modal fade" id="editUnitModal" tabindex="-1" aria-labelledby="editUnitModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editUnitModalLabel">Chỉnh sửa Đơn vị</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editUnitForm">
+                            <input type="hidden" id="editUnitId">
+                            <div class="mb-3">
+                                <label for="editUnitNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="editUnitNameInput" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="editUnitModal" tabindex="-1" aria-labelledby="editUnitModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editUnitModalLabel">Chỉnh sửa Đơn vị</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editUnitForm">
-                        <input type="hidden" id="editUnitId">
-                        <div class="mb-3">
-                            <label for="editUnitNameInput" class="form-label">Tên</label>
-                            <input type="text" class="form-control" id="editUnitNameInput" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Cập nhật</button>
-                    </form>
+        <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCategoryModalLabel">Thêm Danh mục mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addCategoryForm">
+                            <div class="mb-3">
+                                <label for="categoryNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="categoryNameInput" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCategoryModalLabel">Thêm Danh mục mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addCategoryForm">
-                        <div class="mb-3">
-                            <label for="categoryNameInput" class="form-label">Tên</label>
-                            <input type="text" class="form-control" id="categoryNameInput" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Lưu</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editCategoryModalLabel">Chỉnh sửa Danh mục</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editCategoryForm">
-                        <input type="hidden" id="editCategoryId">
-                        <div class="mb-3">
-                            <label for="editCategoryNameInput" class="form-label">Tên</label>
-                            <input type="text" class="form-control" id="editCategoryNameInput" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Cập nhật</button>
-                    </form>
+        <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editCategoryModalLabel">Chỉnh sửa Danh mục</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editCategoryForm">
+                            <input type="hidden" id="editCategoryId">
+                            <div class="mb-3">
+                                <label for="editCategoryNameInput" class="form-label">Tên</label>
+                                <input type="text" class="form-control" id="editCategoryNameInput" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cập nhật</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -214,7 +472,16 @@
     const itemsPerPage = 10;
     let unitSortStates = { column: 'id', direction: 'asc' };
     let categorySortStates = { column: 'id', direction: 'asc' };
-
+    function toggleSidebar() {
+        console.log('Toggling sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const toggleIcon = document.getElementById('toggleIcon');
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('collapsed');
+        toggleIcon.classList.toggle('fa-chevron-left');
+        toggleIcon.classList.toggle('fa-chevron-right');
+    }
     // Check if name exists (for both units and categories)
     async function checkNameExists(type, name) {
         const url = `${baseUrl}/${type === 'unit' ? 'units' : 'categories'}`;

@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
 
-    // Xóa các giá trị cũ khỏi session
+
     session.removeAttribute("otp_created_time");
     session.removeAttribute("otp");
     session.removeAttribute("email");
@@ -38,8 +38,8 @@
     <!-- Left Side - Pharmacy Image -->
     <div class="hidden md:flex md:w-1/2 pharmacy-bg text-white p-12 flex-col justify-between">
         <div>
-            <h1 class="text-4xl font-bold mb-2">PharmaCare</h1>
-            <p class="text-xl opacity-90">Advanced Pharmacy Management System</p>
+            <h1 class="text-4xl font-bold mb-2">Dược phẩm</h1>
+            <p class="text-xl opacity-90">Hệ thống quản lý hiệu thuốc</p>
         </div>
 
         <div class="mt-8">
@@ -48,8 +48,8 @@
                     <i class="fas fa-pills text-4xl"></i>
                 </div>
                 <div>
-                    <h3 class="text-xl font-semibold">Inventory Tracking</h3>
-                    <p class="opacity-80">Real-time medication stock management</p>
+                    <h3 class="text-xl font-semibold">Theo dõi hàng tồn kho</h3>
+                    <p class="opacity-80">Quản lý số lượng theo thời gian thực</p>
                 </div>
             </div>
 
@@ -58,8 +58,8 @@
                     <i class="fas fa-user-md text-4xl"></i>
                 </div>
                 <div>
-                    <h3 class="text-xl font-semibold">Patient Records</h3>
-                    <p class="opacity-80">Comprehensive patient medication history</p>
+                    <h3 class="text-xl font-semibold">Hồ sơ khám bệnh</h3>
+                    <p class="opacity-80">Xem lịch sử mua bán thuốc</p>
                 </div>
             </div>
 
@@ -68,8 +68,8 @@
                     <i class="fas fa-file-prescription text-4xl"></i>
                 </div>
                 <div>
-                    <h3 class="text-xl font-semibold">e-Prescriptions</h3>
-                    <p class="opacity-80">Digital prescription processing</p>
+                    <h3 class="text-xl font-semibold">Kê thuốc điện tử</h3>
+                    <p class="opacity-80">Xử lý kĩ thuật số</p>
                 </div>
             </div>
         </div>
@@ -87,14 +87,19 @@
             <p class="text-gray-600">Pharmacy Management System</p>
         </div>
 
-        <h2 class="text-2xl font-bold text-gray-800 mb-1">Welcome Back</h2>
-        <p class="text-gray-600 mb-8">Sign in to your pharmacy dashboard</p>
+        <h2 class="text-2xl font-bold text-gray-800 mb-1">Chào mừng quay trở lại</h2>
+        <% if (request.getAttribute("message") != null) { %>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative text-center mb-4">
+            <%= request.getAttribute("message") %>
+        </div>
+        <% } %>
+        <p class="text-gray-600 mb-8">Đăng nhập vào trang quản lý</p>
 
         <form action="<%=request.getContextPath()%>/loginservlet" method="POST" class="space-y-6">
 
 
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Gmail</label>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas  fa-user text-gray-400"></i>
@@ -108,7 +113,7 @@
             </div>
 
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-lock text-gray-400"></i>
@@ -140,7 +145,7 @@
 
             <button type="submit"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center">
-                <span>Sign In</span>
+                <span>Đăng nhập</span>
                 <i class="fas fa-arrow-right ml-2"></i>
             </button>
             <p class="text-red-600 text-sm text-center mt-2">${err}</p>
