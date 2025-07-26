@@ -38,7 +38,20 @@ public class UpdatePaymentServlet extends HttpServlet {
                 dao.updatePrescriptionStatus(prescriptionIdByInvoiceId, "Dispensed");
             }
 
-
+// --- TỰ ĐỘNG TRỪ SỐ LƯỢNG THUỐC ---
+            // Lấy danh sách thuốc đã bán trong hóa đơn
+            java.util.List<model.MedicineRes> soldMedicines = dao.getMedicineByInvoiceId(invoiceId);
+            dao.MedicineDAO medicineDAO = new dao.MedicineDAO();
+            for (model.MedicineRes sold : soldMedicines) {
+                model.Medicine med = medicineDAO.getMedicineById(sold.getId());
+                if (med != null) {
+                    int newQuantity = med.getQuantity() - sold.getQuantity();
+                    if (newQuantity < 0) newQuantity = 0; // Không cho âm kho
+                    med.setQuantity(newQuantity);
+                    medicineDAO.updateMedicine(med);
+                }
+            }
+            // --- END ---
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("{\"status\":\"success\",\"message\":\"Cập nhật trạng thái đơn hàng thành công.\"}");
         } catch (Exception e) {

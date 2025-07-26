@@ -335,7 +335,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="card shadow-sm p-3 mb-4 bg-white rounded">
-                    <h5 class="mb-3">Công cụ kiểm tra API Kho</h5>
+                    <h5 class="mb-3">Kho</h5>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <button class="btn btn-primary" onclick="getAllWarehouses()">
@@ -1323,12 +1323,12 @@
             }
 
             const addedWarehouse = await response.json();
-            alert(`Warehouse added successfully with ID: ${addedWarehouse.id}`);
+            alert(`Thêm kho thành công với ID: ${addedWarehouse.id}`);
             $('#addWarehouseModal').modal('hide');
             getAllWarehouses();
         } catch (error) {
             console.error('Add error:', error);
-            alert(`Failed to add warehouse: ${error.message}`);
+            alert(`Không thể thêm kho: ${error.message}`);
             $('#addWarehouseModal').modal('hide');
         } finally {
             document.getElementById('loading').style.display = 'none';
@@ -1381,7 +1381,7 @@
                 throw new Error(errorText || `HTTP error ${response.status}`);
             }
 
-            alert('Warehouse updated successfully');
+            alert('Cập nhật kho thành công');
             $('#editWarehouseModal').modal('hide');
             getAllWarehouses();
         } catch (error) {
@@ -1406,7 +1406,7 @@
                 const errorText = await response.text();
                 throw new Error(errorText || `HTTP error ${response.status}`);
             }
-            alert('Warehouse deleted successfully');
+            alert('Xoá kho thành công');
             getAllWarehouses();
         } catch (error) {
             console.error('Delete error:', error);
@@ -1431,7 +1431,7 @@
     // Add medicine
     async function addMedicine() {
         if (!selectedWarehouseId) {
-            alert('Please select a warehouse first');
+            alert('Vui lòng chọn kho');
             $('#addMedicineModal').modal('hide');
             return;
         }
@@ -1725,13 +1725,13 @@
                 throw new Error(errorText || `HTTP error ${response.status}`);
             }
 
-            alert('Medicine updated successfully');
+            alert('Cập nhật thuốc thành công');
             $('#editMedicineModal').modal('hide');
             if (selectedWarehouseId) showMedicines(selectedWarehouseId);
             else getAllMedicines();
         } catch (error) {
             console.error('Update medicine error:', error);
-            alert('Failed to update medicine: ' + error.message);
+            alert('Không thể cập nhật được thuốc: ' + error.message);
             $('#editMedicineModal').modal('hide');
         } finally {
             document.getElementById('loading').style.display = 'none';
@@ -1740,7 +1740,7 @@
 
     // Delete medicine
     async function deleteMedicine(id) {
-        if (!confirm('Are you sure you want to delete this medicine?')) return;
+        if (!confirm('Bạn có muốn xoá thuốc này không ?')) return;
         document.getElementById('loading').style.display = 'block';
         try {
             const response = await fetch(`${baseUrl}/api/MedicineWarehouse/${id}`, {
@@ -1751,12 +1751,12 @@
                 const errorText = await response.text();
                 throw new Error(errorText || `HTTP error ${response.status}`);
             }
-            alert('Medicine deleted successfully');
+            alert('Thuốc đã được xoá');
             if (selectedWarehouseId) showMedicines(selectedWarehouseId);
             else getAllMedicines();
         } catch (error) {
-            console.error('Delete medicine error:', error);
-            alert('Failed to delete medicine: ' + error.message);
+            console.error('Xoá thuốc lỗi:', error);
+            alert('Xoá thuốc lỗi: ' + error.message);
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
@@ -1767,28 +1767,28 @@
         const nameRegex = /^[a-zA-Z0-9\s]{1,50}$/;
         const textRegex = /^[a-zA-Z0-9\s,]{1,200}$/;
         if (!nameRegex.test(medicine.name)) {
-            throw new Error('Name must be 1-50 alphanumeric characters');
+            throw new Error('Tên phải từ 1 đến 50 kí tự');
         }
         if (!Number.isInteger(medicine.unit_id) || medicine.unit_id <= 0) {
-            throw new Error('Unit must be selected');
+            throw new Error('Bạn chưa chọn đơn vị');
         }
         if (!Number.isInteger(medicine.category_id) || medicine.category_id <= 0) {
-            throw new Error('Category must be selected');
+            throw new Error('Bạn chưa chọn danh mục');
         }
         if (!medicine.manuDate || isNaN(Date.parse(medicine.manuDate))) {
-            throw new Error('Invalid manufacture date');
+            throw new Error('Ngày sản xuất không hợp lệ');
         }
         if (!medicine.expDate || isNaN(Date.parse(medicine.expDate))) {
-            throw new Error('Invalid expiry date');
+            throw new Error('Ngày hết hạn không hợp lệ');
         }
         if (!Number.isInteger(medicine.quantity) || medicine.quantity < 0) {
-            throw new Error('Quantity must be a non-negative integer');
+            throw new Error('Số lượng phải là một số dương');
         }
         if (isNaN(medicine.price) || medicine.price < 0) {
-            throw new Error('Price must be a non-negative number');
+            throw new Error('Giá phải là một số dương');
         }
         if (!Number.isInteger(medicine.warehouse_id) || medicine.warehouse_id <= 0) {
-            throw new Error('Warehouse ID must be a positive integer');
+            throw new Error('ID của kho phải là một số dương');
         }
     }
 

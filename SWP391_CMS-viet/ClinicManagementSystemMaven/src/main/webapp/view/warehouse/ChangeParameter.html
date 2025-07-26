@@ -677,12 +677,12 @@
     async function addUnit() {
         const name = document.getElementById('unitNameInput').value.trim();
         if (!name) {
-            alert('Please enter a unit name');
+            alert('Hãy nhập tên đơn vị');
             return;
         }
         const exists = await checkNameExists('unit', name);
         if (exists) {
-            alert('Unit name already exists!');
+            alert('Tên đơn vị đã tồn tại!');
             return;
         }
         console.log('Adding unit with name:', name);
@@ -696,12 +696,12 @@
             console.log('Add unit response status:', response.status);
             if (!response.ok) throw new Error(`HTTP error ${response.status}`);
             const unit = await response.json();
-            alert('Unit added successfully');
+            alert('Thêm đơn vị thành công');
             $('#addUnitModal').modal('hide');
             getAllUnits();
         } catch (error) {
             console.error('Add unit error:', error);
-            alert('Failed to add unit: ' + error.message);
+            alert('Không thể thêm đơn vị: ' + error.message);
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
@@ -735,7 +735,7 @@
         const id = document.getElementById('editUnitId').value;
         const name = document.getElementById('editUnitNameInput').value.trim();
         if (!name) {
-            alert('Please enter a unit name');
+            alert('Hãy nhập đơn vị');
             return;
         }
         const originalUnit = allUnits.find(unit => unit.idUnit === parseInt(id));
@@ -756,12 +756,12 @@
             });
             console.log('Update unit response status:', response.status);
             if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-            alert('Unit updated successfully');
+            alert('Cập nhật đơn vị thành công');
             $('#editUnitModal').modal('hide');
             getAllUnits();
         } catch (error) {
             console.error('Update unit error:', error);
-            alert('Failed to update unit: ' + error.message);
+            alert('Không thể cập nhật đơn vị: ' + error.message);
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
@@ -769,24 +769,30 @@
 
     // Delete unit
     async function deleteUnit(id) {
-        if (confirm('Are you sure you want to delete this unit?')) {
-            console.log('Deleting unit with id:', id);
-            try {
-                document.getElementById('loading').style.display = 'block';
-                const response = await fetch(`${baseUrl}/units/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                console.log('Delete unit response status:', response.status);
-                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-                alert('Unit deleted successfully');
-                getAllUnits();
-            } catch (error) {
-                console.error('Delete unit error:', error);
-                alert('Failed to delete unit: ' + error.message);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
+        if (!confirm('Bạn có chắc chắn muốn xóa đơn vị này?')) return;
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/units/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                if (response.status === 400 || response.status === 409) {
+                    throw new Error(errorText || 'Không thể xóa đơn vị vì nó đang được sử dụng trong thuốc.');
+                } else if (response.status === 404) {
+                    throw new Error('Không tìm thấy đơn vị.');
+                } else {
+                    throw new Error(errorText || `Lỗi HTTP ${response.status}`);
+                }
             }
+            alert('Xóa đơn vị thành công');
+            getAllUnits(); // Tải lại danh sách đơn vị
+        } catch (error) {
+            console.error('Lỗi xóa đơn vị:', error);
+            alert(`Không thể xóa đơn vị: ${error.message}`);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
         }
     }
 
@@ -794,12 +800,12 @@
     async function addCategory() {
         const name = document.getElementById('categoryNameInput').value.trim();
         if (!name) {
-            alert('Please enter a category name');
+            alert('Hãy nhập danh mục');
             return;
         }
         const exists = await checkNameExists('category', name);
         if (exists) {
-            alert('Category name already exists!');
+            alert('Danh mục đã tồn tại!');
             return;
         }
         console.log('Adding category with name:', name);
@@ -813,7 +819,7 @@
             console.log('Add category response status:', response.status);
             if (!response.ok) throw new Error(`HTTP error ${response.status}`);
             const category = await response.json();
-            alert('Category added successfully');
+            alert('Thêm thành công danh mục');
             $('#addCategoryModal').modal('hide');
             getAllCategories();
         } catch (error) {
@@ -852,14 +858,14 @@
         const id = document.getElementById('editCategoryId').value;
         const name = document.getElementById('editCategoryNameInput').value.trim();
         if (!name) {
-            alert('Please enter a category name');
+            alert('Hãy nhập danh mục');
             return;
         }
         const originalCategory = allCategories.find(category => category.category_id === parseInt(id));
         if (originalCategory && originalCategory.categoryName.toLowerCase() !== name.toLowerCase()) {
             const exists = await checkNameExists('category', name);
             if (exists) {
-                alert('Category name already exists!');
+                alert('Danh mục đã tồn tại!');
                 return;
             }
         }
@@ -873,12 +879,12 @@
             });
             console.log('Update category response status:', response.status);
             if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-            alert('Category updated successfully');
+            alert('Danh mục cập nhật thành công');
             $('#editCategoryModal').modal('hide');
             getAllCategories();
         } catch (error) {
             console.error('Update category error:', error);
-            alert('Failed to update category: ' + error.message);
+            alert('Không thể cập nhật danh mục: ' + error.message);
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
@@ -886,24 +892,30 @@
 
     // Delete category
     async function deleteCategory(id) {
-        if (confirm('Are you sure you want to delete this category?')) {
-            console.log('Deleting category with id:', id);
-            try {
-                document.getElementById('loading').style.display = 'block';
-                const response = await fetch(`${baseUrl}/categories/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                console.log('Delete category response status:', response.status);
-                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-                alert('Category deleted successfully');
-                getAllCategories();
-            } catch (error) {
-                console.error('Delete category error:', error);
-                alert('Failed to delete category: ' + error.message);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
+        if (!confirm('Bạn có chắc chắn muốn xóa danh mục này?')) return;
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const response = await fetch(`${baseUrl}/api/categories/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                if (response.status === 400 || response.status === 409) {
+                    throw new Error(errorText || 'Không thể xóa danh mục vì nó đang được sử dụng trong thuốc.');
+                } else if (response.status === 404) {
+                    throw new Error('Không tìm thấy danh mục.');
+                } else {
+                    throw new Error(errorText || `Lỗi HTTP ${response.status}`);
+                }
             }
+            alert('Xóa danh mục thành công');
+            getAllCategories(); // Tải lại danh sách danh mục
+        } catch (error) {
+            console.error('Lỗi xóa danh mục:', error);
+            alert(`Không thể xóa danh mục: ${error.message}`);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
         }
     }
 
