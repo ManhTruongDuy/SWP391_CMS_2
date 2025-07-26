@@ -14,9 +14,9 @@ public class HistoryDAO {
         this.conn = DBContext.getInstance().getConnection();
     }
 
-    public List<History> searchHistories(String actionType, String entityType, String date, int page, int pageSize) {
+    public List<History> searchHistories(String actionType, String entityType, String date) {
         List<History> histories = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT id, action_type, entity_type, entity_id, details, action_time FROM history WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT history_id, action_type, entity_type, entity_id, details, action_time FROM history WHERE 1=1");
         List<String> params = new ArrayList<>();
 
         if (actionType != null && !actionType.isEmpty()) {
@@ -28,13 +28,11 @@ public class HistoryDAO {
             params.add(entityType);
         }
         if (date != null && !date.isEmpty()) {
-            sql.append(" AND DATE(action_time) = ?");
+            sql.append(" AND CONVERT(date, action_time) = ?");
             params.add(date);
         }
 
-        sql.append(" ORDER BY action_time DESC LIMIT ? OFFSET ?");
-        params.add(String.valueOf(pageSize));
-        params.add(String.valueOf((page - 1) * pageSize));
+        sql.append(" ORDER BY action_time DESC");
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
@@ -43,18 +41,19 @@ public class HistoryDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     History history = new History();
-                    history.setHistoryId(rs.getInt("id"));
+                    history.setHistoryId(rs.getInt("history_id"));
                     history.setActionType(rs.getString("action_type"));
                     history.setEntityType(rs.getString("entity_type"));
                     history.setEntityId(rs.getInt("entity_id"));
                     history.setDetails(rs.getString("details"));
-                    history.setActionTime(rs.getTimestamp("action_time").toLocalDateTime());
+                    history.setActionTime(rs.getTimestamp("action_time") != null ? rs.getTimestamp("action_time").toLocalDateTime() : null);
                     histories.add(history);
                 }
             }
         } catch (SQLException e) {
             System.err.println("Lỗi khi tìm kiếm lịch sử: " + e.getMessage());
             e.printStackTrace();
+
         }
         return histories;
     }
@@ -72,7 +71,7 @@ public class HistoryDAO {
             params.add(entityType);
         }
         if (date != null && !date.isEmpty()) {
-            sql.append(" AND DATE(action_time) = ?");
+            sql.append(" AND CONVERT(date, action_time) = ?");
             params.add(date);
         }
 
@@ -115,4 +114,5 @@ public class HistoryDAO {
         }
         return false;
     }
+
 }
