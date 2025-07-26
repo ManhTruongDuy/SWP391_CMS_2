@@ -133,22 +133,15 @@ public class SysAdminDAO {
     // Lấy tất cả tk bệnh nhân
     public List<PatientAccount> getAllPatients() {
         List<PatientAccount> list = new ArrayList<>();
-        String sql = "SELECT * " +
-                "FROM ((Patient p JOIN Patient_AccountPatient pap " +
-                "ON p.patient_id = pap.patient_id) " +
-                "JOIN AccountPatient ap ON pap.account_patient_id = ap.account_patient_id) " +
-                "ORDER BY p.patient_id " ;
+        String sql = "SELECT * FROM Patient " ;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     PatientAccount pa = new PatientAccount(
                             rs.getInt("patient_id"),
                             rs.getString("full_name"),
-                            rs.getString("phone"),
-                            rs.getString("email"),
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("status")
+                            rs.getString("gender"),
+                            rs.getString("phone")
                     );
                     list.add(pa);
                 }
@@ -284,19 +277,16 @@ public class SysAdminDAO {
 
     //Lấy bệnh nhân theo id
     public PatientAccount getPatientById(int id) {
-        String sql = "SELECT * FROM ((Patient p JOIN Patient_AccountPatient pap ON p.patient_id = pap.patient_id) JOIN AccountPatient ap ON pap.account_patient_id = ap.account_patient_id) WHERE p.patient_id = ?";
+        String sql = "SELECT * FROM Patient WHERE patient_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     PatientAccount pa = new PatientAccount();
                         pa.setPatient_id(rs.getInt("patient_id"));
-                        pa.setFullName(rs.getString("full_name"));
+                        pa.setFull_name(rs.getString("full_name"));
+                        pa.setGender(rs.getString("gender"));
                         pa.setPhone(rs.getString("phone"));
-                        pa.setEmail(rs.getString("email"));
-                        pa.setUsername(rs.getString("username"));
-                        pa.setPassword(rs.getString("password"));
-                        pa.setStatus(rs.getString("status"));
                     return pa;
                 }
             }
@@ -448,20 +438,16 @@ public class SysAdminDAO {
     // Tìm bệnh nhân theo tên
     public List<PatientAccount> getPatientsByName(String name) {
         List<PatientAccount> list = new ArrayList<>();
-        String sql = "SELECT * FROM ((Patient p JOIN Patient_AccountPatient pap ON p.patient_id = pap.patient_id) " +
-                "JOIN AccountPatient ap ON pap.account_patient_id = ap.account_patient_id) " +
-                "WHERE p.full_name COLLATE Latin1_General_CI_AI LIKE ?";        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT * FROM Patient WHERE full_name COLLATE Latin1_General_CI_AI LIKE ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + name + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     PatientAccount pa = new PatientAccount();
                     pa.setPatient_id(rs.getInt("patient_id"));
-                    pa.setFullName(rs.getString("full_name"));
+                    pa.setFull_name(rs.getString("full_name"));
+                    pa.setGender(rs.getString("gender"));
                     pa.setPhone(rs.getString("phone"));
-                    pa.setEmail(rs.getString("email"));
-                    pa.setUsername(rs.getString("username"));
-                    pa.setPassword(rs.getString("password"));
-                    pa.setStatus(rs.getString("status"));
                     list.add(pa);
                 }
             }
@@ -646,21 +632,7 @@ public class SysAdminDAO {
     }
 
 
-    // ======================== PATIENT ========================
-    public boolean updatePatientInfo(PatientAccount patient) {
-        String sql = "UPDATE AccountPatient SET full_name = ?, phone = ?, email = ? " +
-                "WHERE account_patient_id = (SELECT account_patient_id FROM Patient_AccountPatient WHERE patient_id = ?)";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, patient.getFullName());
-            ps.setString(2, patient.getPhone());
-            ps.setString(3, patient.getEmail());
-            ps.setInt(4, patient.getPatient_id());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+
 // get department doctor
     public List<String> getDoctorDepartments() {
         List<String> departments = new ArrayList<>();

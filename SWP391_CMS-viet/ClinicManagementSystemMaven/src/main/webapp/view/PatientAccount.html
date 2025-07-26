@@ -257,11 +257,8 @@
                 <tr>
                     <th>ID</th>
                     <th>Họ và tên</th>
+                    <th>Giới tính</th>
                     <th>Số điện thoại</th>
-                    <th>Email</th>
-                    <th>Tên người dùng</th>
-                    <th>Mật khẩu</th>
-                    <th>Trạng thái</th>
                 </tr>
                 </thead>
                 <tbody id="patient-table-body">
@@ -328,12 +325,9 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${patient.patient_id ?? 'N/A'}</td>
-                <td>${patient.fullName || 'N/A'}</td>
+                <td>${patient.full_name || 'N/A'}</td>
+                <td>${patient.gender || 'N/A'}</td>
                 <td>${patient.phone || 'N/A'}</td>
-                <td>${patient.email || 'N/A'}</td>
-                <td>${patient.username || 'N/A'}</td>
-                <td>${patient.password || 'N/A'}</td>
-                <td>${patient.status || 'N/A'}</td>
             `;
             tbody.appendChild(row);
 
