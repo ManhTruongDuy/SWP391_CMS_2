@@ -333,9 +333,9 @@
 
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
     let selectedRow = null;
-    let allWarehouseManager = []; // Store all manager for filtering
+    let allWarehouseManager = []; // Store for filtering
 
-    // Display pharmacists
+    // Display
     function displayWarehouseManagers(data) {
         const tbody = document.getElementById('wmanager-table-body');
         console.log('Rendering warehouse managers:', data); // Debug
@@ -359,12 +359,7 @@
                 <td>${wManager.password || 'N/A'}</td>
                 <td>${wManager.status || 'N/A'}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm delete-btn" data-id="${sysadmin.id}">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                    <button class="btn btn-info btn-sm select-btn" data-id="${sysadmin.id}">
-                        <i class="bi bi-eye"></i> Select
-                    </button>
+                    Ignore this
                 </td>
             `;
             tbody.appendChild(row);
