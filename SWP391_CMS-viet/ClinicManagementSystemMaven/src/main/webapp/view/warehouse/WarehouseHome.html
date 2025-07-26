@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -249,7 +250,7 @@
     <div class="sidebar-header">
         <a href="WarehouseHome.html" class="sidebar-brand">
             <div class="brand-icon">
-                <i class="fas fa-hospital"></i>
+                <i class="bi bi-hospital"></i>
             </div>
             <span class="brand-text">MediCare System</span>
         </a>
@@ -317,7 +318,7 @@
             </div>
             <div class="col-md-4">
                 <div class="card shadow-sm dashboard-card">
-                    <h3>Thuốc sắp hết hạn</h3>
+                    <h3>Thuốc hết hạn</h3>
                     <div class="value" id="expiringMedicines">0</div>
                 </div>
             </div>
@@ -325,7 +326,7 @@
         <div class="card shadow-sm p-3 bg-white rounded">
             <h5 class="mb-3">Thuốc sắp hết hạn</h5>
             <table class="table table-bordered table-striped">
-                <thead>
+                <thead  class="table-primary">
                 <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Tên</th>
@@ -339,7 +340,7 @@
         </div>
         <div class="card shadow-sm p-3 bg-white rounded">
             <h5 class="mb-3">Lịch sử chỉnh sửa</h5>
-            <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
                 <select class="form-select" id="historyActionType" style="width: auto;">
                     <option value="">Tất cả hành động</option>
                     <option value="CREATE">Thêm</option>
@@ -363,7 +364,7 @@
                         onclick="searchHistory()">Tìm kiếm</button>
             </div>
             <table id="historyTable" class="table table-striped">
-                <thead>
+                <thead class="table-primary">
                 <tr>
                     <th>Thời gian</th>
                     <th>Người thực hiện</th>
@@ -374,7 +375,15 @@
                 </thead>
                 <tbody></tbody>
             </table>
-            <div id="historyPagination" class="pagination-controls"></div>
+            <div class="pagination-controls" id="historyPagination">
+                <button class="btn btn-secondary btn-sm me-2" onclick="changeHistoryPage('prev')" id="prevHistoryPageBtn" disabled>
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                <span id="currentHistoryPage">Trang 1</span>
+                <button class="btn btn-secondary btn-sm ms-2" onclick="changeHistoryPage('next')" id="nextHistoryPageBtn">
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -383,6 +392,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+    const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
+    let allHistories = [];
+    let currentPage = 1;
+    const pageSize = 10;
+
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('main-content');
@@ -392,10 +406,6 @@
         toggleIcon.classList.toggle('fa-chevron-left');
         toggleIcon.classList.toggle('fa-chevron-right');
     }
-
-    const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
-    let historyCurrentPage = 1;
-    const historyPageSize = 10;
 
     // Get expiry status
     function getExpiryStatus(expDate) {
@@ -492,20 +502,41 @@
 
     // Fetch and display history
     async function showHistory(page = 1) {
-        historyCurrentPage = page;
+        currentPage = page;
         try {
-            const actionType = document.getElementById('historyActionType').value;
-            const entityType = document.getElementById('historyEntityType').value;
-            const date = document.getElementById('historyDate').value;
-            const response = await fetch(`${baseUrl}/api/history?actionType=${actionType}&entityType=${entityType}&date=${date}&page=${page}&pageSize=${historyPageSize}`);
-            if (!response.ok) throw new Error('Lỗi khi lấy lịch sử');
-            const data = await response.json();
-            const histories = data.histories;
-            const totalItems = data.totalItems;
+            // Nếu allHistories chưa có dữ liệu hoặc đang tìm kiếm mới, gọi API
+            if (allHistories.length === 0 || page === 1) {
+                const actionType = document.getElementById('historyActionType').value;
+                const entityType = document.getElementById('historyEntityType').value;
+                const date = document.getElementById('historyDate').value;
+                const url = `${baseUrl}/api/history?actionType=${encodeURIComponent(actionType)}&entityType=${encodeURIComponent(entityType)}&date=${encodeURIComponent(date)}`;
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const text = await response.text();
+                if (!text) {
+                    throw new Error('Phản hồi rỗng từ server');
+                }
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('JSON không hợp lệ: ' + text);
+                }
+
+                allHistories = data.histories || [];
+            }
+
+            // Hiển thị trang hiện tại
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageData = allHistories.slice(start, end);
 
             const tbody = document.querySelector('#historyTable tbody');
             tbody.innerHTML = '';
-            histories.forEach(history => {
+            pageData.forEach(history => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${new Date(history.actionTime).toLocaleString('vi-VN')}</td>
@@ -517,33 +548,45 @@
                 tbody.appendChild(row);
             });
 
-            if (histories.length === 0) {
+            if (pageData.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center">Không có lịch sử nào</td></tr>';
             }
 
-            renderHistoryPagination(totalItems);
+            renderHistoryPagination(allHistories.length);
         } catch (error) {
             console.error('Lỗi khi hiển thị lịch sử:', error);
-            alert('Không thể tải lịch sử');
+            const tbody = document.querySelector('#historyTable tbody');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center">Lỗi: ' + error.message + '</td></tr>';
+            document.getElementById('historyPagination').innerHTML = '';
         }
+    }
+
+    // Change history page
+    function changeHistoryPage(direction) {
+        const totalPages = Math.ceil(allHistories.length / pageSize);
+        if (direction === 'prev' && currentPage > 1) {
+            currentPage--;
+        } else if (direction === 'next' && currentPage < totalPages) {
+            currentPage++;
+        }
+        showHistory(currentPage);
     }
 
     // Render pagination controls
     function renderHistoryPagination(totalItems) {
-        const totalPages = Math.ceil(totalItems / historyPageSize);
-        const pagination = document.getElementById('historyPagination');
-        pagination.innerHTML = '';
-        for (let i = 1; i <= totalPages; i++) {
-            const button = document.createElement('button');
-            button.textContent = i;
-            button.className = i === historyCurrentPage ? 'active' : '';
-            button.onclick = () => showHistory(i);
-            pagination.appendChild(button);
-        }
+        const totalPages = Math.ceil(totalItems / pageSize);
+        const currentPageSpan = document.getElementById('currentHistoryPage');
+        const prevButton = document.getElementById('prevHistoryPageBtn');
+        const nextButton = document.getElementById('nextHistoryPageBtn');
+
+        currentPageSpan.textContent = `Trang ${currentPage}`;
+        prevButton.disabled = currentPage === 1;
+        nextButton.disabled = currentPage === totalPages || totalPages === 0;
     }
 
     // Search history
     function searchHistory() {
+        allHistories = []; // Reset dữ liệu để gọi API mới
         showHistory(1);
     }
 

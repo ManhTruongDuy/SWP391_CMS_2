@@ -261,7 +261,7 @@
     <div class="sidebar-header">
         <a href="WarehouseHome.html" class="sidebar-brand">
             <div class="brand-icon">
-                <i class="fas fa-hospital"></i>
+                <i class="bi bi-hospital"></i>
             </div>
             <span class="brand-text">MediCare System</span>
         </a>
@@ -397,6 +397,9 @@
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importMedicineModal">
                                     <i class="bi bi-upload"></i> Thêm nhiều thuốc
                                 </button>
+                                <button class="btn btn-primary" onclick="exportMedicinesToExcel()">
+                                    <i class="bi bi-download"></i> Xuất Excel
+                                </button>
                             </div>
                             <div class="col-md-6">
                                 <div class="input-group">
@@ -404,7 +407,7 @@
                                         <option value="id">ID</option>
                                         <option value="name">Tên</option>
                                     </select>
-                                    <input id="medicineSearchInput" class="form-control" placeholder="Nhập giá trị tìm kiếm" type="text" onkeypress="if(event.key === 'Enter') searchWarehouse()">
+                                    <input id="medicineSearchInput" class="form-control" placeholder="Nhập giá trị tìm kiếm" type="text" onkeypress="if(event.key === 'Enter') searchMedicine()">
                                     <button class="btn btn-outline-primary" onclick="searchMedicine()">
                                         <i class="bi bi-search"></i> Tìm Thuốc
                                     </button>
@@ -412,7 +415,7 @@
                             </div>
                         </div>
                         <table class="table table-bordered table-striped">
-                            <thead>
+                            <thead class="table-primary">
                             <tr>
                                 <th scope="col" class="sortable" onclick="sortTable('medicine', 'id')">
                                     ID <span class="sort-icon" id="medicine-id-sort"></span>
@@ -836,6 +839,10 @@
         } else if (tableType === 'medicine') {
             displayMedicines(data, currentMedicinePage);
         }
+    }
+    function getCategoryName(categoryId) {
+        const category = categories.find(c => c.category_id === categoryId);
+        return category ? category.categoryName : 'N/A';
     }
 
     // Fetch categories
@@ -1541,6 +1548,41 @@
             return `${year}-${month}-${day}`;
         } catch (error) {
             throw new Error(`Ngày không hợp lệ: ${excelDate}`);
+        }
+    }
+    // Export medicines to Excel
+    function exportMedicinesToExcel() {
+        try {
+            if (allMedicines.length === 0) {
+                alert('Không có dữ liệu thuốc để xuất');
+                return;
+            }
+
+            const exportData = allMedicines.map(medicine => ({
+                'ID': medicine.medicine_id || 'N/A',
+                'Tên': medicine.name || 'N/A',
+                'Kho': getWarehouseName(medicine.warehouse_id),
+                'Số lượng': medicine.quantity || 'N/A',
+                'Đơn vị': getUnitName(medicine.unit_id || medicine.unit),
+                'Giá': medicine.price ? medicine.price.toFixed(2) : 'N/A',
+                'Thành phần': medicine.ingredient || 'N/A',
+                'Cách sử dụng': medicine.usage || 'N/A',
+                'Bảo quản': medicine.preservation || 'N/A',
+                'Ngày sản xuất': medicine.manuDate || 'N/A',
+                'Ngày hết hạn': medicine.expDate || 'N/A',
+                'Tình trạng': getExpiryStatus(medicine.expDate).text,
+                'ID Danh mục': getCategoryName(medicine.category_id) || 'N/A'
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Medicines');
+            const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+            saveAs(blob, 'Medicines.xlsx');
+        } catch (error) {
+            console.error('Lỗi khi xuất Excel:', error);
+            alert('Không thể xuất file Excel: ' + error.message);
         }
     }
 
