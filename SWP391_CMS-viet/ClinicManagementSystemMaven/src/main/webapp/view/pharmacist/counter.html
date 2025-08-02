@@ -684,6 +684,132 @@
                 display: none;
             }
         }
+
+        /* Search and Filter Styles */
+        .filter-section {
+            background: linear-gradient(135deg, rgba(44, 90, 160, 0.05) 0%, rgba(23, 162, 184, 0.05) 100%);
+            border: 1px solid rgba(44, 90, 160, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(44, 90, 160, 0.3);
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.1) 0%, rgba(44, 90, 160, 0.1) 100%);
+            border: 1px solid rgba(23, 162, 184, 0.2);
+            color: var(--primary-color);
+        }
+
+        /* Real-time search indicator */
+        .search-loading {
+            position: relative;
+        }
+
+        .search-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            width: 16px;
+            height: 16px;
+            margin-top: -8px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        <!--change -->
+        #search-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin: 30px auto;
+            max-width: 1200px;
+        }
+
+        /* Nhãn form */
+        #search-form .form-label {
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        /* Input & Select */
+        #search-form .form-control,
+        #search-form .form-select {
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+        }
+
+        #search-form .form-control:focus,
+        #search-form .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+        }
+
+        /* Nút thon gọn */
+        #search-form #search-btn,
+        #search-form #reset-btn {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            min-width: auto;
+        }
+
+        /* Layout 2 nút */
+        #search-form .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #search-form .col-md-3,
+            #search-form .col-md-2 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            #search-form .action-buttons {
+                flex-direction: column;
+            }
+
+            #search-form .btn {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -729,6 +855,12 @@
                     <span class="nav-text">Đơn thuốc</span>
                 </a>
             </div>
+<!--            <div class="nav-item">-->
+<!--                <a href="create-prescription.html" class="nav-link">-->
+<!--                    <i class="fas fa-plus-circle nav-icon"></i>-->
+<!--                    <span class="nav-text">Tạo đơn thuốc</span>-->
+<!--                </a>-->
+<!--            </div>-->
             <div class="nav-item">
                 <a href="counter.html" class="nav-link active">
                     <i class="fas fa-cash-register nav-icon"></i>
@@ -739,6 +871,12 @@
                 <a href="alternative-medicine.html" class="nav-link">
                     <i class="fas fa-exchange-alt nav-icon"></i>
                     <span class="nav-text">Thuốc thay thế</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="expiring-medicines.html" class="nav-link">
+                    <i class="fas fa-hourglass-half nav-icon"></i>
+                    <span class="nav-text">Thuốc sắp hết hạn</span>
                 </a>
             </div>
         </div>
@@ -789,6 +927,110 @@
     <div class="row">
         <!-- Left Column - Medicine List -->
         <div class="col-lg-6">
+            <!-- Search Card -->
+            <div class="content-card">
+                <div class="card-header-custom">
+                    <i class="fas fa-search me-2"></i>
+                    Tìm kiếm thuốc
+                </div>
+                <div class="card-body-custom">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="filter-section">
+                                <div class="filter-card">
+<!--                                    <form class="row g-3" id="search-form">-->
+<!--                                        <div class="col-md-3">-->
+<!--                                            <label for="medicine-search" class="form-label fw-bold">-->
+<!--                                                <i class="fas fa-search me-2"></i>-->
+<!--                                                Tên thuốc-->
+<!--                                            </label>-->
+<!--                                            <input type="text" class="form-control" id="medicine-search" placeholder="Nhập tên thuốc để tìm kiếm...">-->
+<!--                                        </div>-->
+<!--&lt;!&ndash;                                        <div class="col-md-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <label for="category-filter" class="form-label fw-bold">&ndash;&gt;-->
+<!--&lt;!&ndash;                                                <i class="fas fa-filter me-2"></i>&ndash;&gt;-->
+<!--&lt;!&ndash;                                                Loại thuốc&ndash;&gt;-->
+<!--&lt;!&ndash;                                            </label>&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                            <select class="form-select" id="category-filter">&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <option value="">Tất cả loại thuốc</option>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <option value="Antibiotics">Kháng sinh</option>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <option value="Painkillers">Giảm đau</option>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <option value="Vitamins">Vitamin</option>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <option value="Supplements">Thực phẩm chức năng</option>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <option value="Antipyretics">Hạ sốt</option>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <option value="Antihistamines">Chống dị ứng</option>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <option value="Antacids">Kháng acid</option>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                                <option value="Laxatives">Nhuận tràng</option>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;&lt;!&ndash;                                            </select>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                                        </div>&ndash;&gt;-->
+<!--                                        <div class="col-md-2">-->
+<!--                                            <label for="min-price" class="form-label fw-bold">-->
+<!--                                                <i class="fas fa-dollar-sign me-2"></i>-->
+<!--                                                Giá từ-->
+<!--                                            </label>-->
+<!--                                            <input type="number" class="form-control" id="min-price" placeholder="0" min="0">-->
+<!--                                        </div>-->
+<!--                                        <div class="col-md-2">-->
+<!--                                            <label for="max-price" class="form-label fw-bold">-->
+<!--                                                <i class="fas fa-dollar-sign me-2"></i>-->
+<!--                                                Giá đến-->
+<!--                                            </label>-->
+<!--                                            <input type="number" class="form-control" id="max-price" placeholder="1000000" min="0">-->
+<!--                                        </div>-->
+<!--                                        <div class="col-md-2 d-flex align-items-end">-->
+<!--                                            <button type="button" class="btn btn-primary me-2" id="search-btn">-->
+<!--                                                <i class="fas fa-search me-1"></i>-->
+<!--                                                Tìm kiếm-->
+<!--                                            </button>-->
+<!--                                            <button type="button" class="btn btn-outline-secondary" id="reset-btn">-->
+<!--                                                <i class="fas fa-redo me-1"></i>-->
+<!--                                                Đặt lại-->
+<!--                                            </button>-->
+<!--                                        </div>-->
+<!--                                    </form>-->
+                                    <form class="row g-3" id="search-form">
+                                        <div class="col-md-6">
+                                            <label for="medicine-search" class="form-label fw-bold">
+                                                <i class="fas fa-search me-2"></i>
+                                                Tên thuốc
+                                            </label>
+                                            <input type="text" class="form-control" id="medicine-search" placeholder="Nhập tên thuốc để tìm kiếm...">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label for="min-price" class="form-label fw-bold">
+                                                <i class="fas fa-dollar-sign me-2"></i>
+                                                Giá từ
+                                            </label>
+                                            <input type="number" class="form-control" id="min-price" placeholder="0" min="0">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label for="max-price" class="form-label fw-bold">
+                                                <i class="fas fa-dollar-sign me-2"></i>
+                                                Giá đến
+                                            </label>
+                                            <input type="number" class="form-control" id="max-price" placeholder="1000000" min="0">
+                                        </div>
+
+                                        <div class="col-md-2 d-flex align-items-end action-buttons">
+                                            <button type="button" class="btn btn-primary" id="search-btn">
+                                                <i class="fas fa-search me-1"></i>
+                                                Tìm
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" id="reset-btn">
+                                                <i class="fas fa-rotate me-1"></i>
+                                                Đặt
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Medicine List Card -->
             <div class="content-card">
                 <div class="card-header-custom">
@@ -820,7 +1062,7 @@
                     </div>
                 </div>
             </div>
-
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
             <!-- Medicine Detail Card -->
             <div class="content-card">
                 <div class="card-header-custom">
@@ -853,6 +1095,23 @@
                             <p>Đang tải thông tin đơn thuốc...</p>
                         </div>
                     </div>
+<!--                    <div class="prescription-medicines mt-3" id="prescription-medicines">-->
+<!--                        <h6 class="fw-bold"><i class="fas fa-pills me-2"></i>Thuốc cần mua:</h6>-->
+<!--                        <div class="table-responsive">-->
+<!--                            <table class="table table-sm">-->
+<!--                                <thead>-->
+<!--                                <tr>-->
+<!--                                    <th>Tên thuốc</th>-->
+<!--                                    <th>Số lượng</th>-->
+<!--                                    <th>Ngày hết hạn</th>-->
+<!--                                </tr>-->
+<!--                                </thead>-->
+<!--                                <tbody id="prescription-medicines-list">-->
+<!--                                &lt;!&ndash; Prescription medicines will be loaded here &ndash;&gt;-->
+<!--                                </tbody>-->
+<!--                            </table>-->
+<!--                        </div>-->
+<!--                    </div>-->
                 </div>
             </div>
 
@@ -921,6 +1180,8 @@
         fetch(`${baseUrl}/api/medicineCounter?page=${page}&pageSize=${pageSize}`)
             .then(res => res.json())
             .then(data => {
+                // Store all medicines
+                allMedicines = data.data;
                 const tbody = document.getElementById('medicine-table-body');
                 tbody.innerHTML = '';
                 selectedRow = null;
@@ -1010,13 +1271,43 @@
                             </div>
                         </div>
                     `;
-            }).catch(() => {
-            document.getElementById('prescription-detail').innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-exclamation-triangle text-danger"></i>
-                            <p class="text-danger">Không tìm thấy đơn thuốc.</p>
-                        </div>
-                    `;
+
+                // Load prescription medicines
+                const medicinesList = document.getElementById('prescription-medicines-list');
+                medicinesList.innerHTML = '';
+
+            //     if (p.prescriptionDetails && p.prescriptionDetails.length > 0) {
+            //         p.prescriptionDetails.forEach(med => {
+            //             const row = document.createElement('tr');
+            //             const expDate = med.medicine?.expDate ? new Date(med.medicine.expDate).toLocaleDateString('vi-VN') : 'N/A';
+            //
+            //             row.innerHTML = `
+            //                 <td>${med.medicine?.name || 'N/A'}</td>
+            //                 <td>${med.quantity || 0} ${med.medicine?.unit?.unitName || ''}</td>
+            //                 <td>${expDate}</td>
+            //             `;
+            //
+            //             medicinesList.appendChild(row);
+            //         });
+            //     } else {
+            //         medicinesList.innerHTML = `
+            //             <tr>
+            //                 <td colspan="3" class="text-center">Không có thông tin thuốc</td>
+            //             </tr>
+            //         `;
+            //     }
+            // }).catch(() => {
+            // document.getElementById('prescription-detail').innerHTML = `
+            //             <div class="empty-state">
+            //                 <i class="fas fa-exclamation-triangle text-danger"></i>
+            //                 <p class="text-danger">Không tìm thấy đơn thuốc.</p>
+            //             </div>
+            //         `;
+            // document.getElementById('prescription-medicines-list').innerHTML = `
+            //     <tr>
+            //         <td colspan="3" class="text-center">Không có thông tin thuốc</td>
+            //     </tr>
+            // `;
         });
     }
 
@@ -1348,8 +1639,129 @@
         }
     }
 
+    // Initialize variables
+    let allMedicines = [];
+
     // Initialize page
     loadPrescriptions(currentPage);
+
+    // Setup event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search and filter event listeners
+        document.getElementById('search-btn').addEventListener('click', function() {
+            searchMedicines();
+        });
+
+        document.getElementById('reset-btn').addEventListener('click', function() {
+            document.getElementById('medicine-search').value = '';
+            document.getElementById('category-filter').value = '';
+            document.getElementById('min-price').value = '';
+            document.getElementById('max-price').value = '';
+            searchMedicines();
+        });
+
+        // Real-time search on input
+        document.getElementById('medicine-search').addEventListener('input', function() {
+            searchMedicines();
+        });
+
+        // Real-time search on category change
+        document.getElementById('category-filter').addEventListener('change', function() {
+            searchMedicines();
+        });
+
+        // Real-time search on price change
+        document.getElementById('min-price').addEventListener('input', function() {
+            searchMedicines();
+        });
+
+        document.getElementById('max-price').addEventListener('input', function() {
+            searchMedicines();
+        });
+    });
+
+    function searchMedicines() {
+        const searchTerm = document.getElementById('medicine-search').value.toLowerCase();
+        const priceMin = document.getElementById('min-price').value ? parseInt(document.getElementById('min-price').value) : 0;
+        const priceMax = document.getElementById('max-price').value ? parseInt(document.getElementById('max-price').value) : Number.MAX_SAFE_INTEGER;
+
+        // Filter medicines
+        const filteredMedicines = allMedicines.filter(med => {
+            const nameMatch = med.name.toLowerCase().includes(searchTerm) ||
+                (med.ingredient && med.ingredient.toLowerCase().includes(searchTerm)) ||
+                (med.usage && med.usage.toLowerCase().includes(searchTerm));
+            const priceMatch = med.price >= priceMin && med.price <= priceMax;
+            return nameMatch && priceMatch;
+        });
+
+        const tbody = document.getElementById('medicine-table-body');
+        tbody.innerHTML = '';
+        selectedRow = null;
+
+        if (filteredMedicines.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center">
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <p>Không tìm thấy thuốc phù hợp với tiêu chí tìm kiếm</p>
+                            <small class="text-muted">Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc</small>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        } else {
+            // Show search results count
+            const resultsCount = document.createElement('div');
+            resultsCount.className = 'alert alert-info mb-3';
+            resultsCount.innerHTML = `
+                <i class="fas fa-info-circle me-2"></i>
+                Tìm thấy <strong>${filteredMedicines.length}</strong> thuốc phù hợp
+            `;
+            tbody.parentElement.parentElement.insertBefore(resultsCount, tbody.parentElement);
+
+            filteredMedicines.forEach((p, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${p.id}</strong></td>
+                    <td class="medicine-name">${p.name}</td>
+                    <td>
+                        <span class="medicine-category">${p.category?.categoryName || ''}</span>
+                    </td>
+                    <td class="medicine-price">${p.price.toLocaleString()} ₫</td>
+                    <td>
+                        <span class="medicine-quantity">${p.quantity}</span>
+                    </td>
+                    <td class="text-center">
+                        <button class="add-btn" title="Thêm vào đơn hàng">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </td>
+                `;
+
+                row.addEventListener('click', () => {
+                    if (selectedRow) selectedRow.classList.remove('selected');
+                    row.classList.add('selected');
+                    selectedRow = row;
+                    showMedicineDetail(p);
+                });
+
+                row.querySelector('button').addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    addToOrder(p);
+                });
+
+                tbody.appendChild(row);
+
+                if (index === 0) {
+                    row.classList.add('selected');
+                    selectedRow = row;
+                    showMedicineDetail(p);
+                }
+            });
+        }
+    }
+
 </script>
 </body>
 </html>

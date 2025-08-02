@@ -366,7 +366,24 @@ public class CounterDAO extends DBContext {
                 invoices.add(invoice);
             }
 
-            return new StatisticCounter(totalInvoices, totalAmount, totalPatients, invoices);
+            // --- Thêm thống kê thuốc ---
+            int totalMedicine = getMedicineCount();
+            int totalExpiringMedicine = 0;
+            String expSql = "SELECT SUM(quantity) FROM Medicine WHERE expDate <= ?";
+            try (PreparedStatement expStmt = connection.prepareStatement(expSql)) {
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                cal.add(java.util.Calendar.YEAR, 3);
+                java.sql.Date threeYearsLater = new java.sql.Date(cal.getTimeInMillis());
+                expStmt.setDate(1, threeYearsLater);
+                try (ResultSet expRs = expStmt.executeQuery()) {
+                    if (expRs.next()) {
+                        totalExpiringMedicine = expRs.getInt(1);
+                    }
+                }
+            }
+            // ---
+
+            return new StatisticCounter(totalInvoices, totalAmount, totalPatients, invoices, totalMedicine, totalExpiringMedicine);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
