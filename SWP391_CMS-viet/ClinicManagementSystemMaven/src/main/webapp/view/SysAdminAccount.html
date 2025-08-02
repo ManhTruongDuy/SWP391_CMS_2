@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
-
     <style>
         body {
             background-color: #f1f5f9;
@@ -172,7 +171,7 @@
             font-size: 16px;
             font-weight: 600;
             color: #ffffff;
-            background-color: #6D9DC5; /* Soft blue background */
+            background-color: #6D9DC5;
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -181,7 +180,7 @@
         }
 
         .create-button:hover {
-            background-color: #5B8AB2; /* Slightly darker soft blue on hover */
+            background-color: #5B8AB2;
             transform: translateY(-2px);
         }
 
@@ -212,7 +211,6 @@
             }
         }
     </style>
-
 </head>
 <body class="bg-gray-100 font-sans">
 
@@ -231,7 +229,6 @@
             <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Profile.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Hồ sơ</a>
             <a href="./accountpharmacist/Login.jsp" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Đăng xuất</a>
         </div>
-
 
         <!-- Mobile Menu Button -->
         <button id="mobile-menu-btn" class="md:hidden focus:outline-none p-2 rounded-lg hover:bg-blue-500 transition-colors">
@@ -294,12 +291,20 @@
                     <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
-
                 </thead>
                 <tbody id="sysadmin-table-body">
                 <!-- rows will be dynamically injected here -->
                 </tbody>
             </table>
+            <div class="pagination-controls">
+                <button class="btn btn-secondary btn-sm me-2" onclick="changePage('prev')" id="prevPageBtn" disabled>
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                <span id="currentPage">Trang 1</span>
+                <button class="btn btn-secondary btn-sm ms-2" onclick="changePage('next')" id="nextPageBtn">
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
         </div>
     </main>
 </div>
@@ -310,278 +315,6 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
     </svg>
 </button>
-
-<script>
-    // Mobile Menu Toggle
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    mobileMenuBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-    });
-
-    // Sidebar Toggle for Mobile
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const sidebar = document.getElementById('sidebar');
-    sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-    });
-
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
-            // Close mobile menu after clicking
-            mobileMenu.classList.add('hidden');
-            sidebar.classList.remove('open');
-        });
-    });
-
-    const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
-    let selectedRow = null;
-    let allSysadmins = [];
-
-    // Display system admins
-    function displaySysadmins(data) {
-        const tbody = document.getElementById('sysadmin-table-body');
-        console.log('Rendering sys-admins:', data); // Debug
-        tbody.innerHTML = '';
-        selectedRow = null;
-
-        const sysadmins = Array.isArray(data) ? data : [data];
-        if (sysadmins.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center">Không tìm thấy quản trị viên</td></tr>';
-            return;
-        }
-
-        sysadmins.forEach((sysadmin, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-
-    <td>${sysadmin.admin_id ?? 'N/A'}</td>
-    <td>${sysadmin.fullName || 'N/A'}</td>
-    <td>${sysadmin.phone || 'N/A'}</td>
-    <td>${sysadmin.department || 'N/A'}</td>
-    <td>${sysadmin.email || 'N/A'}</td>
-    <td>${sysadmin.username || 'N/A'}</td>
-    <td>${sysadmin.password || 'N/A'}</td>
-    <td>${sysadmin.status || 'N/A'}</td>
-    <td>
-
-        <button class="btn ${sysadmin.status === 'Enable' ? 'btn-warning' : 'btn-success'} btn-sm toggle-status-btn"
-            data-id="${sysadmin.admin_id}" data-status="${sysadmin.status}">
-            <i class="bi ${sysadmin.status === 'Enable' ? 'bi-slash-circle' : 'bi-check-circle'}"></i>
-            ${sysadmin.status === 'Enable' ? 'Vô hiệu hóa' : 'Kích hoạt'}
-        </button>
-    </td>
-`;
-
-            tbody.appendChild(row);
-
-            if (index === 0) {
-                row.classList.add('selected');
-                selectedRow = row;
-            }
-        });
-    }
-
-    // Display error message
-    function displayError(message) {
-        const tbody = document.getElementById('sysadmin-table-body');
-        console.error('Error:', message); // Debug
-        tbody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">${message}</td></tr>`;
-    }
-
-    // Fetch all system admins
-    async function getAllSysadmins() {
-        try {
-            const response = await fetch(`${baseUrl}/api/system-admin?action=sys-admins`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();  // handle non-JSON error
-                throw new Error(`HTTP error ${response.status}: ${errorText}`);
-            }
-
-            const text = await response.text(); // read response as text first
-            if (!text) {
-                throw new Error("Phản hồi từ máy chủ rỗng");
-            }
-
-            const data = JSON.parse(text); // now safely parse
-            console.log('Data received:', data);
-            allSysadmins = data;
-            displaySysadmins(data);
-        } catch (error) {
-            console.error('Fetch error:', error);
-            displayError(error.message);
-        }
-    }
-
-    // Search for manager by ID
-    async function searchSysadminById(id) {
-        try {
-            if (!id) {
-                displaySysadmins(allSysadmins); // If no ID, show all admins
-                return;
-            }
-
-            const response = await fetch(`${baseUrl}/api/system-admin?action=sysadminid&id=${id}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
-            }
-
-            const text = await response.text();
-            if (!text) {
-                throw new Error("Phản hồi từ máy chủ rỗng");
-            }
-
-            const data = JSON.parse(text);
-            console.log('Search result:', data);
-            if (!data || Object.keys(data).length === 0) {
-                displayError('Không quản trị viên nào có ID này!');
-            } else {
-                displaySysadmins([data]);
-            }
-        } catch (error) {
-            console.error('Search error:', error);
-            displayError(error.message);
-        }
-    }
-
-
-
-    // Search bar event listener
-    const searchBtn = document.getElementById('search-btn');
-    const searchInput = document.getElementById('sysadmin-id-search');
-    searchBtn.addEventListener('click', () => {
-        const sysadminId = searchInput.value.trim();
-        searchSysadminById(sysadminId);
-    });
-
-    // Allow pressing Enter to search
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const sysadminId = searchInput.value.trim();
-            searchSysadminById(sysadminId);
-        }
-    });
-
-    // Search for system admin by name
-    async function searchSysadminByName(name) {
-        try {
-            if (!name) {
-                displaySysadmins(allSysadmins); // Nếu không nhập gì, hiện tất cả
-                return;
-            }
-
-            const response = await fetch(`${baseUrl}/api/system-admin?action=sysadminname&name=${encodeURIComponent(name)}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
-            }
-
-            const text = await response.text();
-            if (!text) {
-                throw new Error("Phản hồi từ máy chủ rỗng");
-            }
-
-            const data = JSON.parse(text);
-            console.log('Kết quả tìm kiếm theo tên:', data);
-
-            if (!Array.isArray(data) || data.length === 0) {
-                displayError('Không tìm thấy quản trị viên với tên này!');
-            } else {
-                displaySysadmins(data);
-            }
-        } catch (error) {
-            console.error('Lỗi tìm kiếm theo tên:', error);
-            displayError(error.message);
-        }
-    }
-
-    // Load system admin list on page load
-    // Search by name event listener
-    const searchNameBtn = document.getElementById('search-name-btn');
-    const searchNameInput = document.getElementById('sysadmin-name-search');
-
-    searchNameBtn.addEventListener('click', () => {
-        const name = searchNameInput.value.trim();
-        searchSysadminByName(name);
-    });
-
-    searchNameInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const name = searchNameInput.value.trim();
-            searchSysadminByName(name);
-        }
-    });
-
-    getAllSysadmins();
-    // Toggle status handler
-    document.addEventListener('click', async (event) => {
-        if (event.target.closest('.toggle-status-btn')) {
-            const button = event.target.closest('.toggle-status-btn');
-            const sysadminId = button.getAttribute('data-id');
-            const currentStatus = button.getAttribute('data-status');
-            const newStatus = currentStatus === 'Enable' ? 'Disable' : 'Enable';
-
-            // 🔔 Hỏi người dùng trước khi cập nhật
-            const confirmText =
-                newStatus === 'Disable'
-                    ? 'Bạn có chắc chắn muốn VÔ HIỆU HÓA tài khoản này không?'
-                    : 'Bạn có muốn KÍCH HOẠT lại tài khoản này không?';
-
-            const userConfirmed = confirm(confirmText);
-
-            if (!userConfirmed) return; // Nếu người dùng bấm Cancel thì dừng lại
-
-            try {
-                const response = await fetch(`${baseUrl}/api/system-admin?action=toggle-status`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-
-                        id: Number(sysadminId),
-                        role: 'SysAdmin',
-                        status: newStatus,
-                    }),
-                });
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.error || 'Lỗi không xác định');
-                }
-
-                alert('✅ Cập nhật thành công!');
-                getAllSysadmins(); // Refresh lại danh sách
-            } catch (error) {
-                alert('❌ Lỗi cập nhật trạng thái: ' + error.message);
-                console.error(error);
-            }
-        }
-    });
-
-
-
-</script>
-
 
 <!-- Update Modal -->
 <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
@@ -619,10 +352,298 @@
         </div>
     </div>
 </div>
+
 <script>
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // Sidebar Toggle for Mobile
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+            // Close mobile menu after clicking
+            mobileMenu.classList.add('hidden');
+            sidebar.classList.remove('open');
+        });
+    });
+
+    const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
+    let selectedRow = null;
+    let allSysadmins = [];
+    let selectedId = null;
+    let currentPage = 0;
+    const itemsPerPage = 5;
+
+    // Update warehouse pagination controls
+    function updateAccountPaginationControls(page) {
+        currentPage = page;
+        const totalPages = Math.ceil(allSysadmins.length / itemsPerPage);
+        document.getElementById('currentPage').textContent = `Trang ${page + 1} của ${totalPages}`;
+        document.getElementById('prevPageBtn').disabled = page === 0;
+        document.getElementById('nextPageBtn').disabled = page >= totalPages - 1;
+    }
+
+    // Change page
+    function changePage(direction) {
+        if (direction === 'prev' && currentPage > 0) {
+            displaySysadmins(allSysadmins, currentPage - 1);
+        } else if (direction === 'next' && currentPage < Math.ceil(allSysadmins.length / itemsPerPage) - 1) {
+            displaySysadmins(allSysadmins, currentPage + 1);
+        }
+    }
+
+    // Display system admins with pagination
+    function displaySysadmins(data, page = 0) {
+        const tbody = document.getElementById('sysadmin-table-body');
+        console.log('Rendering sys-admins:', data); // Debug
+        tbody.innerHTML = '';
+        selectedRow = null;
+
+        const sysadmins = Array.isArray(data) ? data : [data];
+        if (sysadmins.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center">Không tìm thấy quản trị viên</td></tr>';
+            updateAccountPaginationControls(0);
+            return;
+        }
+
+        allSysadmins = sysadmins; // Update the global list
+        const start = page * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedSysadmins = allSysadmins.slice(start, end);
+
+        paginatedSysadmins.forEach((sysadmin, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${sysadmin.admin_id ?? 'N/A'}</td>
+                <td>${sysadmin.fullName || 'N/A'}</td>
+                <td>${sysadmin.phone || 'N/A'}</td>
+                <td>${sysadmin.department || 'N/A'}</td>
+                <td>${sysadmin.email || 'N/A'}</td>
+                <td>${sysadmin.username || 'N/A'}</td>
+                <td>${sysadmin.password || 'N/A'}</td>
+                <td>${sysadmin.status || 'N/A'}</td>
+                <td>
+                    <button class="btn ${sysadmin.status === 'Enable' ? 'btn-warning' : 'btn-success'} btn-sm toggle-status-btn"
+                        data-id="${sysadmin.admin_id}" data-status="${sysadmin.status}">
+                        <i class="bi ${sysadmin.status === 'Enable' ? 'bi-slash-circle' : 'bi-check-circle'}"></i>
+                        ${sysadmin.status === 'Enable' ? 'Vô hiệu hóa' : 'Kích hoạt'}
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+
+            if (index === 0) {
+                row.classList.add('selected');
+                selectedRow = row;
+            }
+        });
+        updateAccountPaginationControls(page);
+    }
+
+    // Display error message
+    function displayError(message) {
+        const tbody = document.getElementById('sysadmin-table-body');
+        console.error('Error:', message); // Debug
+        tbody.innerHTML = `<tr><td colspan="9" class="text-danger text-center">${message}</td></tr>`;
+    }
+
+    // Fetch all system admins
+    async function getAllSysadmins() {
+        try {
+            const response = await fetch(`${baseUrl}/api/system-admin?action=sys-admins`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error ${response.status}: ${errorText}`);
+            }
+
+            const text = await response.text();
+            if (!text) {
+                throw new Error("Phản hồi từ máy chủ rỗng");
+            }
+
+            const data = JSON.parse(text);
+            console.log('Data received:', data);
+            allSysadmins = data;
+            displaySysadmins(data, 0); // Start at page 0
+        } catch (error) {
+            console.error('Fetch error:', error);
+            displayError(error.message);
+        }
+    }
+
+    // Search for manager by ID
+    async function searchSysadminById(id) {
+        try {
+            if (!id) {
+                displaySysadmins(allSysadmins);
+                return;
+            }
+
+            const response = await fetch(`${baseUrl}/api/system-admin?action=sysadminid&id=${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
+            }
+
+            const text = await response.text();
+            if (!text) {
+                throw new Error("Phản hồi từ máy chủ rỗng");
+            }
+
+            const data = JSON.parse(text);
+            console.log('Search result:', data);
+            if (!data || Object.keys(data).length === 0) {
+                displayError('Không quản trị viên nào có ID này!');
+            } else {
+                displaySysadmins([data]);
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            displayError(error.message);
+        }
+    }
+
+    // Search bar event listener
+    const searchBtn = document.getElementById('search-btn');
+    const searchInput = document.getElementById('sysadmin-id-search');
+    searchBtn.addEventListener('click', () => {
+        const sysadminId = searchInput.value.trim();
+        searchSysadminById(sysadminId);
+    });
+
+    // Allow pressing Enter to search
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const sysadminId = searchInput.value.trim();
+            searchSysadminById(sysadminId);
+        }
+    });
+
+    // Search for system admin by name
+    async function searchSysadminByName(name) {
+        try {
+            if (!name) {
+                displaySysadmins(allSysadmins);
+                return;
+            }
+
+            const response = await fetch(`${baseUrl}/api/system-admin?action=sysadminname&name=${encodeURIComponent(name)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Lỗi HTTP ${response.status}: ${errorText}`);
+            }
+
+            const text = await response.text();
+            if (!text) {
+                throw new Error("Phản hồi từ máy chủ rỗng");
+            }
+
+            const data = JSON.parse(text);
+            console.log('Kết quả tìm kiếm theo tên:', data);
+
+            if (!Array.isArray(data) || data.length === 0) {
+                displayError('Không tìm thấy quản trị viên với tên này!');
+            } else {
+                displaySysadmins(data);
+            }
+        } catch (error) {
+            console.error('Lỗi tìm kiếm theo tên:', error);
+            displayError(error.message);
+        }
+    }
+
+    // Search by name event listener
+    const searchNameBtn = document.getElementById('search-name-btn');
+    const searchNameInput = document.getElementById('sysadmin-name-search');
+    searchNameBtn.addEventListener('click', () => {
+        const name = searchNameInput.value.trim();
+        searchSysadminByName(name);
+    });
+
+    searchNameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const name = searchNameInput.value.trim();
+            searchSysadminByName(name);
+        }
+    });
+
+    // Load system admin list on page load
+    getAllSysadmins();
+
+    // Toggle status handler
+    document.addEventListener('click', async (event) => {
+        if (event.target.closest('.toggle-status-btn')) {
+            const button = event.target.closest('.toggle-status-btn');
+            const sysadminId = button.getAttribute('data-id');
+            const currentStatus = button.getAttribute('data-status');
+            const newStatus = currentStatus === 'Enable' ? 'Disable' : 'Enable';
+
+            const confirmText = newStatus === 'Disable'
+                ? 'Bạn có chắc chắn muốn VÔ HIỆU HÓA tài khoản này không?'
+                : 'Bạn có muốn KÍCH HOẠT lại tài khoản này không?';
+
+            const userConfirmed = confirm(confirmText);
+
+            if (!userConfirmed) return;
+
+            try {
+                const response = await fetch(`${baseUrl}/api/system-admin?action=toggle-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: Number(sysadminId),
+                        role: 'SysAdmin',
+                        status: newStatus,
+                    }),
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Lỗi không xác định');
+                }
+
+                alert('✅ Cập nhật thành công!');
+                getAllSysadmins();
+            } catch (error) {
+                alert('❌ Lỗi cập nhật trạng thái: ' + error.message);
+                console.error(error);
+            }
+        }
+    });
+
+    // Update modal handler
     document.addEventListener('click', function (event) {
         if (event.target.closest('.update-btn')) {
-            console.log("🟡 Click update-btn detected"); // <-- thêm dòng này
+            console.log("🟡 Click update-btn detected");
 
             const button = event.target.closest('.update-btn');
             const id = button.getAttribute('data-id');
@@ -642,7 +663,6 @@
         }
     });
 
-
     document.getElementById('updateForm').addEventListener('submit', async function (e) {
         e.preventDefault();
 
@@ -653,8 +673,7 @@
         const department = document.getElementById('update-department').value.trim();
 
         try {
-            const res = await fetch(`${baseUrl}/api/system-admin?action=update`
-        , {
+            const res = await fetch(`${baseUrl}/api/system-admin?action=update`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -677,33 +696,24 @@
             alert("✅ Cập nhật thành công!");
             const modal = bootstrap.Modal.getInstance(document.getElementById('updateModal'));
             modal.hide();
-            getAllSysadmins(); // Tải lại danh sách
-
+            getAllSysadmins();
         } catch (err) {
             alert("❌ Lỗi: " + err.message);
         }
     });
 
-
-
     document.querySelectorAll('a[href="#logout"]').forEach(logoutLink => {
         logoutLink.addEventListener('click', function (e) {
             e.preventDefault();
 
-
             localStorage.removeItem('token');
             sessionStorage.clear();
 
-
-            window.location.href = '/ClinicManagementSystem_war_exploded/view/accountpharmacist/Login.jsp'; // thay bằng URL thật của trang đăng nhập
+            window.location.href = '/ClinicManagementSystem_war_exploded/view/accountpharmacist/Login.jsp';
         });
     });
-
 </script>
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-
 </body>
 </html>

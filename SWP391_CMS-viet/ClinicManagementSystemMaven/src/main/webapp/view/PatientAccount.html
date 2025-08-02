@@ -199,7 +199,6 @@
             <span class="text-2xl font-bold tracking-tight">HealthCare</span>
         </div>
 
-
         <!-- Desktop Menu -->
         <div class="hidden md:flex space-x-8">
             <a href="SysAdminDashboard.html" class="nav-link text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition-all duration-200 ease-in-out">Trang chủ</a>
@@ -265,6 +264,15 @@
                 <!-- rows will be dynamically injected here -->
                 </tbody>
             </table>
+            <div class="pagination-controls">
+                <button class="btn btn-secondary btn-sm me-2" onclick="changePage('prev')" id="prevPageBtn" disabled>
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+                <span id="currentPage">Trang 1</span>
+                <button class="btn btn-secondary btn-sm ms-2" onclick="changePage('next')" id="nextPageBtn">
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
         </div>
     </main>
 </div>
@@ -307,9 +315,29 @@
     const baseUrl = 'http://localhost:8080/ClinicManagementSystem_war_exploded';
     let selectedRow = null;
     let allPatients = [];
+    let currentPage = 0;
+    const itemsPerPage = 5;
 
-    // Display patients
-    function displayPatients(data) {
+    // Update patient pagination controls
+    function updatePatientPaginationControls(page) {
+        currentPage = page;
+        const totalPages = Math.ceil(allPatients.length / itemsPerPage);
+        document.getElementById('currentPage').textContent = `Trang ${page + 1} của ${totalPages}`;
+        document.getElementById('prevPageBtn').disabled = page === 0;
+        document.getElementById('nextPageBtn').disabled = page >= totalPages - 1;
+    }
+
+    // Change page
+    function changePage(direction) {
+        if (direction === 'prev' && currentPage > 0) {
+            displayPatients(allPatients, currentPage - 1);
+        } else if (direction === 'next' && currentPage < Math.ceil(allPatients.length / itemsPerPage) - 1) {
+            displayPatients(allPatients, currentPage + 1);
+        }
+    }
+
+    // Display patients with pagination
+    function displayPatients(data, page = 0) {
         const tbody = document.getElementById('patient-table-body');
         console.log('Rendering patients:', data); // Debug
         tbody.innerHTML = '';
@@ -317,11 +345,17 @@
 
         const patients = Array.isArray(data) ? data : [data];
         if (patients.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center">Không tìm thấy bệnh nhân</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center">Không tìm thấy bệnh nhân</td></tr>';
+            updatePatientPaginationControls(0);
             return;
         }
 
-        patients.forEach((patient, index) => {
+        allPatients = patients; // Update the global list
+        const start = page * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedPatients = allPatients.slice(start, end);
+
+        paginatedPatients.forEach((patient, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${patient.patient_id ?? 'N/A'}</td>
@@ -336,13 +370,14 @@
                 selectedRow = row;
             }
         });
+        updatePatientPaginationControls(page);
     }
 
     // Display error message
     function displayError(message) {
         const tbody = document.getElementById('patient-table-body');
         console.error('Error:', message); // Debug
-        tbody.innerHTML = `<tr><td colspan="7" class="text-danger text-center">${message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="text-danger text-center">${message}</td></tr>`;
     }
 
     // Fetch all patients
@@ -354,19 +389,19 @@
             });
 
             if (!response.ok) {
-                const errorText = await response.text();  // handle non-JSON error
+                const errorText = await response.text();
                 throw new Error(`HTTP error ${response.status}: ${errorText}`);
             }
 
-            const text = await response.text(); // read response as text first
+            const text = await response.text();
             if (!text) {
                 throw new Error("Phản hồi từ máy chủ rỗng");
             }
 
-            const data = JSON.parse(text); // now safely parse
+            const data = JSON.parse(text);
             console.log('Data received:', data);
             allPatients = data;
-            displayPatients(data);
+            displayPatients(data, 0); // Start at page 0
         } catch (error) {
             console.error('Fetch error:', error);
             displayError(error.message);
@@ -377,7 +412,7 @@
     async function searchPatientById(id) {
         try {
             if (!id) {
-                displayPatients(allPatients) // If no ID, show all patients
+                displayPatients(allPatients);
                 return;
             }
 
@@ -408,10 +443,11 @@
             displayError(error.message);
         }
     }
+
     async function searchPatientByName(name) {
         try {
             if (!name) {
-                getAllPatients(); // Nếu không nhập, hiển thị toàn bộ
+                displayPatients(allPatients);
                 return;
             }
 
@@ -443,7 +479,6 @@
         }
     }
 
-
     // Search bar event listener
     const searchBtn = document.getElementById('search-btn');
     const searchInput = document.getElementById('patient-id-search');
@@ -462,7 +497,6 @@
 
     const searchNameBtn = document.getElementById('search-name-btn');
     const searchNameInput = document.getElementById('patient-name-search');
-
     searchNameBtn.addEventListener('click', () => {
         const name = searchNameInput.value.trim();
         searchPatientByName(name);
@@ -475,8 +509,7 @@
         }
     });
 
-
-
+    // Load patient list on page load
     getAllPatients();
 </script>
 </body>
