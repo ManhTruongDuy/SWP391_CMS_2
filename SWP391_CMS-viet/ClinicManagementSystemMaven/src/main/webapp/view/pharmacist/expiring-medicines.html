@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thuốc sắp hết hạn - Hệ thống quản lý bệnh viện</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c5aa0;
+            --secondary-color: #17a2b8;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #6f42c1;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --dark-bg: #343a40;
+            --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+            --border-radius: 15px;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Vertical Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--dark-bg) 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-brand {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-brand .brand-text {
+            display: none;
+        }
+
+        .sidebar-brand:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .brand-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: -15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            display: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 0;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+
+        .sidebar.collapsed .nav-link .nav-text {
+            display: none;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar.collapsed .nav-link:hover {
+            transform: none;
+        }
+
+        .nav-link.active {
+            color: white;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+            border-right: 3px solid white;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: white;
+        }
+
+        .nav-icon {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-text {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-footer {
+            position: relative;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .user-info {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .user-details {
+            display: none;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.1rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .logout-btn {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: #ff6b6b;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .sidebar.collapsed .logout-btn .logout-text {
+            display: none;
+        }
+
+        .logout-btn:hover {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .page-header {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--success-color));
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .content-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: none;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .card-body-custom {
+            padding: 1.5rem;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .summary-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-description {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .medicines-table {
+            margin-bottom: 0;
+        }
+
+        .medicines-table thead th {
+            background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+            color: white;
+            border: none;
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.8rem;
+        }
+
+        .medicines-table tbody td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+        }
+
+        .medicines-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .medicines-table tbody tr:hover {
+            background: rgba(44, 90, 160, 0.1) !important;
+            transform: scale(1.01);
+        }
+
+        .medicine-name {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .medicine-category {
+            background: rgba(111, 66, 193, 0.1);
+            color: var(--info-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .medicine-price {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .medicine-quantity {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .expiry-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .expiry-danger {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(231, 74, 59, 0.2) 100%);
+            color: #721c24;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .expiry-warning {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(253, 126, 20, 0.2) 100%);
+            color: #856404;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .expiry-info {
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.2) 0%, rgba(0, 123, 255, 0.2) 100%);
+            color: #0c5460;
+            border: 1px solid rgba(23, 162, 184, 0.3);
+        }
+
+        .filter-section {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 0.6rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+        }
+
+        .form-select {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 0.6rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(44, 90, 160, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #e74c3c 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(220, 53, 69, 0.3);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+
+            .mobile-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+
+            .mobile-overlay.show {
+                display: block;
+            }
+
+            .mobile-toggle {
+                display: block;
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 0.5rem;
+                font-size: 1.2rem;
+                z-index: 1001;
+                box-shadow: var(--shadow);
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-toggle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Mobile Overlay -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- Mobile Toggle Button -->
+<button class="mobile-toggle" onclick="openMobileSidebar()">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Vertical Sidebar Navigation -->
+<div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-chevron-left" id="toggleIcon"></i>
+    </button>
+
+    <div class="sidebar-header">
+        <a href="dashboard-pharmacist.html" class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fas fa-hospital"></i>
+            </div>
+            <span class="brand-text">MediCare System</span>
+        </a>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Chính</div>
+            <div class="nav-item">
+                <a href="dashboard-pharmacist.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span class="nav-text">Chức năng</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Quản lý</div>
+            <div class="nav-item">
+                <a href="prescription.html" class="nav-link">
+                    <i class="fas fa-file-prescription nav-icon"></i>
+                    <span class="nav-text">Đơn thuốc</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="create-prescription.html" class="nav-link">
+                    <i class="fas fa-plus-circle nav-icon"></i>
+                    <span class="nav-text">Tạo đơn thuốc</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="counter.html" class="nav-link">
+                    <i class="fas fa-cash-register nav-icon"></i>
+                    <span class="nav-text">Quầy thuốc</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="alternative-medicine.html" class="nav-link">
+                    <i class="fas fa-exchange-alt nav-icon"></i>
+                    <span class="nav-text">Thuốc thay thế</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="expiring-medicines.html" class="nav-link active">
+                    <i class="fas fa-hourglass-half nav-icon"></i>
+                    <span class="nav-text">Thuốc sắp hết hạn</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Báo cáo</div>
+            <div class="nav-item">
+                <a href="statistic-pharmacist.html" class="nav-link">
+                    <i class="fas fa-chart-bar nav-icon"></i>
+                    <span class="nav-text">Thống kê</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="history-pharmacist.html" class="nav-link">
+                    <i class="fas fa-chart-line nav-icon"></i>
+                    <span class="nav-text">Lịch sử & Tra cứu</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar">DT</div>
+            <div class="user-details">
+                <div class="user-name">Dược sĩ Thảo</div>
+                <div class="user-role">Quầy thuốc</div>
+            </div>
+        </div>
+        <a href="login.html" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="logout-text">Đăng xuất</span>
+        </a>
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="main-content" id="mainContent">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-hourglass-half me-3"></i>
+            Quản lý thuốc sắp hết hạn
+        </h1>
+        <p class="page-subtitle">Theo dõi và quản lý thuốc sắp hết hạn trong 3 tháng tới</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="summary-card">
+                <div class="summary-icon">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <div class="summary-title">Tổng số thuốc sắp hết hạn</div>
+                <div class="summary-value" id="total-expiring-medicines">0</div>
+                <div class="summary-description">Thuốc sẽ hết hạn trong 3 tháng tới</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-card">
+                <div class="summary-icon" style="background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="summary-title">Thuốc hết hạn trong 30 ngày</div>
+                <div class="summary-value" id="expiring-30-days">0</div>
+                <div class="summary-description">Cần xử lý gấp</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="summary-card">
+                <div class="summary-icon" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="summary-title">Tổng thiệt hại dự tính</div>
+                <div class="summary-value" id="total-loss">0 ₫</div>
+                <div class="summary-description">Giá trị thuốc sắp hết hạn</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <h5 class="filter-title"><i class="fas fa-filter me-2"></i>Bộ lọc</h5>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label for="expiry-period" class="form-label">Thời gian hết hạn</label>
+                <select class="form-select" id="expiry-period">
+                    <option value="all" selected>Tất cả (3 tháng)</option>
+                    <option value="30">30 ngày tới</option>
+                    <option value="60">60 ngày tới</option>
+                    <option value="90">90 ngày tới</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="medicine-category" class="form-label">Loại thuốc</label>
+                <select class="form-select" id="medicine-category">
+                    <option value="all" selected>Tất cả loại</option>
+                    <option value="antibiotics">Kháng sinh</option>
+                    <option value="painkillers">Giảm đau</option>
+                    <option value="vitamins">Vitamin</option>
+                    <option value="other">Khác</option>
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="medicine-search" class="form-label">Tìm kiếm thuốc</label>
+                <input type="text" class="form-control" id="medicine-search" placeholder="Nhập tên thuốc...">
+            </div>
+            <div class="col-md-2 mb-3 d-flex align-items-end">
+                <button class="btn btn-primary w-100" id="apply-filter">
+                    <i class="fas fa-search me-2"></i>Áp dụng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expiring Medicines Table -->
+    <div class="content-card">
+        <div class="card-header-custom">
+            <i class="fas fa-list-alt me-2"></i>
+            Danh sách thuốc sắp hết hạn
+        </div>
+        <div class="card-body-custom">
+            <div class="table-responsive">
+                <table class="table medicines-table">
+                    <thead>
+                    <tr>
+                        <th width="5%">STT</th>
+                        <th width="25%">Tên thuốc</th>
+                        <th width="10%">Đơn vị</th>
+                        <th width="10%">Loại</th>
+                        <th width="10%">Số lượng</th>
+                        <th width="10%">Giá</th>
+                        <th width="15%">Ngày hết hạn</th>
+                        <th width="15%">Trạng thái</th>
+                    </tr>
+                    </thead>
+                    <tbody id="expiring-medicines-list">
+                    <!-- Expiring medicines will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="empty-state" class="text-center py-4 d-none">
+                <i class="fas fa-prescription-bottle fs-3 text-muted mb-3"></i>
+                <p class="text-muted">Không có thuốc nào sắp hết hạn trong khoảng thời gian đã chọn</p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div>
+                    <span class="fw-bold">Tổng số thuốc hiển thị:</span>
+                    <span id="displayed-count">0</span>
+                </div>
+                <div>
+                    <button class="btn btn-success" id="export-report">
+                        <i class="fas fa-file-export me-2"></i>
+                        Xuất báo cáo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Plan Card -->
+    <div class="content-card">
+        <div class="card-header-custom">
+            <i class="fas fa-tasks me-2"></i>
+            Kế hoạch xử lý
+        </div>
+        <div class="card-body-custom">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="mb-3">Đề xuất xử lý</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Giảm giá bán thuốc sắp hết hạn
+                            <span class="badge bg-primary rounded-pill">Ưu tiên cao</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Thông báo cho bác sĩ về thuốc sắp hết hạn
+                            <span class="badge bg-primary rounded-pill">Ưu tiên cao</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Kiểm tra điều kiện bảo quản
+                            <span class="badge bg-secondary rounded-pill">Ưu tiên trung bình</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Lên kế hoạch mua thuốc thay thế
+                            <span class="badge bg-secondary rounded-pill">Ưu tiên trung bình</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="mb-3">Ghi chú</h5>
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" placeholder="Nhập ghi chú" id="action-notes" style="height: 150px"></textarea>
+                        <label for="action-notes">Ghi chú về kế hoạch xử lý</label>
+                    </div>
+                    <button class="btn btn-primary" id="save-notes">
+                        <i class="fas fa-save me-2"></i>
+                        Lưu ghi chú
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const baseUrl = window.location.origin + '/ClinicManagementSystem_war_exploded';
+    let allMedicines = [];
+    let filteredMedicines = [];
+
+    // Sidebar Functions
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+
+        if (sidebar.classList.contains('collapsed')) {
+            toggleIcon.className = 'fas fa-chevron-right';
+        } else {
+            toggleIcon.className = 'fas fa-chevron-left';
+        }
+    }
+
+    function openMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+
+        sidebar.classList.add('mobile-open');
+        overlay.classList.add('show');
+    }
+
+    function closeMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('show');
+    }
+
+    // Load medicines data
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load medicines data
+        loadMedicines();
+        
+        // Setup event listeners
+        setupEventListeners();
+    });
+
+    function setupEventListeners() {
+        // Filter button
+        document.getElementById('apply-filter').addEventListener('click', function() {
+            applyFilters();
+        });
+
+        // Export report button
+        document.getElementById('export-report').addEventListener('click', function() {
+            exportReport();
+        });
+
+        // Save notes button
+        document.getElementById('save-notes').addEventListener('click', function() {
+            saveNotes();
+        });
+
+        // Load saved notes if any
+        const savedNotes = localStorage.getItem('expiringMedicinesNotes');
+        if (savedNotes) {
+            document.getElementById('action-notes').value = savedNotes;
+        }
+    }
+
+    function loadMedicines() {
+        // Simulate API call to load medicines
+        // In a real application, this would be an actual API call
+        const today = new Date();
+        const threeMontshLater = new Date(today);
+        threeMontshLater.setMonth(today.getMonth() + 3);
+
+        const oneMonthLater = new Date(today);
+        oneMonthLater.setMonth(today.getMonth() + 1);
+
+        const twoMonthsLater = new Date(today);
+        twoMonthsLater.setMonth(today.getMonth() + 2);
+
+        // Sample data for expiring medicines
+        const sampleMedicines = [
+            {
+                id: 1,
+                name: 'Paracetamol 500mg',
+                unit: 'Viên',
+                category: 'painkillers',
+                categoryName: 'Giảm đau',
+                quantity: 150,
+                price: 5000,
+                expiryDate: new Date(today.getFullYear(), today.getMonth() + 1, 15).toISOString(),
+                daysUntilExpiry: 45
+            },
+            {
+                id: 2,
+                name: 'Amoxicillin 500mg',
+                unit: 'Viên',
+                category: 'antibiotics',
+                categoryName: 'Kháng sinh',
+                quantity: 80,
+                price: 8000,
+                expiryDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 20).toISOString(),
+                daysUntilExpiry: 20
+            },
+            {
+                id: 3,
+                name: 'Vitamin C 1000mg',
+                unit: 'Viên',
+                category: 'vitamins',
+                categoryName: 'Vitamin',
+                quantity: 200,
+                price: 3000,
+                expiryDate: new Date(today.getFullYear(), today.getMonth() + 2, 10).toISOString(),
+                daysUntilExpiry: 70
+            },
+            {
+                id: 4,
+                name: 'Omeprazole 20mg',
+                unit: 'Viên',
+                category: 'other',
+                categoryName: 'Khác',
+                quantity: 60,
+                price: 7000,
+                expiryDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 10).toISOString(),
+                daysUntilExpiry: 10
+            },
+            {
+                id: 5,
+                name: 'Ibuprofen 400mg',
+                unit: 'Viên',
+                category: 'painkillers',
+                categoryName: 'Giảm đau',
+                quantity: 100,
+                price: 6000,
+                expiryDate: new Date(today.getFullYear(), today.getMonth() + 2, 25).toISOString(),
+                daysUntilExpiry: 85
+            },
+            {
+                id: 6,
+                name: 'Cetirizine 10mg',
+                unit: 'Viên',
+                category: 'other',
+                categoryName: 'Khác',
+                quantity: 120,
+                price: 4000,
+                expiryDate: new Date(today.getFullYear(), today.getMonth() + 1, 5).toISOString(),
+                daysUntilExpiry: 35
+            },
+            {
+                id: 7,
+                name: 'Azithromycin 500mg',
+                unit: 'Viên',
+                category: 'antibiotics',
+                categoryName: 'Kháng sinh',
+                quantity: 40,
+                price: 12000,
+                expiryDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 15).toISOString(),
+                daysUntilExpiry: 15
+            },
+            {
+                id: 8,
+                name: 'Vitamin D3 1000IU',
+                unit: 'Viên',
+                category: 'vitamins',
+                categoryName: 'Vitamin',
+                quantity: 180,
+                price: 5500,
+                expiryDate: new Date(today.getFullYear(), today.getMonth() + 2, 20).toISOString(),
+                daysUntilExpiry: 80
+            }
+        ];
+
+        // Store medicines in localStorage for demo purposes
+        localStorage.setItem('expiringMedicines', JSON.stringify(sampleMedicines));
+        allMedicines = sampleMedicines;
+        
+        // Apply initial filters
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const expiryPeriod = document.getElementById('expiry-period').value;
+        const category = document.getElementById('medicine-category').value;
+        const searchTerm = document.getElementById('medicine-search').value.toLowerCase();
+        
+        // Filter medicines based on criteria
+        filteredMedicines = allMedicines.filter(medicine => {
+            // Filter by expiry period
+            if (expiryPeriod !== 'all') {
+                const days = parseInt(expiryPeriod);
+                if (medicine.daysUntilExpiry > days) {
+                    return false;
+                }
+            }
+            
+            // Filter by category
+            if (category !== 'all' && medicine.category !== category) {
+                return false;
+            }
+            
+            // Filter by search term
+            if (searchTerm && !medicine.name.toLowerCase().includes(searchTerm)) {
+                return false;
+            }
+            
+            return true;
+        });
+        
+        // Render filtered medicines
+        renderMedicines(filteredMedicines);
+        
+        // Update summary statistics
+        updateSummaryStats();
+    }
+
+    function renderMedicines(medicines) {
+        const container = document.getElementById('expiring-medicines-list');
+        const emptyState = document.getElementById('empty-state');
+        const displayedCount = document.getElementById('displayed-count');
+        
+        if (medicines.length === 0) {
+            container.innerHTML = '';
+            emptyState.classList.remove('d-none');
+            displayedCount.textContent = '0';
+        } else {
+            emptyState.classList.add('d-none');
+            container.innerHTML = '';
+            
+            medicines.forEach((medicine, index) => {
+                const row = document.createElement('tr');
+                const expiryDate = new Date(medicine.expiryDate).toLocaleDateString('vi-VN');
+                
+                // Determine expiry badge class based on days until expiry
+                let expiryBadgeClass = '';
+                let expiryStatus = '';
+                
+                if (medicine.daysUntilExpiry <= 30) {
+                    expiryBadgeClass = 'expiry-danger';
+                    expiryStatus = 'Gấp - ' + medicine.daysUntilExpiry + ' ngày';
+                } else if (medicine.daysUntilExpiry <= 60) {
+                    expiryBadgeClass = 'expiry-warning';
+                    expiryStatus = 'Sắp hết hạn - ' + medicine.daysUntilExpiry + ' ngày';
+                } else {
+                    expiryBadgeClass = 'expiry-info';
+                    expiryStatus = 'Còn ' + medicine.daysUntilExpiry + ' ngày';
+                }
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td class="medicine-name">${medicine.name}</td>
+                    <td>${medicine.unit}</td>
+                    <td><span class="medicine-category">${medicine.categoryName}</span></td>
+                    <td>${medicine.quantity}</td>
+                    <td class="medicine-price">${medicine.price.toLocaleString()} ₫</td>
+                    <td>${expiryDate}</td>
+                    <td><span class="expiry-badge ${expiryBadgeClass}">${expiryStatus}</span></td>
+                `;
+                
+                container.appendChild(row);
+            });
+            
+            displayedCount.textContent = medicines.length;
+        }
+    }
+
+    function updateSummaryStats() {
+        // Calculate summary statistics
+        const totalExpiringMedicines = allMedicines.length;
+        const expiring30Days = allMedicines.filter(med => med.daysUntilExpiry <= 30).length;
+        
+        // Calculate total loss
+        let totalLoss = 0;
+        allMedicines.forEach(medicine => {
+            totalLoss += medicine.quantity * medicine.price;
+        });
+        
+        // Update summary cards
+        document.getElementById('total-expiring-medicines').textContent = totalExpiringMedicines;
+        document.getElementById('expiring-30-days').textContent = expiring30Days;
+        document.getElementById('total-loss').textContent = totalLoss.toLocaleString() + ' ₫';
+    }
+
+    function exportReport() {
+        // In a real application, this would generate a PDF or Excel report
+        // For demo purposes, we'll just show an alert
+        alert('Báo cáo đã được xuất thành công!');
+    }
+
+    function saveNotes() {
+        const notes = document.getElementById('action-notes').value;
+        localStorage.setItem('expiringMedicinesNotes', notes);
+        alert('Ghi chú đã được lưu thành công!');
+    }
+</script>
+</body>
+</html>
