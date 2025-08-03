@@ -82,7 +82,7 @@ public class LoginServlet extends HttpServlet {
 
             switch (staff.getRole()) {
                 case "Doctor":
-                    response.sendRedirect(request.getContextPath() + "/view/doctor/home.jsp");
+                    response.sendRedirect(request.getContextPath() + "/view/DoctorDashboard.html");
                     break;
                 case "AdminSys":
                     response.sendRedirect(request.getContextPath() + "/view/SysAdminDashboard.html");
@@ -117,7 +117,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("userType", "patient");
             session.setAttribute("role", "Patient");
 
-            response.sendRedirect("home");
+            response.sendRedirect("/ClinicManagementSystem_war_exploded/view/PatientDashboard.html");
             return;
         }
 

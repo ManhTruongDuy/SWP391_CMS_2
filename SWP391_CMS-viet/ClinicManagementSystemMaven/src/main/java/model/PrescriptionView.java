@@ -1,7 +1,7 @@
 package model;
 //123
 import java.util.Date;
-
+import java.util.List;
 public class PrescriptionView {
     private int prescriptionId;
     private String patientName;
@@ -20,7 +20,17 @@ public class PrescriptionView {
         this.status = status;
         this.totalAmount = totalAmount;
     }
+    // 🟢 Thêm thuộc tính danh sách thuốc
+    private List<MedicationView> medications;
 
+    // ✅ Getter & Setter cho medications
+    public List<MedicationView> getMedications() {
+        return medications;
+    }
+
+    public void setMedications(List<MedicationView> medications) {
+        this.medications = medications;
+    }
     public int getPrescriptionId() {
         return prescriptionId;
     }
