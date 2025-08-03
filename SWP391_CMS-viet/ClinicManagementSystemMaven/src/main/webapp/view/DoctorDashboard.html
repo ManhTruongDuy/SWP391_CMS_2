@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DoctorDashboard - Quản Lý Đơn Thuốc</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      position: relative;
+    }
+
+    .header h1 {
+      color: #2c3e50;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .header .subtitle {
+      color: #7f8c8d;
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
+
+    .doctor-profile {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .doctor-profile:hover {
+      transform: translateY(-2px);
+    }
+
+    .doctor-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #3498db;
+    }
+
+    .doctor-name {
+      color: #2c3e50;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #ecf0f1;
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: white;
+    }
+
+    .prescriptions-icon {
+      background: linear-gradient(45deg, #e74c3c, #c0392b);
+    }
+
+    .communication-icon {
+      background: linear-gradient(45deg, #2ecc71, #27ae60);
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .date-filter {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #ecf0f1;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .date-input:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+
+    .reset-btn {
+      background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .reset-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(149, 165, 166, 0.3);
+    }
+
+    .prescription-list {
+      flex-grow: 1;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .prescription-item {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-left: 4px solid #3498db;
+    }
+
+    .prescription-item:hover {
+      background: #e3f2fd;
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+    }
+
+    .prescription-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .prescription-id {
+      font-weight: 600;
+      color: #2980b9;
+      font-size: 1.1rem;
+    }
+
+    .prescription-date {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .prescription-status {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-purchased {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .prescription-patient {
+      color: #34495e;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-icon-btn {
+      background: linear-gradient(45deg, #2ecc71, #27ae60);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .chat-icon-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+      background: linear-gradient(45deg, #27ae60, #2ecc71);
+    }
+
+    .communication-section {
+      flex-grow: 1;
+      max-height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message-input-area {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message-input {
+      width: 100%;
+      min-height: 100px;
+      padding: 15px;
+      border: 2px solid #ecf0f1;
+      border-radius: 15px;
+      font-family: inherit;
+      font-size: 1rem;
+      resize: vertical;
+      transition: border-color 0.3s ease;
+    }
+
+    .message-input:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+
+    .send-btn {
+      background: linear-gradient(45deg, #3498db, #2980b9);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-end;
+    }
+
+    .send-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+    }
+
+    .notification-area {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notification-icon {
+      color: #f39c12;
+      font-size: 1.2rem;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 0;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      background: linear-gradient(45deg, #3498db, #2980b9);
+      color: white;
+      padding: 25px 30px;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .close {
+      color: white;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+
+    .close:hover {
+      opacity: 0.7;
+    }
+
+    .modal-body {
+      padding: 30px;
+    }
+
+    .prescription-detail {
+      margin-bottom: 25px;
+    }
+
+    .detail-section {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .detail-title {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .medication-item {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-left: 4px solid #e74c3c;
+    }
+
+    .medication-name {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+
+    .medication-details {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .doctor-detail-item {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .doctor-detail-item i {
+      color: #3498db;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1024px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+
+      .doctor-profile {
+        position: static;
+        margin-top: 20px;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .container {
+        padding: 15px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header fade-in">
+    <h1><i class="fas fa-stethoscope"></i> Hệ Thống Quản Lý Bác Sĩ</h1>
+    <p class="subtitle">Xem lịch sử kê đơn và liên lạc với bệnh nhân</p>
+    <div class="doctor-profile" onclick="showDoctorDetails()">
+      <img src="https://via.placeholder.com/40" class="doctor-avatar" alt="Doctor Avatar">
+      <span class="doctor-name" id="doctorName">BS. Loading...</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Prescriptions Section -->
+    <div class="card fade-in">
+      <div class="card-header">
+        <div class="card-icon prescriptions-icon">
+          <i class="fas fa-prescription-bottle-alt"></i>
+        </div>
+        <div>
+          <h2 class="card-title">Danh Sách Đơn Thuốc</h2>
+        </div>
+      </div>
+
+      <!-- Date Filter -->
+      <div class="date-filter">
+        <div>
+          <label for="startDate" style="font-weight: 500; color: #2c3e50;">Từ ngày:</label>
+          <input type="date" id="startDate" class="date-input" style="padding: 8px; border-radius: 8px; border: 2px solid #ecf0f1;">
+        </div>
+        <div>
+          <label for="endDate" style="font-weight: 500; color: #2c3e50;">Đến ngày:</label>
+          <input type="date" id="endDate" class="date-input" style="padding: 8px; border-radius: 8px; border: 2px solid #ecf0f1;">
+        </div>
+        <button class="send-btn" onclick="filterPrescriptionsByDate()">
+          <i class="fas fa-filter"></i> Lọc
+        </button>
+        <button class="reset-btn" onclick="resetPrescriptionFilter()">
+          <i class="fas fa-redo"></i> Xem tất cả
+        </button>
+      </div>
+
+      <div class="notification-area">
+        <i class="fas fa-bell notification-icon"></i>
+        <span id="notificationMessagePrescriptions">Đang tải danh sách đơn thuốc...</span>
+      </div>
+
+      <div class="prescription-list" id="prescriptionList"></div>
+    </div>
+
+    <!-- Communication Section -->
+    <input type="hidden" id="prescriptionId" value="">
+    <div class="card fade-in" id="communicationCard" style="display: none;">
+      <div class="card-header">
+        <div class="card-icon communication-icon">
+          <i class="fas fa-comments"></i>
+        </div>
+        <div>
+          <h2 class="card-title">Liên Lạc Với Bệnh Nhân</h2>
+        </div>
+      </div>
+
+      <div class="communication-section" id="communicationSection">
+        <div class="message-input-area">
+                    <textarea
+                            class="message-input"
+                            placeholder="Nhập tin nhắn cho bệnh nhân về đơn thuốc..."
+                            id="messageInput"
+                    ></textarea>
+          <button class="send-btn" onclick="sendMessage()">
+            <i class="fas fa-paper-plane"></i>
+            Gửi tin nhắn
+          </button>
+        </div>
+
+        <div id="notificationMessageChat" style="margin: 10px 0; color: green;"></div>
+
+        <div class="detail-section">
+          <div class="detail-title">
+            <i class="fas fa-history"></i> Tin nhắn gần đây
+          </div>
+          <div id="chatMessagesContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Prescription Details -->
+<div id="prescriptionModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="fas fa-file-medical-alt"></i>
+        Chi Tiết Đơn Thuốc
+      </h2>
+      <span class="close" onclick="closeModal()">&times;</span>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Modal for Doctor Details -->
+<div id="doctorModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="fas fa-user-md"></i>
+        Thông Tin Bác Sĩ
+      </h2>
+      <span class="close" onclick="closeDoctorModal()">&times;</span>
+    </div>
+    <div class="modal-body" id="doctorModalBody"></div>
+  </div>
+</div>
+
+<script>
+  const API_BASE_URL = 'http://localhost:8080/ClinicManagementSystem_war_exploded/api/doctorview';
+  let allPrescriptions = {};
+  let currentPrescriptionId = null;
+  let doctorInfo = {};
+
+  async function fetchDoctorInfo() {
+    try {
+      const response = await fetch(`${API_BASE_URL}?action=doctorInfo`, { credentials: 'include' });
+      if (!response.ok) {
+        throw new Error('Lỗi khi lấy thông tin bác sĩ: ' + response.statusText);
+      }
+      const data = await response.json();
+      doctorInfo = {
+        name: data.fullName || 'BS. Không xác định',
+        specialty: data.department || 'Chưa có thông tin',
+        email: data.email || 'Chưa có thông tin',
+        phone: data.phone || 'Chưa có thông tin',
+        avatar: data.img || 'https://via.placeholder.com/40'
+      };
+
+      document.getElementById('doctorName').textContent = doctorInfo.name;
+      document.querySelector('.doctor-avatar').src = doctorInfo.avatar;
+    } catch (error) {
+      console.error('Lỗi khi lấy thông tin bác sĩ:', error);
+      document.getElementById('doctorName').textContent = 'Lỗi tải thông tin';
+    }
+  }
+
+  async function fetchPrescriptions() {
+    try {
+      const response = await fetch(`${API_BASE_URL}?action=history`, { credentials: 'include' });
+      if (!response.ok) {
+        if (response.status === 401) {
+          document.getElementById('notificationMessagePrescriptions').innerHTML = 'Vui lòng đăng nhập để xem danh sách đơn thuốc. <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Login.jsp">Đăng nhập</a>';
+          return;
+        }
+        throw new Error('Lỗi mạng: ' + response.statusText);
+      }
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      allPrescriptions = data.reduce((acc, prescription) => {
+        acc[prescription.prescriptionId] = {
+          id: prescription.prescriptionId,
+          date: new Date(prescription.prescriptionDate).toLocaleDateString('vi-VN'),
+          rawDate: new Date(prescription.prescriptionDate),
+          patient: prescription.patientName,
+          status: prescription.status === 'Dispensed' ? 'Đã mua' : 'Chờ mua',
+          medications: prescription.medications || [],
+          doctorName: prescription.doctorName,
+          notes: prescription.notes || ''
+        };
+        return acc;
+      }, {});
+
+      const notification = document.getElementById('notificationMessagePrescriptions');
+      notification.innerHTML = Object.keys(allPrescriptions).length > 0
+              ? `Bạn có ${Object.keys(allPrescriptions).length} đơn thuốc đã kê`
+              : 'Không có đơn thuốc nào';
+
+      // Đặt giá trị mặc định cho bộ lọc ngày
+      const today = new Date();
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(today.getMonth() - 1);
+
+      document.getElementById('startDate').value = oneMonthAgo.toISOString().split('T')[0];
+      document.getElementById('endDate').value = today.toISOString().split('T')[0];
+
+      renderPrescriptionList(Object.values(allPrescriptions));
+    } catch (error) {
+      console.error('Lỗi khi lấy danh sách đơn thuốc:', error);
+      document.getElementById('notificationMessagePrescriptions').innerHTML = `Không thể tải danh sách đơn thuốc: ${error.message}. Vui lòng thử lại hoặc <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Login.jsp">Đăng nhập</a>.`;
+    }
+  }
+
+  function filterPrescriptionsByDate() {
+    const startDate = new Date(document.getElementById('startDate').value);
+    const endDate = new Date(document.getElementById('endDate').value);
+    const notification = document.getElementById('notificationMessagePrescriptions');
+
+    if (!startDate || !endDate || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      notification.innerHTML = 'Vui lòng chọn khoảng ngày hợp lệ.';
+      return;
+    }
+
+    if (startDate > endDate) {
+      notification.innerHTML = 'Ngày bắt đầu không được lớn hơn ngày kết thúc.';
+      return;
+    }
+
+    endDate.setDate(endDate.getDate() + 1);
+
+    const filteredPrescriptions = Object.values(allPrescriptions).filter(prescription => {
+      const prescriptionDate = new Date(prescription.rawDate);
+      return prescriptionDate >= startDate && prescriptionDate <= endDate;
+    });
+
+    notification.innerHTML = filteredPrescriptions.length > 0
+            ? `Tìm thấy ${filteredPrescriptions.length} đơn thuốc trong khoảng thời gian đã chọn`
+            : 'Không có đơn thuốc nào trong khoảng thời gian đã chọn';
+
+    renderPrescriptionList(filteredPrescriptions);
+  }
+
+  function resetPrescriptionFilter() {
+    const notification = document.getElementById('notificationMessagePrescriptions');
+    const today = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+
+    document.getElementById('startDate').value = oneMonthAgo.toISOString().split('T')[0];
+    document.getElementById('endDate').value = today.toISOString().split('T')[0];
+
+    notification.innerHTML = Object.keys(allPrescriptions).length > 0
+            ? `Bạn có ${Object.keys(allPrescriptions).length} đơn thuốc đã kê`
+            : 'Không có đơn thuốc nào';
+
+    renderPrescriptionList(Object.values(allPrescriptions));
+  }
+
+  function renderPrescriptionList(prescriptionList) {
+    const prescriptionListElement = document.getElementById('prescriptionList');
+    prescriptionListElement.innerHTML = '';
+
+    if (prescriptionList.length === 0) {
+      prescriptionListElement.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Không có đơn thuốc nào.</p>';
+      return;
+    }
+
+    prescriptionList.forEach(prescription => {
+      const item = document.createElement('div');
+      item.className = 'prescription-item';
+
+      item.addEventListener('click', () => {
+        showPrescriptionDetail(prescription.id);
+      });
+
+      item.innerHTML = `
+                <div class="prescription-header">
+                    <div class="prescription-id">
+                        <i class="fas fa-file-medical"></i> Đơn thuốc #${prescription.id}
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div class="prescription-status ${prescription.status === 'Đã mua' ? 'status-purchased' : 'status-pending'}">
+                            <i class="fas fa-${prescription.status === 'Đã mua' ? 'check-circle' : 'hourglass-half'}"></i>
+                            ${prescription.status}
+                        </div>
+                        <button class="chat-icon-btn" title="Nhắn tin với bệnh nhân" onclick="openChatForPrescription(${prescription.id}, event)">
+                            <i class="fas fa-comments"></i> Chat
+                        </button>
+                    </div>
+                </div>
+                <div class="prescription-date">
+                    <i class="fas fa-calendar-alt"></i> ${prescription.date}
+                </div>
+                <div class="prescription-patient">
+                    <i class="fas fa-user"></i> ${prescription.patient}
+                </div>
+            `;
+
+      prescriptionListElement.appendChild(item);
+    });
+  }
+
+  async function showPrescriptionDetail(prescriptionId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${prescriptionId}`, { credentials: 'include' });
+      if (!response.ok) {
+        if (response.status === 401) {
+          document.getElementById('notificationMessagePrescriptions').innerHTML = 'Vui lòng đăng nhập để xem chi tiết đơn thuốc. <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Login.jsp">Đăng nhập</a>';
+          return;
+        }
+        throw new Error('Lỗi mạng: ' + response.statusText);
+      }
+      const prescription = await response.json();
+      currentPrescriptionId = prescriptionId;
+
+      document.getElementById('prescriptionId').value = prescriptionId;
+      document.getElementById('communicationCard').style.display = 'none';
+      document.getElementById('communicationSection').style.display = 'none';
+
+      const modalBody = document.getElementById('modalBody');
+      modalBody.innerHTML = `
+                <div class="prescription-detail">
+                    <div class="detail-section">
+                        <div class="detail-title">
+                            <i class="fas fa-info-circle"></i> Thông Tin Chung
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div><strong><i class="fas fa-hashtag"></i> Mã đơn:</strong> ${prescription.prescriptionId}</div>
+                            <div><strong><i class="fas fa-calendar"></i> Ngày kê:</strong> ${new Date(prescription.prescriptionDate).toLocaleDateString('vi-VN')}</div>
+                            <div><strong><i class="fas fa-user"></i> Bệnh nhân:</strong> ${prescription.patientName}</div>
+                            <div><strong><i class="fas fa-user-md"></i> Bác sĩ:</strong> ${prescription.doctorName}</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <strong><i class="fas fa-flag"></i> Trạng thái:</strong>
+                            <span class="prescription-status ${prescription.status === 'Dispensed' ? 'status-purchased' : 'status-pending'}">
+                                <i class="fas fa-${prescription.status === 'Dispensed' ? 'check-circle' : 'hourglass-half'}"></i>
+                                ${prescription.status === 'Dispensed' ? 'Đã mua' : 'Chờ mua'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-title">
+                            <i class="fas fa-pills"></i> Danh Sách Thuốc
+                        </div>
+                        ${prescription.medications && prescription.medications.length > 0 ? prescription.medications.map(med => `
+                            <div class="medication-item">
+                                <div class="medication-name">
+                                    <i class="fas fa-capsules"></i> ${med.name}
+                                </div>
+                                <div class="medication-details">
+                                    <span><i class="fas fa-prescription"></i> <strong>Liều dùng:</strong> ${med.dosage || 'Không có'}</span>
+                                    <span><i class="fas fa-sort-numeric-up"></i> <strong>Số lượng:</strong> ${med.quantity || 1}</span>
+                                </div>
+                                <div style="margin-top: 8px; color: #7f8c8d;">
+                                    <i class="fas fa-info-circle"></i> <strong>Cách dùng:</strong> ${med.instructions || 'Không có hướng dẫn'}
+                                </div>
+                            </div>
+                        `).join('') : '<p>Không có thông tin thuốc.</p>'}
+                    </div>
+
+                    ${prescription.notes ? `
+                        <div class="detail-section">
+                            <div class="detail-title">
+                                <i class="fas fa-sticky-note"></i> Ghi Chú
+                            </div>
+                            <div style="background: #fff3cd; padding: 15px; border-radius: 10px; border-left: 4px solid #ffc107;">
+                                <i class="fas fa-exclamation-triangle" style="color: #856404;"></i> ${prescription.notes}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+      document.getElementById('prescriptionModal').style.display = 'block';
+    } catch (error) {
+      console.error('Lỗi khi lấy chi tiết đơn thuốc:', error);
+      document.getElementById('notificationMessagePrescriptions').innerHTML = `Không thể lấy chi tiết đơn thuốc: ${error.message}. Vui lòng thử lại hoặc <a href="/ClinicManagementSystem_war_exploded/view/accountpharmacist/Login.jsp">Đăng nhập</a>.`;
+    }
+  }
+
+  function showDoctorDetails() {
+    const modalBody = document.getElementById('doctorModalBody');
+    modalBody.innerHTML = `
+            <div class="prescription-detail">
+                <div class="detail-section">
+                    <div class="detail-title">
+                        <i class="fas fa-user-md"></i> Thông Tin Bác Sĩ
+                    </div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <img src="${doctorInfo.avatar}" alt="Doctor Avatar" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #3498db;">
+                    </div>
+                    <div class="doctor-detail-item">
+                        <i class="fas fa-user"></i>
+                        <strong>Tên:</strong> ${doctorInfo.name}
+                    </div>
+                    <div class="doctor-detail-item">
+                        <i class="fas fa-stethoscope"></i>
+                        <strong>Chuyên khoa:</strong> ${doctorInfo.specialty}
+                    </div>
+                    <div class="doctor-detail-item">
+                        <i class="fas fa-envelope"></i>
+                        <strong>Email:</strong> ${doctorInfo.email}
+                    </div>
+                    <div class="doctor-detail-item">
+                        <i class="fas fa-phone"></i>
+                        <strong>Số điện thoại:</strong> ${doctorInfo.phone}
+                    </div>
+                </div>
+            </div>
+        `;
+    document.getElementById('doctorModal').style.display = 'block';
+  }
+
+  function closeModal() {
+    document.getElementById('prescriptionModal').style.display = 'none';
+    currentPrescriptionId = null;
+  }
+
+  function closeDoctorModal() {
+    document.getElementById('doctorModal').style.display = 'none';
+  }
+
+  function sendMessage() {
+    const message = document.getElementById('messageInput').value.trim();
+    const notification = document.getElementById('notificationMessageChat');
+    const prescriptionId = parseInt(document.getElementById('prescriptionId').value);
+
+    if (!message) {
+      notification.innerHTML = 'Vui lòng nhập tin nhắn trước khi gửi.';
+      return;
+    }
+
+    if (!prescriptionId || isNaN(prescriptionId)) {
+      notification.innerHTML = 'Vui lòng chọn một đơn thuốc để gửi tin nhắn.';
+      return;
+    }
+
+    fetch(API_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        prescriptionId: prescriptionId,
+        message: message,
+        action: 'sendChat'
+      })
+    })
+            .then(res => {
+              if (!res.ok) {
+                throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
+              }
+              return res.json();
+            })
+            .then(data => {
+              if (data.success) {
+                notification.innerHTML = 'Tin nhắn đã được gửi!';
+                document.getElementById('messageInput').value = '';
+                loadChatMessages();
+              } else {
+                notification.innerHTML = `Gửi tin nhắn thất bại: ${data.error || 'Lỗi không xác định'}`;
+              }
+            })
+            .catch(err => {
+              console.error('Lỗi khi gửi tin nhắn:', err);
+              notification.innerHTML = `Có lỗi xảy ra khi gửi: ${err.message}`;
+            });
+  }
+
+  function loadChatMessages() {
+    const prescriptionId = parseInt(document.getElementById('prescriptionId').value);
+    const container = document.getElementById('chatMessagesContainer');
+    const notification = document.getElementById('notificationMessageChat');
+
+    if (!container) {
+      console.error('Container chatMessagesContainer không được tìm thấy!');
+      return;
+    }
+
+    if (!prescriptionId || isNaN(prescriptionId)) {
+      notification.innerHTML = 'Vui lòng chọn một đơn thuốc để xem tin nhắn.';
+      container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Chọn một đơn thuốc để xem tin nhắn.</p>';
+      return;
+    }
+
+    container.innerHTML = '<p style="text-align: center;">Đang tải tin nhắn...</p>';
+
+    fetch(`${API_BASE_URL}?action=chat&prescriptionId=${prescriptionId}`, {
+      method: 'GET',
+      credentials: 'include'
+    })
+            .then(res => {
+              if (!res.ok) {
+                throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
+              }
+              return res.json();
+            })
+            .then(messages => {
+              container.innerHTML = '';
+              if (messages.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Chưa có tin nhắn nào.</p>';
+                return;
+              }
+              messages.forEach(chat => {
+                const isDoctor = chat.senderType === 'doctor';
+                const time = new Date(chat.timestamp).toLocaleString('vi-VN');
+                container.innerHTML += `
+                        <div class="medication-item" style="border-left-color: ${isDoctor ? '#2ecc71' : '#3498db'};">
+                            <div class="medication-name">
+                                <i class="fas ${isDoctor ? 'fa-user-md' : 'fa-user'}"></i>
+                                ${isDoctor ? 'BS.' : 'Bệnh nhân'} - ${time}
+                            </div>
+                            <div style="margin-top: 8px;">${chat.message}</div>
+                        </div>
+                    `;
+              });
+              container.scrollTop = container.scrollHeight;
+            })
+            .catch(err => {
+              console.error('Lỗi khi tải tin nhắn:', err);
+              notification.innerHTML = `Không thể tải tin nhắn: ${err.message}`;
+              container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Lỗi khi tải tin nhắn.</p>';
+            });
+  }
+
+  function openChatForPrescription(prescriptionId, event) {
+    event.stopPropagation();
+    document.getElementById('prescriptionId').value = prescriptionId;
+    currentPrescriptionId = prescriptionId;
+
+    const communicationCard = document.getElementById('communicationCard');
+    const communicationSection = document.getElementById('communicationSection');
+    communicationCard.style.display = 'block';
+    communicationSection.style.display = 'flex';
+
+    document.getElementById('messageInput').focus();
+    document.getElementById('notificationMessageChat').innerText =
+            `Đang trò chuyện với bệnh nhân của đơn thuốc #${prescriptionId}`;
+
+    loadChatMessages();
+  }
+
+  window.onload = function() {
+    fetchDoctorInfo();
+    fetchPrescriptions();
+  };
+</script>
+</body>
+</html>
