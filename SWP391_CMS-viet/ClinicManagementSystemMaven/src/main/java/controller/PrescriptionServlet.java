@@ -127,10 +127,6 @@ public class PrescriptionServlet extends HttpServlet {
 
             System.out.println("Patient: " + patientName + ", Doctor: " + doctorName + ", Date: " + prescriptionDateStr);
 
-            // Lấy danh sách thuốc từ JSON
-            org.json.JSONArray itemsArray = jsonObject.getJSONArray("items");
-            System.out.println("Number of items: " + itemsArray.length());
-
             // Chuyển đổi ngày
             Date prescriptionDate = Date.valueOf(prescriptionDateStr);
 
@@ -189,29 +185,10 @@ public class PrescriptionServlet extends HttpServlet {
             System.out.println("Prescription saved with ID: " + prescriptionId);
 
             if (prescriptionId > 0) {
-                // Lưu các thuốc trong đơn thuốc
-                List<PrescriptionItem> prescriptionItems = new ArrayList<>();
-                for (int i = 0; i < itemsArray.length(); i++) {
-                    JSONObject itemObj = itemsArray.getJSONObject(i);
-                    PrescriptionItem item = new PrescriptionItem();
-                    item.setPrescriptionId(prescriptionId);
-                    item.setMedicineId(itemObj.getInt("id"));
-                    item.setQuantity(itemObj.getFloat("quantity"));
-                    prescriptionItems.add(item);
-
-                    System.out.println("Added item: Medicine ID " + itemObj.getInt("id") + ", Quantity: " + itemObj.getFloat("quantity"));
-                }
-
-                // Lưu danh sách thuốc vào database
-                PrescriptionItemDAO prescriptionItemDAO = new PrescriptionItemDAO();
-                int itemsAdded = prescriptionItemDAO.addPrescriptionItems(prescriptionItems, prescriptionId);
-
-                System.out.println("Items added: " + itemsAdded + " out of " + prescriptionItems.size());
-
                 // Trả về kết quả thành công
                 Map<String, Object> responseMap = new HashMap<>();
                 responseMap.put("success", true);
-                responseMap.put("message", "Đơn thuốc đã được lưu thành công với " + itemsAdded + " thuốc");
+                responseMap.put("message", "Đơn thuốc đã được lưu thành công");
                 responseMap.put("prescriptionId", prescriptionId);
 
                 resp.setStatus(HttpServletResponse.SC_CREATED);

@@ -142,29 +142,29 @@ public class PrescriptionDAO extends DBContext{
         }
         return null;
     }
-    
+
     /**
      * Thêm một đơn thuốc mới vào database
      * @param prescription Đối tượng đơn thuốc cần thêm
      * @return ID của đơn thuốc nếu thành công, -1 nếu thất bại
      */
     public int addPrescription(Prescription prescription) {
-        int newId = getMaxPrescriptionId() + 1;
-        if (newId < 51) newId = 51;
+        String sql = "INSERT INTO Prescription (medicineRecord_id, doctor_id, prescription_date, status) VALUES (?, ?, ?, ?)";
 
-        String sql = "INSERT INTO Prescription (prescription_id, medicineRecord_id, doctor_id, prescription_date, status) " +
-                "VALUES (?, ?, ?, ?, ?)";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, newId);
-            ps.setInt(2, prescription.getMedicineRecord().getId());
-            ps.setInt(3, prescription.getDoctor().getId());
-            ps.setDate(4, prescription.getPrescriptionDate());
-            ps.setString(5, prescription.getStatus());
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, prescription.getMedicineRecord().getId());
+            ps.setInt(2, prescription.getDoctor().getId());
+            ps.setDate(3, prescription.getPrescriptionDate());
+            ps.setString(4, prescription.getStatus());
 
             int affectedRows = ps.executeUpdate();
+
             if (affectedRows > 0) {
-                return newId;
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -172,19 +172,4 @@ public class PrescriptionDAO extends DBContext{
 
         return -1;
     }
-
-    private int getMaxPrescriptionId() {
-        String sql = "SELECT ISNULL(MAX(prescription_id), 0) FROM Prescription"; // Nếu SQL Server
-        // MySQL thì dùng IFNULL(MAX(...),0)
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
 }
