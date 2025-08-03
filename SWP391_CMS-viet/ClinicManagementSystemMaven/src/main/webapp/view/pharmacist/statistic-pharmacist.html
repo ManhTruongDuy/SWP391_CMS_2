@@ -457,6 +457,7 @@
         .stat-card.success::before { background: linear-gradient(90deg, var(--success-color), #20c997); }
         .stat-card.warning::before { background: linear-gradient(90deg, var(--warning-color), #fd7e14); }
         .stat-card.info::before { background: linear-gradient(90deg, var(--info-color), var(--primary-color)); }
+        .stat-card.danger::before { background: linear-gradient(90deg, var(--danger-color), #dc3545); }
 
         .stat-icon {
             font-size: 2rem;
@@ -492,6 +493,7 @@
         .icon-success { color: var(--success-color); }
         .icon-warning { color: var(--warning-color); }
         .icon-info { color: var(--info-color); }
+        .icon-danger { color: var(--danger-color); }
 
         .charts-section {
             padding: 1.5rem 2rem;
@@ -824,6 +826,12 @@
                         <span class="nav-text">Đơn thuốc</span>
                     </a>
                 </div>
+<!--                <div class="nav-item">-->
+<!--                    <a href="create-prescription.html" class="nav-link">-->
+<!--                        <i class="fas fa-plus-circle nav-icon"></i>-->
+<!--                        <span class="nav-text">Tạo đơn thuốc</span>-->
+<!--                    </a>-->
+<!--                </div>-->
                 <div class="nav-item">
                     <a href="counter.html" class="nav-link">
                         <i class="fas fa-cash-register nav-icon"></i>
@@ -836,7 +844,12 @@
                         <span class="nav-text">Thuốc thay thế</span>
                     </a>
                 </div>
-
+                <div class="nav-item">
+                    <a href="expiring-medicines.html" class="nav-link">
+                        <i class="fas fa-hourglass-half nav-icon"></i>
+                        <span class="nav-text">Thuốc sắp hết hạn</span>
+                    </a>
+                </div>
             </div>
 
             <div class="nav-section">
@@ -964,6 +977,22 @@
                         <div class="trend-indicator trend-up">
                             <i class="fas fa-arrow-up"></i>
                         </div>
+                    </div>
+                    <!-- Thêm card tổng số thuốc -->
+                    <div class="stat-card info">
+                        <div class="stat-icon icon-info">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                        <div class="stat-number" id="totalMedicine">0</div>
+                        <div class="stat-label">Tổng số thuốc</div>
+                    </div>
+                    <!-- Thêm card tổng số lượng thuốc hết hạn trong 3 năm tới -->
+                    <div class="stat-card danger">
+                        <div class="stat-icon icon-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-number" id="totalExpiringMedicine">0</div>
+                        <div class="stat-label">SL thuốc hết hạn 3 năm tới</div>
                     </div>
                 </div>
             </div>
@@ -1170,6 +1199,10 @@
         // Calculate average amount per invoice
         const avgAmount = data.total_invoice > 0 ? (data.total_amount / data.total_invoice) : 0;
         document.getElementById('avgAmount').textContent = formatCurrency(avgAmount);
+
+        // Thêm cập nhật tổng số thuốc và số lượng thuốc hết hạn 3 năm tới
+        document.getElementById('totalMedicine').textContent = data.totalMedicine || 0;
+        document.getElementById('totalExpiringMedicine').textContent = data.totalExpiringMedicine || 0;
     }
 
     // Update charts with new data
