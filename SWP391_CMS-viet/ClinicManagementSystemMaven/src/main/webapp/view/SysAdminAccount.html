@@ -287,7 +287,6 @@
                     <th>Phòng ban</th>
                     <th>Email</th>
                     <th>Tên người dùng</th>
-                    <th>Mật khẩu</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
@@ -434,7 +433,6 @@
                 <td>${sysadmin.department || 'N/A'}</td>
                 <td>${sysadmin.email || 'N/A'}</td>
                 <td>${sysadmin.username || 'N/A'}</td>
-                <td>${sysadmin.password || 'N/A'}</td>
                 <td>${sysadmin.status || 'N/A'}</td>
                 <td>
                     <button class="btn ${sysadmin.status === 'Enable' ? 'btn-warning' : 'btn-success'} btn-sm toggle-status-btn"

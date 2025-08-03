@@ -261,7 +261,6 @@
                     <th>Phòng ban</th>
                     <th>Email</th>
                     <th>Tên người dùng</th>
-                    <th>Mật khẩu</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
@@ -370,7 +369,6 @@
                 <td>${doctor.department || 'N/A'}</td>
                 <td>${doctor.email || 'N/A'}</td>
                 <td>${doctor.username || 'N/A'}</td>
-                <td>${doctor.password || 'N/A'}</td>
                 <td>${doctor.status || 'N/A'}</td>
                 <td>
                     <button class="btn ${doctor.status === 'Enable' ? 'btn-warning' : 'btn-success'} btn-sm toggle-doctor-btn"

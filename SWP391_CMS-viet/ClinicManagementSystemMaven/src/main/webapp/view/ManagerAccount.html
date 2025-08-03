@@ -287,7 +287,6 @@
                     <th>Phòng ban</th>
                     <th>Email</th>
                     <th>Tên người dùng</th>
-                    <th>Mật khẩu</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
@@ -396,7 +395,6 @@
                 <td>${manager.department || 'N/A'}</td>
                 <td>${manager.email || 'N/A'}</td>
                 <td>${manager.username || 'N/A'}</td>
-                <td>${manager.password || 'N/A'}</td>
                 <td>${manager.status || 'N/A'}</td>
                 <td>
                     <button class="btn ${manager.status === 'Enable' ? 'btn-warning' : 'btn-success'} btn-sm toggle-manager-btn"
